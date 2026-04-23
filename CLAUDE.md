@@ -123,6 +123,16 @@ hydrax-app/
 
 planner, architect, tdd-guide, code-reviewer, typescript-reviewer, security-reviewer, database-reviewer, build-error-resolver, e2e-runner, refactor-cleaner, doc-updater, feature-dev.
 
+## Required Skills (always invoke)
+
+Non-negotiable. Invoke before the corresponding work starts:
+
+- `/superpowers:writing-plans` — before any non-trivial work (>3 files or >150 LOC, or any new slice). Produces the `docs/plans/YYYY-MM-DD-<slug>.md` required by Operating Rules.
+- `/frontend-design` — for every UI/frontend slice. Enforces production-grade output and overrides default generic patterns. Use for new components, layout changes, and visual passes on the prototype or v1 portals.
+- `/taste-skill` — pair with `/frontend-design` on UI work. Senior UI/UX engineer framing; overrides default LLM aesthetic biases and enforces component rigor.
+- `/design-system` — for work that touches shared primitives, tenant theming, or cross-portal consistency. Use to generate or audit the design system before shipping reusable components.
+- `/nano-banana` — for all background image generation (hero backgrounds, empty-state art, tenant theming imagery). Do not use stock images, gradients-as-substitute, or inline SVG placeholders when a generated asset is needed.
+
 ## Open Questions — Resolve Before Design (PRD §22)
 
 1. HydraX API surface available for workflow-layer integration?
