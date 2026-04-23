@@ -1,0 +1,37 @@
+project: hydrax-app
+updated: 2026-04-24T00:25:00+08:00
+status: in_progress
+summary: HydraX MVP frontend prototype plus PRD v2 draft — tightened scope to tokenized treasury/fund subscription + servicing wedge, one product, on-ledger/off-ledger decision rule, commercialization model.
+current_focus:
+  - New slice: docs/prd-v2.md drafted as authoritative successor to docs/prd.md, applying reviewer feedback (cut ~40% surface area, sharpen commercial wedge, add on-ledger table, add commercialization + boardroom metric)
+  - v2 narrows to: tokenized treasury / short-duration fund subscription & servicing; issuer + ops as primary personas; distributor + investor thin in v1
+  - v2 adds hard product boundary, economic case, on-ledger vs off-ledger decision rule, monetization model, 4 gating open questions
+  - Prior completed slice: static frontend shell with premium landing + command-surface preview
+  - Prior completed slice: operational workspace with sidebar navigation, state banners, and multi-panel hierarchy
+  - Prior completed slice: orders workbench drill-down — clickable rows, selection state, rich detail card, keyboard a11y, filter-aware selection
+  - Prior completed slice: cross-cutting consistency pass — single venues fixture drives hero + panel + counts; derived status pills
+  - Prior completed slice: workspace state persistence via localStorage (hydrax.workspace.v1)
+recently_verified:
+  - node --check app.js passes after full refactor
+  - Every getElementById in app.js has a matching id in index.html (verified via grep diff)
+  - All new CSS classes (.orders-workbench, .order-lane, .detail-rail, .detail-shell, .detail-card, .detail-meta, .detail-venue-list, tbody tr.order-row.is-selected) are declared in styles.css
+  - Hero heroVenueCount renders from venues.length (9); nav orders count renders from live-status order count; nav venues count renders from live-state venue count
+  - localStorage persistence tolerates missing/invalid storage via try/catch fallbacks
+next_actions:
+  - User review of docs/prd-v2.md — approve, revise, or reject before v2 becomes authoritative
+  - On approval: promote v2 by updating CLAUDE.md references from docs/prd.md to docs/prd-v2.md (or rename)
+  - Resolve the 4 v1-gating open questions from prd-v2 §14 (HydraX API surface, first product template, first tenant design partner, HydraX pricing commitment)
+  - Pending: extend drill-down pattern to Venues panel reusing .detail-shell
+  - Pending: risk panel review-queue interaction (accept/defer)
+  - Pending: authenticated navigation shell and operator identity
+  - Pending: replace hardcoded arrays with typed fixture module, prep for real data wiring
+next_recommended_slice: Get v2 PRD reviewed and approved. Once approved, write docs/plans/2026-04-24-v1-build-kickoff.md that maps v2 §6 modules to the services/ and web/apps/ scaffolding in CLAUDE.md.
+blockers:
+  - v1 build cannot start until the 4 gating questions in prd-v2 §14 are resolved (HydraX API, product template, design partner, pricing)
+verification_log:
+  - 2026-04-23 — manual cross-check of HTML ids vs JS getElementById (all hit)
+  - 2026-04-23 — node --check app.js passes
+  - 2026-04-23 — styles.css extended by ~148 lines covering the previously unstyled orders workbench classes
+  - 2026-04-23 — second pass added unified venues fixture (9 entries), derived nav counts, derived active-orders pill, workspace-status live pill, and localStorage persistence
+  - 2026-04-23 — ACP cron prompt (job f1aa332a) rewritten with a four-file consistency gate, runtime sanity gate, and verification-log requirement before claiming progress
+  - 2026-04-24 — docs/prd-v2.md written; applies reviewer feedback point-by-point (rename, wedge narrowing, hard boundary, economic case, persona cuts, module in/out table, on-ledger decision rule, commercialization, boardroom metric, gating open questions)
