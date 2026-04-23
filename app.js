@@ -1,13 +1,94 @@
 const venues = [
-  { name: "Singapore Nexus", state: "live", uptime: "99.2%" },
-  { name: "Tokyo Arc", state: "live", uptime: "98.7%" },
-  { name: "Dubai Harbor", state: "live", uptime: "97.9%" },
-  { name: "Frankfurt Loop", state: "warm", uptime: "Warm" },
-  { name: "London Arc", state: "live", uptime: "98.1%" },
-  { name: "New York Relay", state: "live", uptime: "99.4%" },
-  { name: "Sydney Rim", state: "warm", uptime: "Warm" },
-  { name: "Zurich Chain", state: "live", uptime: "98.8%" },
-  { name: "Seoul Vertex", state: "live", uptime: "97.3%" },
+  {
+    id: "sg-nexus",
+    name: "Singapore Nexus",
+    state: "live",
+    uptime: "99.2%",
+    role: "primary",
+    load: { queueDepth: 1842, fillQuality: "strong", posture: "Balanced sweep" },
+    fallback: { target: "Tokyo Arc", readiness: "armed" },
+    rationale: "Deepest Asia-session book today, lowest adverse selection pressure across the primary cluster.",
+  },
+  {
+    id: "tk-arc",
+    name: "Tokyo Arc",
+    state: "live",
+    uptime: "98.7%",
+    role: "primary",
+    load: { queueDepth: 1264, fillQuality: "fair", posture: "Latency shield" },
+    fallback: { target: "Singapore Nexus", readiness: "armed" },
+    rationale: "Holds JGB and Nikkei flow under tight latency envelope; paired with Singapore for symmetric failover.",
+  },
+  {
+    id: "db-harbor",
+    name: "Dubai Harbor",
+    state: "live",
+    uptime: "97.9%",
+    role: "primary",
+    load: { queueDepth: 978, fillQuality: "strong", posture: "Inventory protect" },
+    fallback: { target: "Frankfurt Loop", readiness: "armed" },
+    rationale: "GCC liquidity seam between Asia close and London open; clears inventory skew without spread widening.",
+  },
+  {
+    id: "fr-loop",
+    name: "Frankfurt Loop",
+    state: "warm",
+    uptime: "Warm",
+    role: "secondary",
+    load: { queueDepth: 412, fillQuality: "weak", posture: "Fallback mesh" },
+    fallback: { target: "London Arc", readiness: "degraded" },
+    rationale: "Recovering from the 10:42 latency spike; routes held off the book until round-trip normalizes.",
+  },
+  {
+    id: "ln-arc",
+    name: "London Arc",
+    state: "live",
+    uptime: "98.1%",
+    role: "primary",
+    load: { queueDepth: 1537, fillQuality: "fair", posture: "Balanced sweep" },
+    fallback: { target: "Frankfurt Loop", readiness: "armed" },
+    rationale: "European macro book anchor; carries the Frankfurt overflow while Frankfurt stabilizes.",
+  },
+  {
+    id: "ny-relay",
+    name: "New York Relay",
+    state: "live",
+    uptime: "99.4%",
+    role: "primary",
+    load: { queueDepth: 2104, fillQuality: "strong", posture: "Balanced sweep" },
+    fallback: { target: "Zurich Chain", readiness: "armed" },
+    rationale: "US session primary; strongest fill quality in the network during overlap with London close.",
+  },
+  {
+    id: "sy-rim",
+    name: "Sydney Rim",
+    state: "warm",
+    uptime: "Warm",
+    role: "secondary",
+    load: { queueDepth: 286, fillQuality: "fair", posture: "Passive ladder" },
+    fallback: { target: "Singapore Nexus", readiness: "armed" },
+    rationale: "Pre-open standby for APAC; warms the book before Tokyo takes primary weight.",
+  },
+  {
+    id: "zu-chain",
+    name: "Zurich Chain",
+    state: "live",
+    uptime: "98.8%",
+    role: "secondary",
+    load: { queueDepth: 624, fillQuality: "fair", posture: "Inventory protect" },
+    fallback: { target: "Frankfurt Loop", readiness: "armed" },
+    rationale: "Central European counterweight; absorbs Frankfurt degraded flow without routing through London.",
+  },
+  {
+    id: "se-vertex",
+    name: "Seoul Vertex",
+    state: "live",
+    uptime: "97.3%",
+    role: "secondary",
+    load: { queueDepth: 498, fillQuality: "fair", posture: "Latency shield" },
+    fallback: { target: "Tokyo Arc", readiness: "unavailable" },
+    rationale: "KRX-linked flow only; Tokyo fallback currently unavailable during the Nikkei session halt window.",
+  },
 ];
 
 const STORAGE_KEY = "hydrax.workspace.v1";
@@ -160,6 +241,7 @@ let activePanel = persisted.activePanel || "orders";
 let activeFilter = persisted.activeFilter || "all";
 let activeState = "loading";
 let selectedOrderId = persisted.selectedOrderId || null;
+let selectedVenueId = persisted.selectedVenueId || null;
 
 function readPersistedState() {
   try {
@@ -179,6 +261,7 @@ function persistState() {
       activePanel,
       activeFilter,
       selectedOrderId,
+      selectedVenueId,
     }));
   } catch (_err) {
     // ignore — persistence is best-effort
@@ -208,8 +291,13 @@ const summaryFallbackCaption = document.getElementById("summaryFallbackCaption")
 const ordersActivePill = document.getElementById("ordersActivePill");
 const workspaceLivePill = document.getElementById("workspaceLivePill");
 const venueList = document.getElementById("venueList");
-const venueHealthList = document.getElementById("venueHealthList");
+const venuesTableBody = document.getElementById("venuesTableBody");
+const venueDetail = document.getElementById("venueDetail");
+const venuesActivePill = document.getElementById("venuesActivePill");
 const heroVenueCount = document.getElementById("heroVenueCount");
+const summaryFillLabel = document.getElementById("summaryFillLabel");
+const summaryRiskLabel = document.getElementById("summaryRiskLabel");
+const summaryFallbackLabel = document.getElementById("summaryFallbackLabel");
 const navCountEls = {
   orders: document.querySelector('[data-nav-count="orders"]'),
   venues: document.querySelector('[data-nav-count="venues"]'),
@@ -278,7 +366,7 @@ function renderOrders() {
     </tr>
   `).join("");
 
-  updateSummary(filtered);
+  updateLaneSummary(filtered);
   updateOrdersPill();
 
   if (activeState === "ready" && filtered.length === 0) {
@@ -372,8 +460,20 @@ function selectOrder(orderId) {
   renderOrderDetail();
 }
 
-function updateSummary(filtered) {
+function updateLaneSummary(filtered) {
+  if (activePanel === "venues") {
+    updateVenuesSummary();
+  } else {
+    updateOrdersSummary(filtered);
+  }
+}
+
+function updateOrdersSummary(filtered) {
   if (!summaryFillValue) return;
+
+  if (summaryFillLabel) summaryFillLabel.textContent = "Fill quality";
+  if (summaryRiskLabel) summaryRiskLabel.textContent = "Risk pressure";
+  if (summaryFallbackLabel) summaryFallbackLabel.textContent = "Fallback posture";
 
   const source = filtered && filtered.length ? filtered : orders;
   const liveCount = source.filter((o) => o.status === "live").length;
@@ -416,16 +516,74 @@ function updateSummary(filtered) {
   summaryFallbackCaption.textContent = fallbackCopy;
 }
 
+function updateVenuesSummary() {
+  if (!summaryFillValue) return;
+
+  if (summaryFillLabel) summaryFillLabel.textContent = "Venue load";
+  if (summaryRiskLabel) summaryRiskLabel.textContent = "Failover readiness";
+  if (summaryFallbackLabel) summaryFallbackLabel.textContent = "Connected cluster";
+
+  const strongCount = venues.filter((v) => v.load.fillQuality === "strong").length;
+  const fairCount = venues.filter((v) => v.load.fillQuality === "fair").length;
+  const weakCount = venues.filter((v) => v.load.fillQuality === "weak").length;
+
+  let loadLabel;
+  if (weakCount > 0) loadLabel = `${weakCount} weak`;
+  else if (fairCount >= strongCount) loadLabel = `${fairCount} fair`;
+  else loadLabel = `${strongCount} strong`;
+  summaryFillValue.textContent = loadLabel;
+  summaryFillCaption.textContent = `${strongCount} strong / ${fairCount} fair / ${weakCount} weak across ${venues.length} venue${venues.length === 1 ? "" : "s"}`;
+
+  const armed = venues.filter((v) => v.fallback.readiness === "armed").length;
+  const degraded = venues.filter((v) => v.fallback.readiness === "degraded").length;
+  const unavailable = venues.filter((v) => v.fallback.readiness === "unavailable").length;
+
+  let readinessLabel = `${armed} armed`;
+  let readinessCopy = `${armed} venue${armed === 1 ? "" : "s"} with failover armed`;
+  if (unavailable > 0) {
+    readinessLabel = `${unavailable} gap${unavailable === 1 ? "" : "s"}`;
+    readinessCopy = `${unavailable} venue${unavailable === 1 ? "" : "s"} without an available fallback — operator attention required`;
+  } else if (degraded > 0) {
+    readinessLabel = `${degraded} degraded`;
+    readinessCopy = `${degraded} fallback${degraded === 1 ? "" : "s"} degraded — monitor before peak window`;
+  }
+  summaryRiskValue.textContent = readinessLabel;
+  summaryRiskCaption.textContent = readinessCopy;
+
+  const liveCount = venues.filter((v) => v.state === "live").length;
+  const warmCount = venues.filter((v) => v.state === "warm").length;
+  summaryFallbackValue.textContent = `${liveCount} of ${venues.length}`;
+  summaryFallbackCaption.textContent = warmCount > 0
+    ? `${liveCount} live, ${warmCount} warm standby across the connected cluster`
+    : `${liveCount} venue${liveCount === 1 ? "" : "s"} live across the connected cluster`;
+}
+
+const stateLabel = {
+  live: "Live",
+  warm: "Warm",
+  cold: "Cold",
+};
+
+const loadLabel = {
+  strong: "Strong",
+  fair: "Fair",
+  weak: "Weak",
+};
+
+const readinessLabel = {
+  armed: "Armed",
+  degraded: "Degraded",
+  unavailable: "Unavailable",
+};
+
+function routedOrdersFor(venueName) {
+  return orders.filter((o) => o.venue === venueName);
+}
+
 function renderVenues() {
   if (heroVenueCount) {
     heroVenueCount.textContent = String(venues.length);
   }
-
-  const stateLabel = {
-    live: "Live",
-    warm: "Warm",
-    cold: "Cold",
-  };
 
   if (venueList) {
     const featured = venues.slice(0, 3);
@@ -434,11 +592,159 @@ function renderVenues() {
       .join("");
   }
 
-  if (venueHealthList) {
-    venueHealthList.innerHTML = venues
-      .map((v) => `<li><span>${v.name}</span><strong class="${v.state}">${v.uptime}</strong></li>`)
-      .join("");
+  renderVenueLane();
+  renderVenueDetail();
+  updateVenuesPill();
+}
+
+function renderVenueLane() {
+  if (!venuesTableBody) return;
+
+  if (selectedVenueId && !venues.some((v) => v.id === selectedVenueId)) {
+    selectedVenueId = null;
+    persistState();
   }
+
+  venuesTableBody.innerHTML = venues.map((venue) => {
+    const routed = routedOrdersFor(venue.name);
+    const roleLabel = venue.role.charAt(0).toUpperCase() + venue.role.slice(1);
+    const stateText = stateLabel[venue.state] || venue.state;
+    const readinessText = readinessLabel[venue.fallback.readiness] || venue.fallback.readiness;
+    const loadText = loadLabel[venue.load.fillQuality] || venue.load.fillQuality;
+    return `
+      <tr
+        data-venue-id="${venue.id}"
+        class="venue-row${venue.id === selectedVenueId ? " is-selected" : ""}"
+        tabindex="0"
+        role="button"
+        aria-pressed="${venue.id === selectedVenueId ? "true" : "false"}"
+        aria-label="Open ${venue.name} venue detail"
+      >
+        <td>
+          <strong>${venue.name}</strong>
+          <span class="venue-role venue-role-${venue.role}">${roleLabel}</span>
+        </td>
+        <td><span class="venue-state venue-state-${venue.state}">${stateText}</span></td>
+        <td>
+          <span class="load-pill load-${venue.load.fillQuality}">${loadText}</span>
+          <span class="load-posture">${venue.load.posture}</span>
+        </td>
+        <td class="numeric">${venue.load.queueDepth.toLocaleString()}</td>
+        <td>${routed.length}</td>
+        <td><span class="readiness-pill readiness-${venue.fallback.readiness}">${readinessText}</span></td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderVenueDetail() {
+  if (!venueDetail) return;
+
+  const selected = venues.find((v) => v.id === selectedVenueId);
+
+  if (!selected) {
+    venueDetail.innerHTML = `
+      <div class="detail-placeholder">
+        <p class="panel-label">Venue detail</p>
+        <strong>Select a venue to inspect load, routed orders, and failover readiness.</strong>
+        <p>Each venue carries an operator rationale, a failover target, and a readiness state. Open a row to see the trail.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const stateText = stateLabel[selected.state] || selected.state;
+  const roleText = selected.role.charAt(0).toUpperCase() + selected.role.slice(1);
+  const loadText = loadLabel[selected.load.fillQuality] || selected.load.fillQuality;
+  const readinessText = readinessLabel[selected.fallback.readiness] || selected.fallback.readiness;
+  const routed = routedOrdersFor(selected.name);
+
+  const routedMarkup = routed.length
+    ? `<ul class="detail-venue-list">${routed.map((order) => `
+        <li>
+          <span>
+            <strong class="routed-order-id" data-routed-order-id="${order.id}" role="button" tabindex="0" aria-label="Open ${order.id} in orders lane">${order.id}</strong>
+            <span class="routed-order-meta">${order.instrument} · ${order.mode}</span>
+          </span>
+          <span class="status-badge ${order.status}">${order.status}</span>
+        </li>
+      `).join("")}</ul>`
+    : `<p class="narrative-copy">No orders currently routed through ${selected.name}.</p>`;
+
+  venueDetail.innerHTML = `
+    <article class="detail-card">
+      <header class="detail-head">
+        <div>
+          <p class="panel-label">${selected.name}</p>
+          <strong>${selected.load.posture}</strong>
+        </div>
+        <span class="venue-state venue-state-${selected.state}">${stateText}</span>
+      </header>
+
+      <dl class="detail-meta">
+        <div><dt>Role</dt><dd>${roleText}</dd></div>
+        <div><dt>Uptime</dt><dd>${selected.uptime}</dd></div>
+        <div><dt>Queue depth</dt><dd>${selected.load.queueDepth.toLocaleString()}</dd></div>
+        <div><dt>Fill quality</dt><dd>${loadText}</dd></div>
+        <div><dt>Posture</dt><dd>${selected.load.posture}</dd></div>
+        <div><dt>Routed orders</dt><dd>${routed.length}</dd></div>
+      </dl>
+
+      <section class="detail-section">
+        <p class="panel-label">Operator rationale</p>
+        <p class="narrative-copy">${selected.rationale}</p>
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Routed orders</p>
+        ${routedMarkup}
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Failover readiness</p>
+        <div class="detail-fallback">
+          <span>Target</span><strong>${selected.fallback.target}</strong>
+          <span>Readiness</span><strong class="readiness-pill readiness-${selected.fallback.readiness}">${readinessText}</strong>
+        </div>
+      </section>
+    </article>
+  `;
+}
+
+function selectVenue(venueId) {
+  const exists = venues.some((v) => v.id === venueId);
+  if (!exists) return;
+
+  selectedVenueId = selectedVenueId === venueId ? null : venueId;
+
+  venuesTableBody?.querySelectorAll("tr.venue-row").forEach((row) => {
+    const isSelected = row.getAttribute("data-venue-id") === selectedVenueId;
+    row.classList.toggle("is-selected", isSelected);
+    row.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
+
+  persistState();
+  renderVenueDetail();
+}
+
+function jumpToOrder(orderId) {
+  const exists = orders.some((o) => o.id === orderId);
+  if (!exists) return;
+
+  if (activeFilter !== "all" && !filteredOrders().some((o) => o.id === orderId)) {
+    setActiveFilter("all");
+  }
+
+  selectedOrderId = orderId;
+  persistState();
+  setActivePanel("orders");
+  renderOrders();
+}
+
+function updateVenuesPill() {
+  if (!venuesActivePill) return;
+  const liveCount = venues.filter((v) => v.state === "live").length;
+  venuesActivePill.textContent = `${liveCount} live · ${venues.length} total`;
 }
 
 function updateNavCounts() {
@@ -505,6 +811,7 @@ function setActivePanel(panel) {
   });
 
   persistState();
+  updateLaneSummary(filteredOrders());
 }
 
 function setActiveFilter(filter) {
@@ -561,6 +868,38 @@ ordersTableBody?.addEventListener("keydown", (event) => {
   event.preventDefault();
   const id = row.getAttribute("data-order-id");
   if (id) selectOrder(id);
+});
+
+venuesTableBody?.addEventListener("click", (event) => {
+  const row = event.target.closest("tr.venue-row");
+  if (!row) return;
+  const id = row.getAttribute("data-venue-id");
+  if (id) selectVenue(id);
+});
+
+venuesTableBody?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const row = event.target.closest("tr.venue-row");
+  if (!row) return;
+  event.preventDefault();
+  const id = row.getAttribute("data-venue-id");
+  if (id) selectVenue(id);
+});
+
+venueDetail?.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-routed-order-id]");
+  if (!target) return;
+  const id = target.getAttribute("data-routed-order-id");
+  if (id) jumpToOrder(id);
+});
+
+venueDetail?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const target = event.target.closest("[data-routed-order-id]");
+  if (!target) return;
+  event.preventDefault();
+  const id = target.getAttribute("data-routed-order-id");
+  if (id) jumpToOrder(id);
 });
 
 dashboardButtons.forEach((button) => {
