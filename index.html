@@ -240,17 +240,17 @@
 
               <div class="summary-grid">
                 <article class="summary-card">
-                  <p class="panel-label">Fill quality</p>
+                  <p class="panel-label" id="summaryFillLabel">Fill quality</p>
                   <strong id="summaryFillValue">98.4%</strong>
                   <span id="summaryFillCaption">Within slippage ceiling over the last 20 route decisions</span>
                 </article>
                 <article class="summary-card">
-                  <p class="panel-label">Risk pressure</p>
+                  <p class="panel-label" id="summaryRiskLabel">Risk pressure</p>
                   <strong id="summaryRiskValue">Contained</strong>
                   <span id="summaryRiskCaption">Inventory skew cooling across Asia and Europe books</span>
                 </article>
                 <article class="summary-card">
-                  <p class="panel-label">Fallback posture</p>
+                  <p class="panel-label" id="summaryFallbackLabel">Fallback posture</p>
                   <strong id="summaryFallbackValue">Ready</strong>
                   <span id="summaryFallbackCaption">Frankfurt reroute profile armed with graceful degradation</span>
                 </article>
@@ -350,26 +350,38 @@
               </section>
 
               <section class="workspace-panel" id="panel-venues" data-panel-body>
-                <div class="dual-grid">
-                  <article class="data-card">
-                    <div class="card-head">
-                      <div>
-                        <p class="panel-label">Venue health</p>
-                        <strong>Connected cluster</strong>
-                      </div>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Venue health</p>
+                      <strong>Connected cluster</strong>
                     </div>
-                    <ul class="venue-health-list" id="venueHealthList"></ul>
-                  </article>
-                  <article class="data-card state-degraded">
-                    <div class="card-head">
-                      <div>
-                        <p class="panel-label">Degraded mode</p>
-                        <strong>Fallback readiness</strong>
+                    <span class="status-pill" id="venuesActivePill">0 live</span>
+                  </div>
+                  <div class="venues-workbench">
+                    <div class="venue-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Venue</th>
+                              <th>State</th>
+                              <th>Load</th>
+                              <th class="numeric">Queue</th>
+                              <th>Routed</th>
+                              <th>Failover</th>
+                            </tr>
+                          </thead>
+                          <tbody id="venuesTableBody"></tbody>
+                        </table>
                       </div>
-                      <span class="status-pill warning">Warm standby</span>
+                      <p class="table-footnote">Select a venue to inspect load, routed orders, and failover readiness. Routed order ids jump to the orders lane.</p>
                     </div>
-                    <p class="narrative-copy">If Frankfurt latency drifts again, HydraX downgrades routing weight, preserves audit history, and rebalances into Singapore plus Dubai.</p>
-                  </article>
+
+                    <aside class="detail-rail">
+                      <div class="detail-shell" id="venueDetail" aria-live="polite"></div>
+                    </aside>
+                  </div>
                 </div>
               </section>
 

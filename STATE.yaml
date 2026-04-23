@@ -1,33 +1,45 @@
 project: hydrax-app
-updated: 2026-04-24T00:25:00+08:00
+updated: 2026-04-24T12:45:00+08:00
 status: in_progress
-summary: HydraX MVP frontend prototype plus PRD v2 draft — tightened scope to tokenized treasury/fund subscription + servicing wedge, one product, on-ledger/off-ledger decision rule, commercialization model.
+summary: HydraX frontend prototype + PRD v2. Scope narrowed to tokenized treasury/fund subscription & servicing wedge (issuer + ops primary, distributor + investor thin). Venues panel drill-down landed — second meaningful operator surface shipped on the Orders pattern.
 current_focus:
-  - New slice: docs/prd-v2.md drafted as authoritative successor to docs/prd.md, applying reviewer feedback (cut ~40% surface area, sharpen commercial wedge, add on-ledger table, add commercialization + boardroom metric)
-  - v2 narrows to: tokenized treasury / short-duration fund subscription & servicing; issuer + ops as primary personas; distributor + investor thin in v1
-  - v2 adds hard product boundary, economic case, on-ledger vs off-ledger decision rule, monetization model, 4 gating open questions
-  - Prior completed slice: static frontend shell with premium landing + command-surface preview
-  - Prior completed slice: operational workspace with sidebar navigation, state banners, and multi-panel hierarchy
-  - Prior completed slice: orders workbench drill-down — clickable rows, selection state, rich detail card, keyboard a11y, filter-aware selection
-  - Prior completed slice: cross-cutting consistency pass — single venues fixture drives hero + panel + counts; derived status pills
-  - Prior completed slice: workspace state persistence via localStorage (hydrax.workspace.v1)
+  - Shipped — Venues panel drill-down per docs/plans/2026-04-24-venues-panel-slice.md
+  - Selectable venue rows, detail-driven operator rail, load visibility, routed-order cross-links, failover readiness, venue rationale, lane-aware summary context (all seven surfaces live)
+  - Fixture extension — venues now carry id, role, load (queueDepth/fillQuality/posture), fallback (target/readiness), rationale; routedOrderIds derived from the orders fixture
+  - PRD v2 authoritative; prototype continues to harden UX patterns that will feed the v1 issuer-portal + ops-console shells
+  - Prior completed slices — static shell, operational workspace, orders drill-down, cross-cutting consistency pass, workspace state persistence, PRD v2 draft
 recently_verified:
   - node --check app.js passes after full refactor
   - Every getElementById in app.js has a matching id in index.html (verified via grep diff)
-  - All new CSS classes (.orders-workbench, .order-lane, .detail-rail, .detail-shell, .detail-card, .detail-meta, .detail-venue-list, tbody tr.order-row.is-selected) are declared in styles.css
+  - All prior CSS classes (.orders-workbench, .order-lane, .detail-rail, .detail-shell, .detail-card, .detail-meta, .detail-venue-list, tbody tr.order-row.is-selected) are declared in styles.css
   - Hero heroVenueCount renders from venues.length (9); nav orders count renders from live-status order count; nav venues count renders from live-state venue count
   - localStorage persistence tolerates missing/invalid storage via try/catch fallbacks
+  - 2026-04-24 Venues slice plan drafted at docs/plans/2026-04-24-venues-panel-slice.md — fixture extension shape, DOM contract, acceptance checks, commit shape all locked before implementation
 next_actions:
-  - User review of docs/prd-v2.md — approve, revise, or reject before v2 becomes authoritative
-  - On approval: promote v2 by updating CLAUDE.md references from docs/prd.md to docs/prd-v2.md (or rename)
-  - Resolve the 4 v1-gating open questions from prd-v2 §14 (HydraX API surface, first product template, first tenant design partner, HydraX pricing commitment)
-  - Pending: extend drill-down pattern to Venues panel reusing .detail-shell
-  - Pending: risk panel review-queue interaction (accept/defer)
-  - Pending: authenticated navigation shell and operator identity
-  - Pending: replace hardcoded arrays with typed fixture module, prep for real data wiring
-next_recommended_slice: Get v2 PRD reviewed and approved. Once approved, write docs/plans/2026-04-24-v1-build-kickoff.md that maps v2 §6 modules to the services/ and web/apps/ scaffolding in CLAUDE.md.
+  - Promote PRD v2 references — update CLAUDE.md pointers from docs/prd.md to docs/prd-v2.md (queued as its own commit, not bundled with Venues)
+  - Resolve the 4 v1-gating open questions from prd-v2 §14 (HydraX API surface, first product template, first tenant design partner, HydraX pricing commitment) — these block v1 build, not prototype slices
+  - Next prototype slice: extend drill-down pattern to risk panel review-queue (accept/defer actions)
+  - Following: replace hardcoded fixture arrays with a typed fixture module as prep for real data wiring
+  - Deferred to v1 build: authenticated navigation shell and operator identity, services/ scaffolding, web/apps/ shells
+next_recommended_slice: Risk panel review-queue interaction (accept/defer) — reuse the .detail-shell primitive one more time to confirm it generalizes before extracting into a shared component.
+roadmap_alignment:
+  prototype_sequence:
+    - done — static landing + command-surface preview
+    - done — operational workspace shell (sidebar, panels, state banners)
+    - done — Orders workbench drill-down (pattern foundation)
+    - done — cross-cutting fixture consistency + derived counts
+    - done — workspace state persistence (hydrax.workspace.v1)
+    - done — Venues panel drill-down (2026-04-24)
+    - next — Risk panel review-queue interaction
+    - pending — typed fixture module (data-wiring prep)
+  v1_build_dependencies:
+    - prd-v2 §14 Q1 — HydraX API surface
+    - prd-v2 §14 Q3 — first product template (MMF vs short-duration credit vs treasury-equivalent)
+    - prd-v2 §14 Q4 — first tenant design partner
+    - prd-v2 §14 Q7 — pricing commitment
+  post_v1: see prd-v2 §12 (v2 extends the wedge; v3 platform expansion)
 blockers:
-  - v1 build cannot start until the 4 gating questions in prd-v2 §14 are resolved (HydraX API, product template, design partner, pricing)
+  - v1 build cannot start until the 4 gating questions in prd-v2 §14 are resolved — prototype slices continue in parallel and do not unblock v1
 verification_log:
   - 2026-04-23 — manual cross-check of HTML ids vs JS getElementById (all hit)
   - 2026-04-23 — node --check app.js passes
@@ -35,3 +47,10 @@ verification_log:
   - 2026-04-23 — second pass added unified venues fixture (9 entries), derived nav counts, derived active-orders pill, workspace-status live pill, and localStorage persistence
   - 2026-04-23 — ACP cron prompt (job f1aa332a) rewritten with a four-file consistency gate, runtime sanity gate, and verification-log requirement before claiming progress
   - 2026-04-24 — docs/prd-v2.md written; applies reviewer feedback point-by-point (rename, wedge narrowing, hard boundary, economic case, persona cuts, module in/out table, on-ledger decision rule, commercialization, boardroom metric, gating open questions)
+  - 2026-04-24 — roadmap upgraded against prd-v2; Venues panel locked as next slice with docs/plans/2026-04-24-venues-panel-slice.md; STATE.yaml current_focus, next_actions, and roadmap_alignment updated to match
+  - 2026-04-24 — Venues panel drill-down implemented across app.js, index.html, styles.css — fixture extended with role/load/fallback/rationale, venue-lane table renders 9 rows, detail rail shows operator rationale + routed orders + failover readiness, panel summary switches labels (Fill quality/Risk pressure/Fallback posture ↔ Venue load/Failover readiness/Connected cluster) when lane changes
+  - 2026-04-24 — node --check app.js passes
+  - 2026-04-24 — id audit clean (grep of every getElementById call vs id="…" in index.html — zero missing)
+  - 2026-04-24 — class audit clean (every new class used in JS declared in styles.css — venue-row, venues-workbench, venue-lane, venue-role*, load-*, readiness-*, routed-order-*, detail-fallback)
+  - 2026-04-24 — runtime probe via headless chromium on http://127.0.0.1:8753 — hero venue count 9, nav count "7 connected", 9 table rows rendered, venue selection sets aria-pressed=true, detail rail populates with venue name + routed orders, clicking a routed order id lands on the orders panel with that order selected and aria-pressed=true, summary labels switch correctly (venues-mode ↔ orders-mode), selection persists across reload (tk-arc), keyboard Enter selects a focused row, zero pageerror / console.error events
+  - 2026-04-24 — dead CSS removed (.venue-health-list selectors no longer referenced after panel replacement)

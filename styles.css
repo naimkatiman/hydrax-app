@@ -305,7 +305,6 @@ main {
 .summary-card span,
 .workspace-nav-item small,
 .insight-list span,
-.venue-health-list span,
 .risk-list span,
 .mini-list,
 .route-readout p {
@@ -454,7 +453,6 @@ main {
 .mini-list,
 .venue-list,
 .insight-list,
-.venue-health-list,
 .risk-list {
   padding: 0;
   list-style: none;
@@ -462,7 +460,6 @@ main {
 
 .venue-list li,
 .insight-list li,
-.venue-health-list li,
 .risk-list li {
   display: flex;
   align-items: center;
@@ -756,15 +753,173 @@ tbody tr:last-child td {
   font-variant-numeric: tabular-nums;
 }
 
-tbody tr.order-row {
+tbody tr.order-row,
+tbody tr.venue-row {
   cursor: pointer;
   transition: background 140ms ease, border-color 140ms ease;
 }
 
 tbody tr.order-row:hover,
-tbody tr.order-row:focus-visible {
+tbody tr.order-row:focus-visible,
+tbody tr.venue-row:hover,
+tbody tr.venue-row:focus-visible {
   background: rgba(255, 255, 255, 0.04);
   outline: none;
+}
+
+tbody tr.venue-row.is-selected {
+  background: rgba(65, 200, 149, 0.1);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+tbody tr.venue-row.is-selected td:first-child strong {
+  color: var(--accent);
+}
+
+.venues-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.venue-lane {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.venue-lane th.numeric,
+.venue-lane td.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+tbody tr.venue-row td strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.venue-role {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.venue-role-primary {
+  color: var(--accent);
+}
+
+.venue-role-failover,
+.venue-role-secondary {
+  color: var(--warm);
+}
+
+.load-pill,
+.readiness-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--line);
+}
+
+.load-strong {
+  color: var(--accent);
+  border-color: rgba(98, 226, 188, 0.35);
+  background: rgba(98, 226, 188, 0.08);
+}
+
+.load-fair {
+  color: var(--warm);
+  border-color: rgba(255, 200, 120, 0.35);
+  background: rgba(255, 200, 120, 0.08);
+}
+
+.load-weak {
+  color: #ff8a8a;
+  border-color: rgba(255, 138, 138, 0.35);
+  background: rgba(255, 138, 138, 0.08);
+}
+
+.load-posture {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.readiness-armed {
+  color: var(--accent);
+  border-color: rgba(98, 226, 188, 0.35);
+  background: rgba(98, 226, 188, 0.08);
+}
+
+.readiness-degraded {
+  color: var(--warm);
+  border-color: rgba(255, 200, 120, 0.35);
+  background: rgba(255, 200, 120, 0.08);
+}
+
+.readiness-unavailable {
+  color: #ff8a8a;
+  border-color: rgba(255, 138, 138, 0.35);
+  background: rgba(255, 138, 138, 0.08);
+}
+
+.routed-order-id {
+  cursor: pointer;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.routed-order-id:hover,
+.routed-order-id:focus-visible {
+  color: #8ef5cd;
+  outline: none;
+}
+
+.routed-order-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.detail-fallback {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+
+.detail-fallback span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.detail-fallback strong {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 960px) {
+  .venues-workbench {
+    grid-template-columns: 1fr;
+  }
 }
 
 tbody tr.order-row.is-selected {
