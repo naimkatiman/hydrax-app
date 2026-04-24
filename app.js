@@ -316,6 +316,7 @@ const eventFeed = document.getElementById("eventFeed");
 const ordersTableBody = document.getElementById("ordersTableBody");
 const orderDetail = document.getElementById("orderDetail");
 const panelTitle = document.getElementById("panelTitle");
+const breadcrumbTrail = document.getElementById("breadcrumbTrail");
 const stateBanner = document.getElementById("stateBanner");
 const cycleStateButton = document.getElementById("cycleState");
 const navButtons = Array.from(document.querySelectorAll(".workspace-nav-item"));
@@ -494,6 +495,41 @@ function filteredRisk() {
     : riskAlerts.filter((a) => a.status === activeFilter);
 }
 
+function selectedItemForPanel(panel) {
+  if (panel === "orders" && selectedOrderId) {
+    return orders.find((o) => o.id === selectedOrderId)?.id || null;
+  }
+  if (panel === "venues" && selectedVenueId) {
+    return venues.find((v) => v.id === selectedVenueId)?.name || null;
+  }
+  if (panel === "risk" && selectedRiskId) {
+    return riskAlerts.find((a) => a.id === selectedRiskId)?.id || null;
+  }
+  if (panel === "positions" && selectedPositionId) {
+    return positions.find((p) => p.id === selectedPositionId)?.name || null;
+  }
+  return null;
+}
+
+function renderBreadcrumb() {
+  if (!breadcrumbTrail) return;
+  const panelName = panelTitles[activePanel] || "Workspace";
+  const itemLabel = selectedItemForPanel(activePanel);
+
+  let html =
+    '<span class="crumb-root">Dashboard view</span>' +
+    '<span class="crumb-sep" aria-hidden="true">›</span>' +
+    '<span class="crumb-panel">' + panelName + '</span>';
+
+  if (itemLabel) {
+    html +=
+      '<span class="crumb-sep" aria-hidden="true">›</span>' +
+      '<span class="crumb-item">' + itemLabel + '</span>';
+  }
+
+  breadcrumbTrail.innerHTML = html;
+}
+
 function renderFilterChips(panel) {
   if (!filterGroup) return;
   var filters = panelFilters[panel] || [];
@@ -633,6 +669,7 @@ function selectOrder(orderId) {
   persistState();
   renderOrderDetail();
   if (selectedOrderId) logActivity("Select order", selectedOrderId);
+  renderBreadcrumb();
 }
 
 function updateLaneSummary(filtered) {
@@ -923,6 +960,7 @@ function selectVenue(venueId) {
     const v = venues.find((v) => v.id === selectedVenueId);
     if (v) logActivity("Select venue", v.name);
   }
+  renderBreadcrumb();
 }
 
 function showToast(message) {
@@ -1103,6 +1141,7 @@ function selectRisk(riskId) {
   persistState();
   renderRiskDetail();
   if (selectedRiskId) logActivity("Select risk", selectedRiskId);
+  renderBreadcrumb();
 }
 
 function resolveRisk(riskId, resolution) {
@@ -1113,6 +1152,7 @@ function resolveRisk(riskId, resolution) {
   logActivity("Risk " + resolution, alert.id + " — " + alert.type);
   renderRiskAlerts();
   updateLaneSummary(filteredOrders());
+  renderBreadcrumb();
 }
 
 function updateRiskPill() {
@@ -1282,6 +1322,7 @@ function selectPosition(positionId) {
     const p = positions.find((p) => p.id === selectedPositionId);
     if (p) logActivity("Select position", p.name);
   }
+  renderBreadcrumb();
 }
 
 function updatePositionsPill() {
@@ -1415,6 +1456,7 @@ function setActivePanel(panel, skipLog) {
   persistState();
   updateLaneSummary(filteredOrders());
   if (!skipLog) logActivity("Panel switch", panelTitles[panel] || panel);
+  renderBreadcrumb();
 }
 
 function setActiveFilter(filter) {

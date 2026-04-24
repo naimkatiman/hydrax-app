@@ -1,26 +1,25 @@
 project: hydrax-app
-updated: 2026-04-25T00:55:00+08:00
+updated: 2026-04-25T01:20:00+08:00
 status: in_progress
-summary: Shared drill-down primitive extracted — renderDetailCard() generates detail cards for all four panels (orders, venues, risk, positions) with unified close button, meta grid, and section layout. Close button click handlers wired via event delegation on each detail shell.
+summary: Contextual breadcrumb trail landed — toolbar eyebrow replaced with "Dashboard view > Panel > Selected-item" breadcrumb driven by renderBreadcrumb() and wired into all six navigation entry points (setActivePanel, selectOrder, selectVenue, selectRisk, selectPosition, resolveRisk).
 current_focus:
-  - renderDetailCard(opts) function replaces four separate detail-rendering patterns with one shared primitive
-  - Close button (detail-close) rendered inside every detail card with event delegation on all four detail shells
-  - data-detail-for attribute on each detail shell marks which panel it belongs to
-  - Dynamic filter chips via renderFilterChips(panel) replace static HTML chip markup
-  - Fixture data compacted with JSDoc type annotations for all four fixture arrays
-  - Nineteen workbench features now fully interactive: Orders, Positions, Venues, Risk, Settings, Search, Cross-panel linking, Toasts, Keyboard shortcuts, Activity log, Activity persistence, Responsive sidebar, Mobile toolbar, Topbar responsive, Sortable columns, Panel-aware filters, Per-panel empty states, Shared drill-down primitive, Detail close button
+  - Toolbar eyebrow is now a <nav id="breadcrumbTrail"> breadcrumb instead of the static "Dashboard view" label
+  - renderBreadcrumb() always renders "Dashboard view > <Panel name>" and appends "> <Selected item>" when a drill-down is active
+  - selectedItemForPanel(panel) resolves the label: order.id / venue.name / riskAlert.id / position.name
+  - Six call sites hooked: setActivePanel + four select*() + resolveRisk
+  - CSS reuses existing eyebrow treatment for crumb-root/panel/sep; crumb-item uses var(--accent) to mark the active drill-down
+  - Twenty workbench features now fully interactive: Orders, Positions, Venues, Risk, Settings, Search, Cross-panel linking, Toasts, Keyboard shortcuts, Activity log, Activity persistence, Responsive sidebar, Mobile toolbar, Topbar responsive, Sortable columns, Panel-aware filters, Per-panel empty states, Shared drill-down primitive, Detail close button, Contextual breadcrumb trail
 recently_verified:
   - node --check app.js passes
-  - getElementById audit clean (zero missing ids)
-  - detail-close click handlers wired on orderDetail, venueDetail, riskDetail, positionDetail
-  - renderDetailCard called by renderOrderDetail, renderVenueDetail, renderRiskDetail, renderPositionDetail
-  - CSS class detail-close declared with hover/focus states
-  - data-detail-for attributes on all four detail shells in HTML
-  - wc -l index.html=613 app.js=1894 styles.css=1981
-  - git diff --stat confirms 4 project files changed
+  - breadcrumbTrail id in HTML matched by getElementById in JS
+  - renderBreadcrumb() appears 7x in app.js (1 definition + 6 call sites wired into every navigation mutation)
+  - 5 new CSS classes declared: breadcrumb-trail, crumb-root, crumb-sep, crumb-panel, crumb-item
+  - serve check: python3 http.server returns HTTP 200 for /, /app.js, /styles.css; breadcrumb markers present in the served bytes
+  - wc -l index.html=617 app.js=1936 styles.css=2016
+  - git diff --stat will confirm 3 code files + STATE.yaml changed
 next_actions:
   - Deferred to v1 build: authenticated navigation shell, services/ scaffolding, web/apps/ shells
-next_recommended_slice: Contextual breadcrumb trail — show the current navigation path (panel > selected item) in the toolbar area, updating as the user drills into detail views.
+next_recommended_slice: Clickable breadcrumb segments — make the panel crumb switch panels (already covered by the sidebar, but sensible shortcut) and the item crumb toggle deselection; alternatively a different slice the user picks.
 roadmap_alignment:
   prototype_sequence:
     - done — static landing + command-surface preview
@@ -46,7 +45,8 @@ roadmap_alignment:
     - done — Panel-aware filter chips (2026-04-24, corrected: fixtures inlined, 4-file constraint restored)
     - done — Per-panel empty-state filter messaging (2026-04-24)
     - done — Shared drill-down primitive with close button (2026-04-24)
-    - next — contextual breadcrumb trail
+    - done — Contextual breadcrumb trail (2026-04-25)
+    - next — clickable breadcrumb segments (or alternative slice)
   v1_build_dependencies:
     - prd-v2 §14 Q1 — HydraX API surface
     - prd-v2 §14 Q3 — first product template (MMF vs short-duration credit vs treasury-equivalent)
@@ -86,3 +86,4 @@ verification_log:
   - 2026-04-24 — Per-panel empty-state filter messaging: node --check app.js passes; getElementById audit clean; venuesFilterEmpty/positionsFilterEmpty/riskFilterEmpty ids matched in HTML+JS; filter-empty + is-visible + is-hidden CSS classes declared; wc -l index.html=613 app.js=1939 styles.css=1954; git diff --stat confirms 3 code files + STATE.yaml changed
   - 2026-04-24 — Shared drill-down primitive: node --check app.js passes; getElementById audit clean (zero missing); renderDetailCard() shared across all 4 panels; detail-close click handlers wired on orderDetail/venueDetail/riskDetail/positionDetail via event delegation; CSS detail-close class declared with hover+focus states; data-detail-for attrs on all detail shells; dynamic filter chips via renderFilterChips(); wc -l index.html=613 app.js=1894 styles.css=1981; git diff --stat confirms 4 project files changed
   - 2026-04-25 — data/ cleanup: git rm data/fixtures.js (orphaned 436-line duplicate left behind by f69b7b5); data/ directory empty and removed; node --check app.js passes; zero HydraxFixtures or data/fixtures.js references across html/js/css; wc -l index.html=613 app.js=1894 styles.css=1981 unchanged; git diff --stat confirms 1 file deleted + STATE.yaml
+  - 2026-04-25 — breadcrumb trail: node --check app.js passes; breadcrumbTrail id in HTML (index.html:254) matched by getElementById in JS; renderBreadcrumb defined at app.js:514 and called at app.js:672 (selectOrder), 963 (selectVenue), 1144 (selectRisk), 1155 (resolveRisk), 1325 (selectPosition), 1459 (setActivePanel); 5 new CSS classes declared (breadcrumb-trail, crumb-root, crumb-sep, crumb-panel, crumb-item) reusing existing eyebrow treatment; python3 http.server serves /, /app.js, /styles.css as HTTP 200 with expected markers; wc -l index.html=617 app.js=1936 styles.css=2016; visual browser walk-through deferred to user; git diff --stat confirms 3 code files + STATE.yaml changed
