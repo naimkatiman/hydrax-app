@@ -260,12 +260,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                   </button>
                   <input type="text" class="workspace-search" id="workspaceSearch" placeholder="Filter rows..." aria-label="Filter workspace rows" />
-                  <div class="filter-group" id="filterGroup" aria-label="Panel filters">
-                    <button class="filter-chip is-active" type="button" data-filter="all">All</button>
-                    <button class="filter-chip" type="button" data-filter="live">Live</button>
-                    <button class="filter-chip" type="button" data-filter="review">Needs review</button>
-                    <button class="filter-chip" type="button" data-filter="queued">Queued</button>
-                  </div>
+                  <div class="filter-group" id="filterGroup" aria-label="Panel filters"></div>
                   <button class="button button-ghost small" id="cycleState" type="button">Cycle state</button>
                 </div>
               </div>
@@ -340,7 +335,7 @@
                     </div>
 
                     <aside class="detail-rail">
-                      <div class="detail-shell" id="orderDetail" aria-live="polite"></div>
+                      <div class="detail-shell" id="orderDetail" data-detail-for="orders" aria-live="polite"></div>
                     </aside>
                   </div>
                 </div>
@@ -383,8 +378,14 @@
                     </div>
 
                     <aside class="detail-rail">
-                      <div class="detail-shell" id="positionDetail" aria-live="polite"></div>
+                      <div class="detail-shell" id="positionDetail" data-detail-for="positions" aria-live="polite"></div>
                     </aside>
+
+                    <div class="filter-empty" id="positionsFilterEmpty" aria-live="polite">
+                      <p class="panel-label">No matching positions</p>
+                      <strong>Current filter removed every book from view.</strong>
+                      <p>Switch to another status filter or select All to restore the position table.</p>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -419,8 +420,14 @@
                     </div>
 
                     <aside class="detail-rail">
-                      <div class="detail-shell" id="venueDetail" aria-live="polite"></div>
+                      <div class="detail-shell" id="venueDetail" data-detail-for="venues" aria-live="polite"></div>
                     </aside>
+
+                    <div class="filter-empty" id="venuesFilterEmpty" aria-live="polite">
+                      <p class="panel-label">No matching venues</p>
+                      <strong>Current filter removed every venue from view.</strong>
+                      <p>Switch to another state filter or select All to restore the venue table.</p>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -454,8 +461,14 @@
                     </div>
 
                     <aside class="detail-rail">
-                      <div class="detail-shell" id="riskDetail" aria-live="polite"></div>
+                      <div class="detail-shell" id="riskDetail" data-detail-for="risk" aria-live="polite"></div>
                     </aside>
+
+                    <div class="filter-empty" id="riskFilterEmpty" aria-live="polite">
+                      <p class="panel-label">No matching alerts</p>
+                      <strong>Current filter removed every alert from the queue.</strong>
+                      <p>Switch to another status filter or select All to restore the risk review table.</p>
+                    </div>
                   </div>
                 </div>
               </section>

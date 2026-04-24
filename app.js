@@ -1,247 +1,206 @@
+/** @type {{ id:string, name:string, state:"live"|"warm", uptime:string, role:"primary"|"secondary", load:{ queueDepth:number, fillQuality:"strong"|"fair"|"weak", posture:string }, fallback:{ target:string, readiness:"armed"|"degraded"|"unavailable" }, rationale:string }[]} */
 const venues = [
   {
-    id: "sg-nexus",
-    name: "Singapore Nexus",
-    state: "live",
-    uptime: "99.2%",
-    role: "primary",
+    id: "sg-nexus", name: "Singapore Nexus", state: "live", uptime: "99.2%", role: "primary",
     load: { queueDepth: 1842, fillQuality: "strong", posture: "Balanced sweep" },
     fallback: { target: "Tokyo Arc", readiness: "armed" },
     rationale: "Deepest Asia-session book today, lowest adverse selection pressure across the primary cluster.",
   },
   {
-    id: "tk-arc",
-    name: "Tokyo Arc",
-    state: "live",
-    uptime: "98.7%",
-    role: "primary",
+    id: "tk-arc", name: "Tokyo Arc", state: "live", uptime: "98.7%", role: "primary",
     load: { queueDepth: 1264, fillQuality: "fair", posture: "Latency shield" },
     fallback: { target: "Singapore Nexus", readiness: "armed" },
     rationale: "Holds JGB and Nikkei flow under tight latency envelope; paired with Singapore for symmetric failover.",
   },
   {
-    id: "db-harbor",
-    name: "Dubai Harbor",
-    state: "live",
-    uptime: "97.9%",
-    role: "primary",
+    id: "db-harbor", name: "Dubai Harbor", state: "live", uptime: "97.9%", role: "primary",
     load: { queueDepth: 978, fillQuality: "strong", posture: "Inventory protect" },
     fallback: { target: "Frankfurt Loop", readiness: "armed" },
     rationale: "GCC liquidity seam between Asia close and London open; clears inventory skew without spread widening.",
   },
   {
-    id: "fr-loop",
-    name: "Frankfurt Loop",
-    state: "warm",
-    uptime: "Warm",
-    role: "secondary",
+    id: "fr-loop", name: "Frankfurt Loop", state: "warm", uptime: "Warm", role: "secondary",
     load: { queueDepth: 412, fillQuality: "weak", posture: "Fallback mesh" },
     fallback: { target: "London Arc", readiness: "degraded" },
     rationale: "Recovering from the 10:42 latency spike; routes held off the book until round-trip normalizes.",
   },
   {
-    id: "ln-arc",
-    name: "London Arc",
-    state: "live",
-    uptime: "98.1%",
-    role: "primary",
+    id: "ln-arc", name: "London Arc", state: "live", uptime: "98.1%", role: "primary",
     load: { queueDepth: 1537, fillQuality: "fair", posture: "Balanced sweep" },
     fallback: { target: "Frankfurt Loop", readiness: "armed" },
     rationale: "European macro book anchor; carries the Frankfurt overflow while Frankfurt stabilizes.",
   },
   {
-    id: "ny-relay",
-    name: "New York Relay",
-    state: "live",
-    uptime: "99.4%",
-    role: "primary",
+    id: "ny-relay", name: "New York Relay", state: "live", uptime: "99.4%", role: "primary",
     load: { queueDepth: 2104, fillQuality: "strong", posture: "Balanced sweep" },
     fallback: { target: "Zurich Chain", readiness: "armed" },
     rationale: "US session primary; strongest fill quality in the network during overlap with London close.",
   },
   {
-    id: "sy-rim",
-    name: "Sydney Rim",
-    state: "warm",
-    uptime: "Warm",
-    role: "secondary",
+    id: "sy-rim", name: "Sydney Rim", state: "warm", uptime: "Warm", role: "secondary",
     load: { queueDepth: 286, fillQuality: "fair", posture: "Passive ladder" },
     fallback: { target: "Singapore Nexus", readiness: "armed" },
     rationale: "Pre-open standby for APAC; warms the book before Tokyo takes primary weight.",
   },
   {
-    id: "zu-chain",
-    name: "Zurich Chain",
-    state: "live",
-    uptime: "98.8%",
-    role: "secondary",
+    id: "zu-chain", name: "Zurich Chain", state: "live", uptime: "98.8%", role: "secondary",
     load: { queueDepth: 624, fillQuality: "fair", posture: "Inventory protect" },
     fallback: { target: "Frankfurt Loop", readiness: "armed" },
     rationale: "Central European counterweight; absorbs Frankfurt degraded flow without routing through London.",
   },
   {
-    id: "se-vertex",
-    name: "Seoul Vertex",
-    state: "live",
-    uptime: "97.3%",
-    role: "secondary",
+    id: "se-vertex", name: "Seoul Vertex", state: "live", uptime: "97.3%", role: "secondary",
     load: { queueDepth: 498, fillQuality: "fair", posture: "Latency shield" },
     fallback: { target: "Tokyo Arc", readiness: "unavailable" },
     rationale: "KRX-linked flow only; Tokyo fallback currently unavailable during the Nikkei session halt window.",
   },
 ];
 
+/** @type {{ id:string, type:string, trigger:string, severity:"high"|"moderate"|"low", status:"pending"|"accepted"|"deferred", venue:string, timestamp:string, rationale:string, recommendation:string, impact:string }[]} */
 const riskAlerts = [
   {
-    id: "RA-001",
-    type: "Threshold widening",
-    trigger: "London open spread exceeded 2.1 bps",
-    severity: "high",
-    status: "pending",
-    venue: "London Arc",
-    timestamp: "08:32",
+    id: "RA-001", type: "Threshold widening", trigger: "London open spread exceeded 2.1 bps",
+    severity: "high", status: "pending", venue: "London Arc", timestamp: "08:32",
     rationale: "Operator widened the fill slippage ceiling from 1.8 bps to 2.4 bps during London open volatility. HydraX held the route but flagged for sign-off before re-arming passive mode.",
     recommendation: "Accept the widened threshold for the current session and auto-revert at London close.",
     impact: "Allows continued routing through London Arc without manual holds during peak liquidity.",
   },
   {
-    id: "RA-002",
-    type: "Passive window reopen",
-    trigger: "Spread normalization on Singapore Nexus",
-    severity: "moderate",
-    status: "pending",
-    venue: "Singapore Nexus",
-    timestamp: "08:18",
+    id: "RA-002", type: "Passive window reopen", trigger: "Spread normalization on Singapore Nexus",
+    severity: "moderate", status: "pending", venue: "Singapore Nexus", timestamp: "08:18",
     rationale: "HydraX detected spread normalization after Asia session volatility. Passive routing window can reopen, but operator confirmation is required per guardrail policy.",
     recommendation: "Reopen passive window with a 15-minute review horizon.",
     impact: "Restores full routing flexibility on Singapore Nexus for the remainder of the Asia session.",
   },
   {
-    id: "RA-003",
-    type: "Inventory skew",
-    trigger: "Asia book skew crossed -0.6% threshold",
-    severity: "low",
-    status: "pending",
-    venue: "Tokyo Arc",
-    timestamp: "07:54",
+    id: "RA-003", type: "Inventory skew", trigger: "Asia book skew crossed -0.6% threshold",
+    severity: "low", status: "pending", venue: "Tokyo Arc", timestamp: "07:54",
     rationale: "Inventory skew in the Asia macro book crossed the -0.6% soft threshold. Currently narrowing, no hard limit breached.",
     recommendation: "Acknowledge and monitor. No action required unless skew widens past -1.2%.",
     impact: "Informational. Current trajectory is self-correcting.",
   },
   {
-    id: "RA-004",
-    type: "Adverse selection",
-    trigger: "Fill quality dropped below 95% on Frankfurt",
-    severity: "high",
-    status: "pending",
-    venue: "Frankfurt Loop",
-    timestamp: "07:41",
+    id: "RA-004", type: "Adverse selection", trigger: "Fill quality dropped below 95% on Frankfurt",
+    severity: "high", status: "pending", venue: "Frankfurt Loop", timestamp: "07:41",
     rationale: "Frankfurt Loop reported adverse selection pressure after the latency spike. Fill quality dropped to 93.2%. HydraX moved the venue to warm standby and rerouted to London Arc.",
     recommendation: "Defer re-enabling Frankfurt routing until round-trip stabilizes below 18ms for five minutes.",
     impact: "Prevents degraded fills during Frankfurt recovery. London Arc absorbs overflow.",
   },
 ];
 
+/** @type {{ id:string, name:string, pnl:string, exposure:string, status:"active"|"watch"|"staged", instruments:number, topHoldings:{ name:string, weight:string, venue:string }[], venueAllocation:{ name:string, share:string }[], rationale:string, riskNote:string }[]} */
 const positions = [
   {
-    id: "BK-ASIA",
-    name: "Asia macro book",
-    pnl: "+1.8%",
-    exposure: "$18.4M",
-    status: "active",
-    instruments: 12,
+    id: "BK-ASIA", name: "Asia macro book", pnl: "+1.8%", exposure: "$18.4M", status: "active", instruments: 12,
     topHoldings: [
       { name: "SGX iShares MSCI", weight: "22%", venue: "Singapore Nexus" },
       { name: "Nikkei 225 basket", weight: "18%", venue: "Tokyo Arc" },
       { name: "GCC energy sleeve", weight: "14%", venue: "Dubai Harbor" },
     ],
     venueAllocation: [
-      { name: "Singapore Nexus", share: "41%" },
-      { name: "Tokyo Arc", share: "32%" },
-      { name: "Dubai Harbor", share: "19%" },
-      { name: "Seoul Vertex", share: "8%" },
+      { name: "Singapore Nexus", share: "41%" }, { name: "Tokyo Arc", share: "32%" },
+      { name: "Dubai Harbor", share: "19%" }, { name: "Seoul Vertex", share: "8%" },
     ],
     rationale: "Overweight Asia-Pacific flow during pre-London session. Inventory skew narrowing after the BoJ tape print; queue density improving on Singapore and Tokyo.",
     riskNote: "Soft threshold at -0.6% inventory skew crossed but self-correcting. No hard limit breached.",
   },
   {
-    id: "BK-EUR",
-    name: "Europe dispersion",
-    pnl: "-0.4%",
-    exposure: "$11.2M",
-    status: "watch",
-    instruments: 8,
+    id: "BK-EUR", name: "Europe dispersion", pnl: "-0.4%", exposure: "$11.2M", status: "watch", instruments: 8,
     topHoldings: [
       { name: "DAX futures sleeve", weight: "28%", venue: "Frankfurt Loop" },
       { name: "Euro Stoxx vol surface", weight: "24%", venue: "London Arc" },
       { name: "CHF rates overlay", weight: "16%", venue: "Zurich Chain" },
     ],
     venueAllocation: [
-      { name: "London Arc", share: "44%" },
-      { name: "Frankfurt Loop", share: "30%" },
-      { name: "Zurich Chain", share: "26%" },
+      { name: "London Arc", share: "44%" }, { name: "Frankfurt Loop", share: "30%" }, { name: "Zurich Chain", share: "26%" },
     ],
     rationale: "Book tilted defensive after Frankfurt latency spike. London Arc absorbing overflow while Frankfurt recovers. Dispersion trades hedging against implied vol mean-reversion.",
     riskNote: "Frankfurt Loop in warm standby — DAX sleeve queued until round-trip normalizes below 18ms.",
   },
   {
-    id: "BK-HEDGE",
-    name: "Cross-venue hedge",
-    pnl: "+0.9%",
-    exposure: "$6.8M",
-    status: "active",
-    instruments: 5,
+    id: "BK-HEDGE", name: "Cross-venue hedge", pnl: "+0.9%", exposure: "$6.8M", status: "active", instruments: 5,
     topHoldings: [
       { name: "SGD rates curve", weight: "34%", venue: "Singapore Nexus" },
       { name: "JGB short sleeve", weight: "28%", venue: "Tokyo Arc" },
       { name: "FX delta neutral", weight: "22%", venue: "New York Relay" },
     ],
     venueAllocation: [
-      { name: "Singapore Nexus", share: "38%" },
-      { name: "Tokyo Arc", share: "30%" },
-      { name: "New York Relay", share: "32%" },
+      { name: "Singapore Nexus", share: "38%" }, { name: "Tokyo Arc", share: "30%" }, { name: "New York Relay", share: "32%" },
     ],
     rationale: "Offsetting directional exposure across the Asia and US books. Rate curve positions sized to maintain delta neutrality during the session overlap.",
     riskNote: "Within tolerance band. Auto-rebalance armed if net delta drifts beyond 0.3%.",
   },
   {
-    id: "BK-US",
-    name: "US session book",
-    pnl: "+2.1%",
-    exposure: "$22.6M",
-    status: "active",
-    instruments: 9,
+    id: "BK-US", name: "US session book", pnl: "+2.1%", exposure: "$22.6M", status: "active", instruments: 9,
     topHoldings: [
       { name: "S&P 500 basket", weight: "30%", venue: "New York Relay" },
       { name: "Treasury curve", weight: "25%", venue: "New York Relay" },
       { name: "VIX sleeve", weight: "15%", venue: "New York Relay" },
     ],
     venueAllocation: [
-      { name: "New York Relay", share: "72%" },
-      { name: "Zurich Chain", share: "18%" },
-      { name: "London Arc", share: "10%" },
+      { name: "New York Relay", share: "72%" }, { name: "Zurich Chain", share: "18%" }, { name: "London Arc", share: "10%" },
     ],
     rationale: "Primary US session exposure. Strongest fill quality in the network during the London-New York overlap window. Treasury curve weighted for yield curve steepening.",
     riskNote: "Clean. No threshold breach. Passive mode fully armed.",
   },
   {
-    id: "BK-APAC",
-    name: "APAC pre-open staging",
-    pnl: "Flat",
-    exposure: "$3.2M",
-    status: "staged",
-    instruments: 3,
+    id: "BK-APAC", name: "APAC pre-open staging", pnl: "Flat", exposure: "$3.2M", status: "staged", instruments: 3,
     topHoldings: [
       { name: "ASX 200 sleeve", weight: "45%", venue: "Sydney Rim" },
       { name: "KRX flow basket", weight: "35%", venue: "Seoul Vertex" },
       { name: "NZD overlay", weight: "20%", venue: "Sydney Rim" },
     ],
     venueAllocation: [
-      { name: "Sydney Rim", share: "55%" },
-      { name: "Seoul Vertex", share: "45%" },
+      { name: "Sydney Rim", share: "55%" }, { name: "Seoul Vertex", share: "45%" },
     ],
     rationale: "Pre-open staging for the next APAC session. Orders held in passive ladder until Sydney and Seoul venues warm into primary weight.",
     riskNote: "No live exposure. Staged orders will activate when venue load thresholds are met.",
+  },
+];
+
+/** @type {{ id:string, venue:string, mode:string, exposure:string, status:"live"|"review"|"queued", side:"Buy"|"Sell", instrument:string, fillQuality:string, slippage:string, rationale:string, venueMix:{ name:string, share:string }[], fallback:string }[]} */
+const orders = [
+  {
+    id: "HX-2041", venue: "Singapore Nexus", mode: "Balanced Sweep", exposure: "$4.2M",
+    status: "live", side: "Buy", instrument: "SGX iShares MSCI", fillQuality: "99.1%", slippage: "+0.06%",
+    rationale: "Queue depth tightened on Singapore Nexus, HydraX shifted weight from Tokyo to absorb the improved fill curve.",
+    venueMix: [{ name: "Singapore Nexus", share: "68%" }, { name: "Tokyo Arc", share: "24%" }, { name: "Dubai Harbor", share: "8%" }],
+    fallback: "Tokyo Arc armed as warm reroute if Singapore latency drifts above 18ms.",
+  },
+  {
+    id: "HX-2038", venue: "Tokyo Arc", mode: "Latency Shield", exposure: "$2.1M",
+    status: "review", side: "Sell", instrument: "Nikkei 225 basket", fillQuality: "96.4%", slippage: "+0.14%",
+    rationale: "Adverse selection pressure rose during the Tokyo open; HydraX flagged the route for operator review before expanding the child-order window.",
+    venueMix: [{ name: "Tokyo Arc", share: "74%" }, { name: "Singapore Nexus", share: "26%" }],
+    fallback: "Passive ladder rollback ready if spread widens beyond 1.4 bps.",
+  },
+  {
+    id: "HX-2035", venue: "Dubai Harbor", mode: "Inventory Protect", exposure: "$3.4M",
+    status: "live", side: "Buy", instrument: "GCC energy sleeve", fillQuality: "98.7%", slippage: "+0.08%",
+    rationale: "Inventory skew in the Asia book narrowed; HydraX re-enabled aggressive take on Dubai Harbor to rebuild depth.",
+    venueMix: [{ name: "Dubai Harbor", share: "82%" }, { name: "Frankfurt Loop", share: "18%" }],
+    fallback: "Frankfurt Loop holds warm standby with tightened size caps.",
+  },
+  {
+    id: "HX-2031", venue: "Frankfurt Loop", mode: "Fallback Mesh", exposure: "$1.2M",
+    status: "queued", side: "Sell", instrument: "DAX futures sleeve", fillQuality: "Pending", slippage: "\u2014",
+    rationale: "Route parked until Frankfurt Loop recovers from the 10:42 latency spike. HydraX is holding exposure off the book rather than forcing a degraded fill.",
+    venueMix: [{ name: "Frankfurt Loop", share: "60% target" }, { name: "Singapore Nexus", share: "40% hedge" }],
+    fallback: "Auto-release once Frankfurt round-trip drops under 22ms for two minutes.",
+  },
+  {
+    id: "HX-2028", venue: "Singapore Nexus", mode: "Balanced Sweep", exposure: "$5.0M",
+    status: "review", side: "Buy", instrument: "SGD rates curve", fillQuality: "97.2%", slippage: "+0.12%",
+    rationale: "Operator widened the threshold during London open, HydraX logged the override and is awaiting sign-off before re-arming passive mode.",
+    venueMix: [{ name: "Singapore Nexus", share: "58%" }, { name: "Dubai Harbor", share: "30%" }, { name: "Tokyo Arc", share: "12%" }],
+    fallback: "Auto-revert to Balanced Sweep once passive window reopens post-review.",
+  },
+  {
+    id: "HX-2026", venue: "Tokyo Arc", mode: "Passive Ladder", exposure: "$900K",
+    status: "queued", side: "Sell", instrument: "JGB short sleeve", fillQuality: "Pending", slippage: "\u2014",
+    rationale: "Child orders staged but held — HydraX is waiting for queue density to normalize after the BoJ tape print.",
+    venueMix: [{ name: "Tokyo Arc", share: "100%" }],
+    fallback: "Escalate to Latency Shield if queue density recovers before spread normalizes.",
   },
 ];
 
@@ -271,112 +230,6 @@ const events = [
   "HydraX reduced exposure drift during an adverse selection burst.",
   "Passive routing window reopened after spread normalized.",
   "Inventory pressure cooled across the primary venue cluster.",
-];
-
-const orders = [
-  {
-    id: "HX-2041",
-    venue: "Singapore Nexus",
-    mode: "Balanced Sweep",
-    exposure: "$4.2M",
-    status: "live",
-    side: "Buy",
-    instrument: "SGX iShares MSCI",
-    fillQuality: "99.1%",
-    slippage: "+0.06%",
-    rationale: "Queue depth tightened on Singapore Nexus, HydraX shifted weight from Tokyo to absorb the improved fill curve.",
-    venueMix: [
-      { name: "Singapore Nexus", share: "68%" },
-      { name: "Tokyo Arc", share: "24%" },
-      { name: "Dubai Harbor", share: "8%" },
-    ],
-    fallback: "Tokyo Arc armed as warm reroute if Singapore latency drifts above 18ms.",
-  },
-  {
-    id: "HX-2038",
-    venue: "Tokyo Arc",
-    mode: "Latency Shield",
-    exposure: "$2.1M",
-    status: "review",
-    side: "Sell",
-    instrument: "Nikkei 225 basket",
-    fillQuality: "96.4%",
-    slippage: "+0.14%",
-    rationale: "Adverse selection pressure rose during the Tokyo open; HydraX flagged the route for operator review before expanding the child-order window.",
-    venueMix: [
-      { name: "Tokyo Arc", share: "74%" },
-      { name: "Singapore Nexus", share: "26%" },
-    ],
-    fallback: "Passive ladder rollback ready if spread widens beyond 1.4 bps.",
-  },
-  {
-    id: "HX-2035",
-    venue: "Dubai Harbor",
-    mode: "Inventory Protect",
-    exposure: "$3.4M",
-    status: "live",
-    side: "Buy",
-    instrument: "GCC energy sleeve",
-    fillQuality: "98.7%",
-    slippage: "+0.08%",
-    rationale: "Inventory skew in the Asia book narrowed; HydraX re-enabled aggressive take on Dubai Harbor to rebuild depth.",
-    venueMix: [
-      { name: "Dubai Harbor", share: "82%" },
-      { name: "Frankfurt Loop", share: "18%" },
-    ],
-    fallback: "Frankfurt Loop holds warm standby with tightened size caps.",
-  },
-  {
-    id: "HX-2031",
-    venue: "Frankfurt Loop",
-    mode: "Fallback Mesh",
-    exposure: "$1.2M",
-    status: "queued",
-    side: "Sell",
-    instrument: "DAX futures sleeve",
-    fillQuality: "Pending",
-    slippage: "—",
-    rationale: "Route parked until Frankfurt Loop recovers from the 10:42 latency spike. HydraX is holding exposure off the book rather than forcing a degraded fill.",
-    venueMix: [
-      { name: "Frankfurt Loop", share: "60% target" },
-      { name: "Singapore Nexus", share: "40% hedge" },
-    ],
-    fallback: "Auto-release once Frankfurt round-trip drops under 22ms for two minutes.",
-  },
-  {
-    id: "HX-2028",
-    venue: "Singapore Nexus",
-    mode: "Balanced Sweep",
-    exposure: "$5.0M",
-    status: "review",
-    side: "Buy",
-    instrument: "SGD rates curve",
-    fillQuality: "97.2%",
-    slippage: "+0.12%",
-    rationale: "Operator widened the threshold during London open, HydraX logged the override and is awaiting sign-off before re-arming passive mode.",
-    venueMix: [
-      { name: "Singapore Nexus", share: "58%" },
-      { name: "Dubai Harbor", share: "30%" },
-      { name: "Tokyo Arc", share: "12%" },
-    ],
-    fallback: "Auto-revert to Balanced Sweep once passive window reopens post-review.",
-  },
-  {
-    id: "HX-2026",
-    venue: "Tokyo Arc",
-    mode: "Passive Ladder",
-    exposure: "$900K",
-    status: "queued",
-    side: "Sell",
-    instrument: "JGB short sleeve",
-    fillQuality: "Pending",
-    slippage: "—",
-    rationale: "Child orders staged but held — HydraX is waiting for queue density to normalize after the BoJ tape print.",
-    venueMix: [
-      { name: "Tokyo Arc", share: "100%" },
-    ],
-    fallback: "Escalate to Latency Shield if queue density recovers before spread normalizes.",
-  },
 ];
 
 const panelTitles = {
@@ -466,7 +319,7 @@ const panelTitle = document.getElementById("panelTitle");
 const stateBanner = document.getElementById("stateBanner");
 const cycleStateButton = document.getElementById("cycleState");
 const navButtons = Array.from(document.querySelectorAll(".workspace-nav-item"));
-const filterButtons = Array.from(document.querySelectorAll(".filter-chip"));
+const filterGroup = document.getElementById("filterGroup");
 const panelBodies = Array.from(document.querySelectorAll("[data-panel-body]"));
 const stateCards = Array.from(document.querySelectorAll("#panel-orders [data-state]"));
 const summaryFillValue = document.getElementById("summaryFillValue");
@@ -514,6 +367,10 @@ const activityTableBody = document.getElementById("activityTableBody");
 const activityCountPill = document.getElementById("activityCountPill");
 const activityEmpty = document.getElementById("activityEmpty");
 const navCountActivity = document.querySelector('[data-nav-count="activity"]');
+
+const venuesFilterEmpty = document.getElementById("venuesFilterEmpty");
+const positionsFilterEmpty = document.getElementById("positionsFilterEmpty");
+const riskFilterEmpty = document.getElementById("riskFilterEmpty");
 
 const ACTIVITY_STORAGE_KEY = "hydrax.activity.v1";
 
@@ -619,6 +476,43 @@ function filteredOrders() {
     : orders.filter((order) => order.status === activeFilter);
 }
 
+function filteredVenues() {
+  return activeFilter === "all"
+    ? venues
+    : venues.filter((v) => v.state === activeFilter);
+}
+
+function filteredPositions() {
+  return activeFilter === "all"
+    ? positions
+    : positions.filter((p) => p.status === activeFilter);
+}
+
+function filteredRisk() {
+  return activeFilter === "all"
+    ? riskAlerts
+    : riskAlerts.filter((a) => a.status === activeFilter);
+}
+
+function renderFilterChips(panel) {
+  if (!filterGroup) return;
+  var filters = panelFilters[panel] || [];
+  if (filters.length === 0) {
+    filterGroup.classList.add("is-hidden");
+    filterGroup.innerHTML = "";
+    return;
+  }
+  filterGroup.classList.remove("is-hidden");
+  filterGroup.innerHTML = filters.map(function (f) {
+    return '<button class="filter-chip' + (f.key === activeFilter ? " is-active" : "") + '" type="button" data-filter="' + f.key + '">' + f.label + '</button>';
+  }).join("");
+  filterGroup.querySelectorAll(".filter-chip").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setActiveFilter(btn.dataset.filter);
+    });
+  });
+}
+
 function renderOrders() {
   if (!ordersTableBody) return;
 
@@ -660,6 +554,27 @@ function renderOrders() {
   renderOrderDetail();
 }
 
+/**
+ * Shared drill-down detail card renderer.
+ * @param {{ label:string, title:string, badge:string, badgeClass:string, meta:{ dt:string, dd:string }[], sections:{ label:string, html:string }[], actions?:string }} opts
+ * @returns {string}
+ */
+function renderDetailCard(opts) {
+  const closeIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+  const metaRows = opts.meta.map(function (m) { return '<div><dt>' + m.dt + '</dt><dd>' + m.dd + '</dd></div>'; }).join('');
+  const sectionRows = opts.sections.map(function (s) { return '<section class="detail-section"><p class="panel-label">' + s.label + '</p>' + s.html + '</section>'; }).join('');
+  return '<article class="detail-card">' +
+    '<header class="detail-head">' +
+      '<div><p class="panel-label">' + opts.label + '</p><strong>' + opts.title + '</strong></div>' +
+      '<span class="' + opts.badgeClass + '">' + opts.badge + '</span>' +
+      '<button class="detail-close" type="button" aria-label="Close detail">' + closeIcon + '</button>' +
+    '</header>' +
+    '<dl class="detail-meta">' + metaRows + '</dl>' +
+    sectionRows +
+    (opts.actions || '') +
+  '</article>';
+}
+
 function renderOrderDetail() {
   if (!orderDetail) return;
 
@@ -682,41 +597,25 @@ function renderOrderDetail() {
     .map((entry) => `<li><span><span class="venue-link" data-venue-link="${entry.name}" role="button" tabindex="0" aria-label="Open ${entry.name} in venues panel">${entry.name}</span></span><strong>${entry.share}</strong></li>`)
     .join("");
 
-  orderDetail.innerHTML = `
-    <article class="detail-card">
-      <header class="detail-head">
-        <div>
-          <p class="panel-label">${selected.id}</p>
-          <strong>${selected.instrument}</strong>
-        </div>
-        <span class="status-badge ${selected.status}">${statusLabel}</span>
-      </header>
-
-      <dl class="detail-meta">
-        <div><dt>Side</dt><dd>${selected.side}</dd></div>
-        <div><dt>Venue</dt><dd><span class="venue-link" data-venue-link="${selected.venue}" role="button" tabindex="0" aria-label="Open ${selected.venue} in venues panel">${selected.venue}</span></dd></div>
-        <div><dt>Mode</dt><dd>${selected.mode}</dd></div>
-        <div><dt>Exposure</dt><dd>${selected.exposure}</dd></div>
-        <div><dt>Fill quality</dt><dd>${selected.fillQuality}</dd></div>
-        <div><dt>Slippage</dt><dd>${selected.slippage}</dd></div>
-      </dl>
-
-      <section class="detail-section">
-        <p class="panel-label">Operator rationale</p>
-        <p class="narrative-copy">${selected.rationale}</p>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Venue mix</p>
-        <ul class="detail-venue-list">${venueRows}</ul>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Fallback sequence</p>
-        <p class="narrative-copy">${selected.fallback}</p>
-      </section>
-    </article>
-  `;
+  orderDetail.innerHTML = renderDetailCard({
+    label: selected.id,
+    title: selected.instrument,
+    badge: statusLabel,
+    badgeClass: 'status-badge ' + selected.status,
+    meta: [
+      { dt: 'Side', dd: selected.side },
+      { dt: 'Venue', dd: '<span class="venue-link" data-venue-link="' + selected.venue + '" role="button" tabindex="0" aria-label="Open ' + selected.venue + ' in venues panel">' + selected.venue + '</span>' },
+      { dt: 'Mode', dd: selected.mode },
+      { dt: 'Exposure', dd: selected.exposure },
+      { dt: 'Fill quality', dd: selected.fillQuality },
+      { dt: 'Slippage', dd: selected.slippage },
+    ],
+    sections: [
+      { label: 'Operator rationale', html: '<p class="narrative-copy">' + selected.rationale + '</p>' },
+      { label: 'Venue mix', html: '<ul class="detail-venue-list">' + venueRows + '</ul>' },
+      { label: 'Fallback sequence', html: '<p class="narrative-copy">' + selected.fallback + '</p>' },
+    ],
+  });
 }
 
 function selectOrder(orderId) {
@@ -904,12 +803,21 @@ function renderVenues() {
 function renderVenueLane() {
   if (!venuesTableBody) return;
 
-  if (selectedVenueId && !venues.some((v) => v.id === selectedVenueId)) {
+  var filtered = filteredVenues();
+  var isEmpty = filtered.length === 0;
+
+  if (venuesFilterEmpty) venuesFilterEmpty.classList.toggle("is-visible", isEmpty);
+  var venueLane = venuesTableBody.closest(".venue-lane");
+  if (venueLane) venueLane.classList.toggle("is-hidden", isEmpty);
+  var venueRail = venuesTableBody.closest(".venues-workbench")?.querySelector(".detail-rail");
+  if (venueRail) venueRail.classList.toggle("is-hidden", isEmpty);
+
+  if (selectedVenueId && !filtered.some((v) => v.id === selectedVenueId)) {
     selectedVenueId = null;
     persistState();
   }
 
-  venuesTableBody.innerHTML = venues.map((venue) => {
+  venuesTableBody.innerHTML = filtered.map((venue) => {
     const routed = routedOrdersFor(venue.name);
     const roleLabel = venue.role.charAt(0).toUpperCase() + venue.role.slice(1);
     const stateText = stateLabel[venue.state] || venue.state;
@@ -975,44 +883,25 @@ function renderVenueDetail() {
       `).join("")}</ul>`
     : `<p class="narrative-copy">No orders currently routed through ${selected.name}.</p>`;
 
-  venueDetail.innerHTML = `
-    <article class="detail-card">
-      <header class="detail-head">
-        <div>
-          <p class="panel-label">${selected.name}</p>
-          <strong>${selected.load.posture}</strong>
-        </div>
-        <span class="venue-state venue-state-${selected.state}">${stateText}</span>
-      </header>
-
-      <dl class="detail-meta">
-        <div><dt>Role</dt><dd>${roleText}</dd></div>
-        <div><dt>Uptime</dt><dd>${selected.uptime}</dd></div>
-        <div><dt>Queue depth</dt><dd>${selected.load.queueDepth.toLocaleString()}</dd></div>
-        <div><dt>Fill quality</dt><dd>${loadText}</dd></div>
-        <div><dt>Posture</dt><dd>${selected.load.posture}</dd></div>
-        <div><dt>Routed orders</dt><dd>${routed.length}</dd></div>
-      </dl>
-
-      <section class="detail-section">
-        <p class="panel-label">Operator rationale</p>
-        <p class="narrative-copy">${selected.rationale}</p>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Routed orders</p>
-        ${routedMarkup}
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Failover readiness</p>
-        <div class="detail-fallback">
-          <span>Target</span><strong>${selected.fallback.target}</strong>
-          <span>Readiness</span><strong class="readiness-pill readiness-${selected.fallback.readiness}">${readinessText}</strong>
-        </div>
-      </section>
-    </article>
-  `;
+  venueDetail.innerHTML = renderDetailCard({
+    label: selected.name,
+    title: selected.load.posture,
+    badge: stateText,
+    badgeClass: 'venue-state venue-state-' + selected.state,
+    meta: [
+      { dt: 'Role', dd: roleText },
+      { dt: 'Uptime', dd: selected.uptime },
+      { dt: 'Queue depth', dd: selected.load.queueDepth.toLocaleString() },
+      { dt: 'Fill quality', dd: loadText },
+      { dt: 'Posture', dd: selected.load.posture },
+      { dt: 'Routed orders', dd: String(routed.length) },
+    ],
+    sections: [
+      { label: 'Operator rationale', html: '<p class="narrative-copy">' + selected.rationale + '</p>' },
+      { label: 'Routed orders', html: routedMarkup },
+      { label: 'Failover readiness', html: '<div class="detail-fallback"><span>Target</span><strong>' + selected.fallback.target + '</strong><span>Readiness</span><strong class="readiness-pill readiness-' + selected.fallback.readiness + '">' + readinessText + '</strong></div>' },
+    ],
+  });
 }
 
 function selectVenue(venueId) {
@@ -1108,12 +997,21 @@ function pendingRiskCount() {
 function renderRiskAlerts() {
   if (!riskTableBody) return;
 
-  if (selectedRiskId && !riskAlerts.some((a) => a.id === selectedRiskId)) {
+  var filtered = filteredRisk();
+  var isEmpty = filtered.length === 0;
+
+  if (riskFilterEmpty) riskFilterEmpty.classList.toggle("is-visible", isEmpty);
+  var riskLane = riskTableBody.closest(".risk-lane");
+  if (riskLane) riskLane.classList.toggle("is-hidden", isEmpty);
+  var riskRail = riskTableBody.closest(".risk-workbench")?.querySelector(".detail-rail");
+  if (riskRail) riskRail.classList.toggle("is-hidden", isEmpty);
+
+  if (selectedRiskId && !filtered.some((a) => a.id === selectedRiskId)) {
     selectedRiskId = null;
     persistState();
   }
 
-  riskTableBody.innerHTML = riskAlerts.map((alert) => {
+  riskTableBody.innerHTML = filtered.map((alert) => {
     const sevText = severityLabel[alert.severity] || alert.severity;
     const statusText = riskStatusLabel[alert.status] || alert.status;
     return `
@@ -1170,45 +1068,24 @@ function renderRiskDetail() {
         <span class="risk-status-badge risk-status-${selected.status}">${statusText}</span>
       </div>`;
 
-  riskDetail.innerHTML = `
-    <article class="detail-card">
-      <header class="detail-head">
-        <div>
-          <p class="panel-label">${selected.id}</p>
-          <strong>${selected.type}</strong>
-        </div>
-        <span class="severity-badge severity-${selected.severity}">${sevText}</span>
-      </header>
-
-      <dl class="detail-meta">
-        <div><dt>Severity</dt><dd>${sevText}</dd></div>
-        <div><dt>Venue</dt><dd>${selected.venue}</dd></div>
-        <div><dt>Triggered</dt><dd>${selected.timestamp}</dd></div>
-      </dl>
-
-      <section class="detail-section">
-        <p class="panel-label">Trigger</p>
-        <p class="narrative-copy">${selected.trigger}</p>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Rationale</p>
-        <p class="narrative-copy">${selected.rationale}</p>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Recommendation</p>
-        <p class="narrative-copy">${selected.recommendation}</p>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Impact</p>
-        <p class="narrative-copy">${selected.impact}</p>
-      </section>
-
-      ${actionsMarkup}
-    </article>
-  `;
+  riskDetail.innerHTML = renderDetailCard({
+    label: selected.id,
+    title: selected.type,
+    badge: sevText,
+    badgeClass: 'severity-badge severity-' + selected.severity,
+    meta: [
+      { dt: 'Severity', dd: sevText },
+      { dt: 'Venue', dd: selected.venue },
+      { dt: 'Triggered', dd: selected.timestamp },
+    ],
+    sections: [
+      { label: 'Trigger', html: '<p class="narrative-copy">' + selected.trigger + '</p>' },
+      { label: 'Rationale', html: '<p class="narrative-copy">' + selected.rationale + '</p>' },
+      { label: 'Recommendation', html: '<p class="narrative-copy">' + selected.recommendation + '</p>' },
+      { label: 'Impact', html: '<p class="narrative-copy">' + selected.impact + '</p>' },
+    ],
+    actions: actionsMarkup,
+  });
 }
 
 function selectRisk(riskId) {
@@ -1298,12 +1175,21 @@ const positionStatusLabel = {
 function renderPositions() {
   if (!positionsTableBody) return;
 
-  if (selectedPositionId && !positions.some((p) => p.id === selectedPositionId)) {
+  var filtered = filteredPositions();
+  var isEmpty = filtered.length === 0;
+
+  if (positionsFilterEmpty) positionsFilterEmpty.classList.toggle("is-visible", isEmpty);
+  var posLane = positionsTableBody.closest(".position-lane");
+  if (posLane) posLane.classList.toggle("is-hidden", isEmpty);
+  var posRail = positionsTableBody.closest(".positions-workbench")?.querySelector(".detail-rail");
+  if (posRail) posRail.classList.toggle("is-hidden", isEmpty);
+
+  if (selectedPositionId && !filtered.some((p) => p.id === selectedPositionId)) {
     selectedPositionId = null;
     persistState();
   }
 
-  positionsTableBody.innerHTML = positions.map((pos) => {
+  positionsTableBody.innerHTML = filtered.map((pos) => {
     const statusText = positionStatusLabel[pos.status] || pos.status;
     return `
       <tr
@@ -1357,43 +1243,25 @@ function renderPositionDetail() {
     .map((v) => `<li><span><span class="venue-link" data-venue-link="${v.name}" role="button" tabindex="0" aria-label="Open ${v.name} in venues panel">${v.name}</span></span><strong>${v.share}</strong></li>`)
     .join("");
 
-  positionDetail.innerHTML = `
-    <article class="detail-card">
-      <header class="detail-head">
-        <div>
-          <p class="panel-label">${selected.id}</p>
-          <strong>${selected.name}</strong>
-        </div>
-        <span class="position-status-badge position-status-${selected.status}">${statusText}</span>
-      </header>
+  const pnlClass = parseFloat(selected.pnl) > 0 ? "pnl-positive" : parseFloat(selected.pnl) < 0 ? "pnl-negative" : "pnl-flat";
 
-      <dl class="detail-meta">
-        <div><dt>Exposure</dt><dd>${selected.exposure}</dd></div>
-        <div><dt>P&L</dt><dd class="pnl-value ${parseFloat(selected.pnl) > 0 ? "pnl-positive" : parseFloat(selected.pnl) < 0 ? "pnl-negative" : "pnl-flat"}">${selected.pnl}</dd></div>
-        <div><dt>Instruments</dt><dd>${selected.instruments}</dd></div>
-      </dl>
-
-      <section class="detail-section">
-        <p class="panel-label">Top holdings</p>
-        <ul class="detail-venue-list">${holdingsMarkup}</ul>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Venue allocation</p>
-        <ul class="detail-venue-list">${allocationMarkup}</ul>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Operator rationale</p>
-        <p class="narrative-copy">${selected.rationale}</p>
-      </section>
-
-      <section class="detail-section">
-        <p class="panel-label">Risk note</p>
-        <p class="narrative-copy">${selected.riskNote}</p>
-      </section>
-    </article>
-  `;
+  positionDetail.innerHTML = renderDetailCard({
+    label: selected.id,
+    title: selected.name,
+    badge: statusText,
+    badgeClass: 'position-status-badge position-status-' + selected.status,
+    meta: [
+      { dt: 'Exposure', dd: selected.exposure },
+      { dt: 'P&L', dd: '<span class="pnl-value ' + pnlClass + '">' + selected.pnl + '</span>' },
+      { dt: 'Instruments', dd: String(selected.instruments) },
+    ],
+    sections: [
+      { label: 'Top holdings', html: '<ul class="detail-venue-list">' + holdingsMarkup + '</ul>' },
+      { label: 'Venue allocation', html: '<ul class="detail-venue-list">' + allocationMarkup + '</ul>' },
+      { label: 'Operator rationale', html: '<p class="narrative-copy">' + selected.rationale + '</p>' },
+      { label: 'Risk note', html: '<p class="narrative-copy">' + selected.riskNote + '</p>' },
+    ],
+  });
 }
 
 function selectPosition(positionId) {
@@ -1532,6 +1400,8 @@ function clearSearch() {
 function setActivePanel(panel, skipLog) {
   activePanel = panel;
   clearSearch();
+  activeFilter = "all";
+  renderFilterChips(panel);
   panelTitle.textContent = panelTitles[panel] || "Workspace";
 
   navButtons.forEach((button) => {
@@ -1549,24 +1419,38 @@ function setActivePanel(panel, skipLog) {
 
 function setActiveFilter(filter) {
   activeFilter = filter;
-  filterButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.filter === filter);
-  });
+
+  if (filterGroup) {
+    filterGroup.querySelectorAll(".filter-chip").forEach(function (btn) {
+      btn.classList.toggle("is-active", btn.dataset.filter === filter);
+    });
+  }
 
   persistState();
-  logActivity("Filter change", "Orders filtered to: " + filter);
+  logActivity("Filter change", panelTitles[activePanel] + " filtered to: " + filter);
 
-  if (activeState === "loading") {
-    updateOrdersPill();
-    return;
+  if (activePanel === "orders") {
+    if (activeState === "loading") {
+      updateOrdersPill();
+      return;
+    }
+    var filtered = filteredOrders();
+    if (filtered.length === 0) {
+      setOrderState("empty");
+    } else {
+      setOrderState("ready");
+    }
+  } else if (activePanel === "venues") {
+    renderVenueLane();
+    renderVenueDetail();
+    updateVenuesPill();
+  } else if (activePanel === "positions") {
+    renderPositions();
+  } else if (activePanel === "risk") {
+    renderRiskAlerts();
   }
 
-  const filtered = filteredOrders();
-  if (filtered.length === 0) {
-    setOrderState("empty");
-  } else {
-    setOrderState("ready");
-  }
+  updateLaneSummary(filteredOrders());
 }
 
 cycleModeButton?.addEventListener("click", () => {
@@ -1587,9 +1471,7 @@ navButtons.forEach((button) => {
   });
 });
 
-filterButtons.forEach((button) => {
-  button.addEventListener("click", () => setActiveFilter(button.dataset.filter));
-});
+// Filter chip listeners are now attached dynamically in renderFilterChips
 
 ordersTableBody?.addEventListener("click", (event) => {
   const row = event.target.closest("tr.order-row");
@@ -1624,6 +1506,7 @@ venuesTableBody?.addEventListener("keydown", (event) => {
 });
 
 venueDetail?.addEventListener("click", (event) => {
+  if (event.target.closest(".detail-close")) { selectVenue(selectedVenueId); return; }
   const target = event.target.closest("[data-routed-order-id]");
   if (!target) return;
   const id = target.getAttribute("data-routed-order-id");
@@ -1672,6 +1555,7 @@ positionsTableBody?.addEventListener("keydown", (event) => {
 });
 
 riskDetail?.addEventListener("click", (event) => {
+  if (event.target.closest(".detail-close")) { selectRisk(selectedRiskId); return; }
   const actionBtn = event.target.closest("[data-risk-action]");
   if (!actionBtn) return;
   const action = actionBtn.getAttribute("data-risk-action");
@@ -1695,9 +1579,15 @@ function handleVenueLinkKeydown(event) {
   if (venueName) jumpToVenue(venueName);
 }
 
-orderDetail?.addEventListener("click", handleVenueLinkClick);
+orderDetail?.addEventListener("click", (event) => {
+  if (event.target.closest(".detail-close")) { selectOrder(selectedOrderId); return; }
+  handleVenueLinkClick(event);
+});
 orderDetail?.addEventListener("keydown", handleVenueLinkKeydown);
-positionDetail?.addEventListener("click", handleVenueLinkClick);
+positionDetail?.addEventListener("click", (event) => {
+  if (event.target.closest(".detail-close")) { selectPosition(selectedPositionId); return; }
+  handleVenueLinkClick(event);
+});
 positionDetail?.addEventListener("keydown", handleVenueLinkKeydown);
 
 dashboardButtons.forEach((button) => {
@@ -1864,9 +1754,7 @@ if (settingAlertCadence) settingAlertCadence.addEventListener("change", onSettin
 if (settingFallbackPolicy) settingFallbackPolicy.addEventListener("change", onSettingChange);
 if (settingDensity) settingDensity.addEventListener("change", onSettingChange);
 
-filterButtons.forEach((button) => {
-  button.classList.toggle("is-active", button.dataset.filter === activeFilter);
-});
+// Initial filter chips rendered via renderFilterChips in setActivePanel
 
 renderVenues();
 renderRiskAlerts();
