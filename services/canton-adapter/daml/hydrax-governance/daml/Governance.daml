@@ -32,3 +32,26 @@ template GovernanceProposal
     ensure requiredApprovals > 0
         && requiredApprovals <= length approvers
         && unique approvers
+
+    choice Approve : ContractId GovernanceProposal
+      with
+        approver: Party
+      controller approver
+      do
+        assertMsg "approver not authorized" $ approver `elem` approvers
+        assertMsg "duplicate approval"      $ approver `notElem` approvals
+        assertMsg "not pending"             $ status == Pending
+        let newApprovals = approver :: approvals
+        let newStatus =
+              if length newApprovals >= requiredApprovals
+                then Approved
+                else Pending
+        create this with
+          approvals = newApprovals
+          status    = newStatus
+
+    choice Execute : ContractId GovernanceProposal
+      controller proposer
+      do
+        assertMsg "not approved" $ status == Approved
+        create this with status = Executed

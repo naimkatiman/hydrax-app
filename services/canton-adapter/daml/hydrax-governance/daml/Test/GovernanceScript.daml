@@ -1,0 +1,29 @@
+module Test.GovernanceScript where
+
+import Daml.Script
+import Governance
+
+testHappyPath : Script ()
+testHappyPath = script do
+  issuer    <- allocateParty "Issuer"
+  ops1      <- allocateParty "Ops1"
+  ops2      <- allocateParty "Ops2"
+  custodian <- allocateParty "Custodian"
+
+  cid0 <- submit issuer $ createCmd GovernanceProposal with
+    proposer          = issuer
+    approvers         = [ops1, ops2]
+    observers         = [custodian]
+    proposalType      = ProductLaunch
+    payload           = "Launch MMF v1"
+    requiredApprovals = 2
+    approvals         = []
+    status            = Pending
+
+  cid1 <- submit ops1 $ exerciseCmd cid0 Approve with approver = ops1
+  cid2 <- submit ops2 $ exerciseCmd cid1 Approve with approver = ops2
+  cid3 <- submit issuer $ exerciseCmd cid2 Execute
+
+  Some final <- queryContractId issuer cid3
+  assertMsg "status must be Executed" $ final.status == Executed
+  pure ()
