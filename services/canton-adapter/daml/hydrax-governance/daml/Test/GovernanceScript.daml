@@ -85,3 +85,25 @@ testRejectBlocksExecute = script do
     reason   = "insufficient diligence"
 
   submitMustFail issuer $ exerciseCmd rejectedCid Execute
+
+testInterfaceView : Script ()
+testInterfaceView = script do
+  issuer <- allocateParty "Issuer"
+  ops1   <- allocateParty "Ops1"
+
+  cid <- submit issuer $ createCmd GovernanceProposal with
+    proposer          = issuer
+    approvers         = [ops1]
+    observers         = []
+    proposalType      = ProductLaunch
+    payload           = "interface view"
+    requiredApprovals = 1
+    approvals         = []
+    status            = Pending
+
+  let ifaceCid = toInterfaceContractId @Proposal cid
+  Some view <- queryInterfaceContractId @Proposal issuer ifaceCid
+  assertMsg "view.proposer must match"     $ view.proposer == issuer
+  assertMsg "view.status must be Pending"  $ view.status   == Pending
+  assertMsg "view.proposalType must match" $ view.proposalType == ProductLaunch
+  pure ()
