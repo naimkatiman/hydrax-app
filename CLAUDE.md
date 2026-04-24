@@ -158,6 +158,19 @@ Non-negotiable. Invoke before the corresponding work starts:
 - `/design-system` — for work that touches shared primitives, tenant theming, or cross-portal consistency. Use to generate or audit the design system before shipping reusable components.
 - `/nano-banana` — for all background image generation (hero backgrounds, empty-state art, tenant theming imagery). Do not use stock images, gradients-as-substitute, or inline SVG placeholders when a generated asset is needed.
 
+## Workflow Companions (use when triggered)
+
+Installed at user-level from `naimkatiman/continuous-improvement`. Optional — invoke only when the trigger fires, not on every task.
+
+- `/proceed-with-claude-recommendation` — walk a recommendation list top-to-bottom under the 7 Laws. Triggers: `/proceed-with-claude-recommendation`, "proceed with your recommendation", "do all of it", "all of them", "yes do it". Stops on `needs-approval` items (deploy, force-push, DB drop, secret change) even if other items are `safe`. Honors scope cues like "just the first one".
+- `/workspace-surface-audit` — pre-flight environment scan. Run first-time or when a recommendation list references tools/plugins/MCP servers not obviously present in the repo.
+- `/planning-with-files` — persistent `docs/plans/` workflow (task_plan + findings + progress). Complements `/superpowers:writing-plans`.
+- `/continuous-improvement` — on-demand reflection + instinct analysis. Run after significant work; not every session.
+- `/dashboard` — visual instinct health + observation stats.
+- `/discipline` — quick-reference card for the 7 Laws.
+- `/ralph` — autonomous multi-iteration loop for PRD-sized work. Requires explicit authorization; incompatible with small reversible slices.
+- `/superpowers` — framework companion. Prefer the namespaced `superpowers:*` plugin skills (writing-plans, brainstorming, verification) for specific workflow stages.
+
 ## Open Questions — Resolve Before Design (PRD §22)
 
 1. HydraX API surface available for workflow-layer integration?
