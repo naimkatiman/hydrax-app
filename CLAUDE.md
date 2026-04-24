@@ -15,6 +15,31 @@
 - [docs/](docs/) — PRD, plan, problems, workflow, homework, ideas.
 - No backend, no database, no build pipeline yet.
 
+## Prototype — How to Work on It Today
+
+Until `services/` and `web/apps/` exist, the three-file prototype is the only runnable surface. Treat it as the verification target.
+
+**Preview:**
+```bash
+python3 -m http.server 8000   # then open http://localhost:8000
+# or just open index.html directly in a browser
+```
+
+**Verification (run after every edit — these are the smallest correctness proofs):**
+- `node --check app.js` — syntax check, must pass.
+- `getElementById` ↔ HTML `id=` audit — every `document.getElementById("x")` in [app.js](app.js) must have a matching `id="x"` in [index.html](index.html). Zero misses.
+- CSS class audit — every class referenced in [index.html](index.html) or added via [app.js](app.js) must be declared in [styles.css](styles.css).
+- `wc -l index.html app.js styles.css` — record counts in [STATE.yaml](STATE.yaml) `verification_log`.
+- `git diff --stat` — confirm only the expected files changed (prototype work touches exactly those three + STATE.yaml).
+
+**Gotchas:**
+- LocalStorage keys are versioned: `hydrax.workspace.v1` ([app.js:248](app.js#L248)) and `hydrax.activity.v1` ([app.js:490](app.js#L490)). If you change the persisted shape, **bump the `.v1` suffix** — do not silently break users with stale state.
+- All three prototype files change together for any interactive slice (HTML ids + JS handlers + CSS classes). A commit that touches one or two without the other is almost always incomplete.
+- Go/TS verification gates below apply once those services exist. For prototype work, the five checks above are the gate.
+
+**STATE.yaml `verification_log` entry format** (match what's already there):
+`YYYY-MM-DD — <slice>: node --check app.js passes; <id audit result>; <css audit result>; wc -l index.html=N app.js=N styles.css=N; git diff --stat confirms N code files changed`
+
 ## Target Tech Stack
 
 ### Backend (polyglot microservices)
