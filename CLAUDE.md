@@ -183,4 +183,4 @@ Installed at user-level from `naimkatiman/continuous-improvement`. Optional — 
 
 ## Past Mistakes
 
-(empty — log dated entries with verification step when they happen)
+- **2026-04-24 — Commit-message mismatch from stale auto-context.** Commit `78888d3` was titled `feat(ui): persist activity log across sessions with Clear Log action` but the actual file diff shipped sortable-table-columns work. Root cause: assistant read STATE.yaml from session-start auto-context describing the prior slice, then wrote a commit message off that stale summary without running `git diff --stat` against the actual working tree first. **Prevention:** before drafting any commit message, run `git diff --stat` and skim each file's diff. Do not trust STATE.yaml's `summary` field as authoritative for what the current working tree contains.
