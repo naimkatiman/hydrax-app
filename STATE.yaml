@@ -1,5 +1,5 @@
 project: hydrax-app
-updated: 2026-04-24T18:31:00+08:00
+updated: 2026-04-25T00:55:00+08:00
 status: in_progress
 summary: Shared drill-down primitive extracted — renderDetailCard() generates detail cards for all four panels (orders, venues, risk, positions) with unified close button, meta grid, and section layout. Close button click handlers wired via event delegation on each detail shell.
 current_focus:
@@ -19,7 +19,6 @@ recently_verified:
   - wc -l index.html=613 app.js=1894 styles.css=1981
   - git diff --stat confirms 4 project files changed
 next_actions:
-  - Delete data/ directory (orphaned, no longer referenced)
   - Deferred to v1 build: authenticated navigation shell, services/ scaffolding, web/apps/ shells
 next_recommended_slice: Contextual breadcrumb trail — show the current navigation path (panel > selected item) in the toolbar area, updating as the user drills into detail views.
 roadmap_alignment:
@@ -86,3 +85,4 @@ verification_log:
   - 2026-04-24 — Panel-aware filter chips (corrected): fixture data folded back into app.js with inline JSDoc types; data/fixtures.js script tag removed from index.html; node --check app.js passes; getElementById audit clean; no fixtures.js references in code files; wc -l index.html=595 app.js=1914 styles.css=1922; git diff --stat confirms 4 project files changed
   - 2026-04-24 — Per-panel empty-state filter messaging: node --check app.js passes; getElementById audit clean; venuesFilterEmpty/positionsFilterEmpty/riskFilterEmpty ids matched in HTML+JS; filter-empty + is-visible + is-hidden CSS classes declared; wc -l index.html=613 app.js=1939 styles.css=1954; git diff --stat confirms 3 code files + STATE.yaml changed
   - 2026-04-24 — Shared drill-down primitive: node --check app.js passes; getElementById audit clean (zero missing); renderDetailCard() shared across all 4 panels; detail-close click handlers wired on orderDetail/venueDetail/riskDetail/positionDetail via event delegation; CSS detail-close class declared with hover+focus states; data-detail-for attrs on all detail shells; dynamic filter chips via renderFilterChips(); wc -l index.html=613 app.js=1894 styles.css=1981; git diff --stat confirms 4 project files changed
+  - 2026-04-25 — data/ cleanup: git rm data/fixtures.js (orphaned 436-line duplicate left behind by f69b7b5); data/ directory empty and removed; node --check app.js passes; zero HydraxFixtures or data/fixtures.js references across html/js/css; wc -l index.html=613 app.js=1894 styles.css=1981 unchanged; git diff --stat confirms 1 file deleted + STATE.yaml
