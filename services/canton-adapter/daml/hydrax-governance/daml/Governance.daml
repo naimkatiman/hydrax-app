@@ -1,0 +1,5 @@
+module Governance where
+
+-- HydraX institutional governance spike.
+-- See README.md for mental model and non-goals.
+-- This is throwaway code. Do not import from other packages.
