@@ -1,25 +1,25 @@
 project: hydrax-app
-updated: 2026-04-25T01:20:00+08:00
+updated: 2026-04-25T01:35:00+08:00
 status: in_progress
-summary: Contextual breadcrumb trail landed — toolbar eyebrow replaced with "Dashboard view > Panel > Selected-item" breadcrumb driven by renderBreadcrumb() and wired into all six navigation entry points (setActivePanel, selectOrder, selectVenue, selectRisk, selectPosition, resolveRisk).
+summary: Clickable breadcrumb segments — panel and item crumbs become interactive (role=button, tabindex=0) whenever a drill-down is active; click or Enter/Space on either triggers deselectActivePanel() which toggles the current select*() to clear the selection.
 current_focus:
   - Toolbar eyebrow is now a <nav id="breadcrumbTrail"> breadcrumb instead of the static "Dashboard view" label
   - renderBreadcrumb() always renders "Dashboard view > <Panel name>" and appends "> <Selected item>" when a drill-down is active
-  - selectedItemForPanel(panel) resolves the label: order.id / venue.name / riskAlert.id / position.name
-  - Six call sites hooked: setActivePanel + four select*() + resolveRisk
-  - CSS reuses existing eyebrow treatment for crumb-root/panel/sep; crumb-item uses var(--accent) to mark the active drill-down
-  - Twenty workbench features now fully interactive: Orders, Positions, Venues, Risk, Settings, Search, Cross-panel linking, Toasts, Keyboard shortcuts, Activity log, Activity persistence, Responsive sidebar, Mobile toolbar, Topbar responsive, Sortable columns, Panel-aware filters, Per-panel empty states, Shared drill-down primitive, Detail close button, Contextual breadcrumb trail
+  - Panel and item crumbs toggle is-interactive (with role=button, tabindex=0, aria-label) whenever a selection exists
+  - breadcrumbTrail has click + keydown (Enter/Space) event delegation calling deselectActivePanel()
+  - deselectActivePanel() toggles the current select*() for the active panel, clearing the selection and returning focus to the lane
+  - CSS .is-interactive adds cursor, accent-soft hover/focus background, and focus-visible outline for keyboard a11y
+  - Twenty-one workbench features now fully interactive: ... , Contextual breadcrumb trail, Clickable breadcrumb segments
 recently_verified:
   - node --check app.js passes
-  - breadcrumbTrail id in HTML matched by getElementById in JS
-  - renderBreadcrumb() appears 7x in app.js (1 definition + 6 call sites wired into every navigation mutation)
-  - 5 new CSS classes declared: breadcrumb-trail, crumb-root, crumb-sep, crumb-panel, crumb-item
-  - serve check: python3 http.server returns HTTP 200 for /, /app.js, /styles.css; breadcrumb markers present in the served bytes
-  - wc -l index.html=617 app.js=1936 styles.css=2016
-  - git diff --stat will confirm 3 code files + STATE.yaml changed
+  - deselectActivePanel referenced 3x in app.js (1 definition + click + keydown handlers)
+  - is-interactive referenced 4x in app.js (renderBreadcrumb output) and 6x in styles.css (3 rule blocks x 2 selectors)
+  - serve check: python3 http.server; /app.js contains "deselectActivePanel"; /styles.css contains "is-interactive"
+  - wc -l index.html=617 app.js=1961 styles.css=2036
+  - git diff --stat will confirm 2 code files + STATE.yaml changed
 next_actions:
   - Deferred to v1 build: authenticated navigation shell, services/ scaffolding, web/apps/ shells
-next_recommended_slice: Clickable breadcrumb segments — make the panel crumb switch panels (already covered by the sidebar, but sensible shortcut) and the item crumb toggle deselection; alternatively a different slice the user picks.
+next_recommended_slice: Pending user direction — candidates: (a) keyboard shortcut to deselect (Esc), (b) breadcrumb history trail (previous 2-3 drill-downs, like a mini back stack), (c) different slice entirely.
 roadmap_alignment:
   prototype_sequence:
     - done — static landing + command-surface preview
@@ -46,7 +46,8 @@ roadmap_alignment:
     - done — Per-panel empty-state filter messaging (2026-04-24)
     - done — Shared drill-down primitive with close button (2026-04-24)
     - done — Contextual breadcrumb trail (2026-04-25)
-    - next — clickable breadcrumb segments (or alternative slice)
+    - done — Clickable breadcrumb segments (2026-04-25)
+    - next — user to pick (Esc-to-deselect, breadcrumb history, or alternative slice)
   v1_build_dependencies:
     - prd-v2 §14 Q1 — HydraX API surface
     - prd-v2 §14 Q3 — first product template (MMF vs short-duration credit vs treasury-equivalent)
@@ -87,3 +88,4 @@ verification_log:
   - 2026-04-24 — Shared drill-down primitive: node --check app.js passes; getElementById audit clean (zero missing); renderDetailCard() shared across all 4 panels; detail-close click handlers wired on orderDetail/venueDetail/riskDetail/positionDetail via event delegation; CSS detail-close class declared with hover+focus states; data-detail-for attrs on all detail shells; dynamic filter chips via renderFilterChips(); wc -l index.html=613 app.js=1894 styles.css=1981; git diff --stat confirms 4 project files changed
   - 2026-04-25 — data/ cleanup: git rm data/fixtures.js (orphaned 436-line duplicate left behind by f69b7b5); data/ directory empty and removed; node --check app.js passes; zero HydraxFixtures or data/fixtures.js references across html/js/css; wc -l index.html=613 app.js=1894 styles.css=1981 unchanged; git diff --stat confirms 1 file deleted + STATE.yaml
   - 2026-04-25 — breadcrumb trail: node --check app.js passes; breadcrumbTrail id in HTML (index.html:254) matched by getElementById in JS; renderBreadcrumb defined at app.js:514 and called at app.js:672 (selectOrder), 963 (selectVenue), 1144 (selectRisk), 1155 (resolveRisk), 1325 (selectPosition), 1459 (setActivePanel); 5 new CSS classes declared (breadcrumb-trail, crumb-root, crumb-sep, crumb-panel, crumb-item) reusing existing eyebrow treatment; python3 http.server serves /, /app.js, /styles.css as HTTP 200 with expected markers; wc -l index.html=617 app.js=1936 styles.css=2016; visual browser walk-through deferred to user; git diff --stat confirms 3 code files + STATE.yaml changed
+  - 2026-04-25 — clickable breadcrumb segments: node --check app.js passes; renderBreadcrumb emits is-interactive + role=button + tabindex=0 + aria-label on crumb-panel and crumb-item whenever a drill-down is active; deselectActivePanel() dispatches to the correct select*() for the active panel; click + keydown (Enter/Space) handlers on breadcrumbTrail with .is-interactive target filter; CSS adds cursor/focus-visible/accent-soft hover state via 3 new rule blocks; serve check confirms deselectActivePanel in /app.js and is-interactive in /styles.css; wc -l index.html=617 app.js=1961 styles.css=2036; visual browser click-through deferred to user; git diff --stat confirms 2 code files + STATE.yaml changed

@@ -515,20 +515,45 @@ function renderBreadcrumb() {
   if (!breadcrumbTrail) return;
   const panelName = panelTitles[activePanel] || "Workspace";
   const itemLabel = selectedItemForPanel(activePanel);
+  const hasItem = Boolean(itemLabel);
+  const panelInteractive = hasItem
+    ? ' role="button" tabindex="0" aria-label="Clear selection"'
+    : "";
 
   let html =
     '<span class="crumb-root">Dashboard view</span>' +
     '<span class="crumb-sep" aria-hidden="true">›</span>' +
-    '<span class="crumb-panel">' + panelName + '</span>';
+    '<span class="crumb-panel' + (hasItem ? " is-interactive" : "") + '"' + panelInteractive + '>' + panelName + '</span>';
 
-  if (itemLabel) {
+  if (hasItem) {
     html +=
       '<span class="crumb-sep" aria-hidden="true">›</span>' +
-      '<span class="crumb-item">' + itemLabel + '</span>';
+      '<span class="crumb-item is-interactive" role="button" tabindex="0" aria-label="Clear selection">' + itemLabel + '</span>';
   }
 
   breadcrumbTrail.innerHTML = html;
 }
+
+function deselectActivePanel() {
+  if (activePanel === "orders" && selectedOrderId) selectOrder(selectedOrderId);
+  else if (activePanel === "venues" && selectedVenueId) selectVenue(selectedVenueId);
+  else if (activePanel === "risk" && selectedRiskId) selectRisk(selectedRiskId);
+  else if (activePanel === "positions" && selectedPositionId) selectPosition(selectedPositionId);
+}
+
+breadcrumbTrail?.addEventListener("click", (event) => {
+  const target = event.target.closest(".crumb-item.is-interactive, .crumb-panel.is-interactive");
+  if (!target) return;
+  deselectActivePanel();
+});
+
+breadcrumbTrail?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const target = event.target.closest(".crumb-item.is-interactive, .crumb-panel.is-interactive");
+  if (!target) return;
+  event.preventDefault();
+  deselectActivePanel();
+});
 
 function renderFilterChips(panel) {
   if (!filterGroup) return;

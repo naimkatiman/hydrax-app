@@ -177,6 +177,26 @@ main {
   text-transform: none;
 }
 
+.crumb-panel.is-interactive,
+.crumb-item.is-interactive {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.crumb-panel.is-interactive:hover,
+.crumb-panel.is-interactive:focus-visible {
+  color: var(--text);
+  background: var(--accent-soft);
+  outline: none;
+}
+
+.crumb-item.is-interactive:hover,
+.crumb-item.is-interactive:focus-visible {
+  background: var(--accent-soft);
+  outline: none;
+}
+
 .brand-subtitle {
   margin: 2px 0 0;
   font-size: 0.88rem;
