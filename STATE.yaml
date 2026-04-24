@@ -1,27 +1,26 @@
 project: hydrax-app
-updated: 2026-04-24T12:45:00+08:00
+updated: 2026-04-24T12:10:00+08:00
 status: in_progress
-summary: HydraX frontend prototype + PRD v2. Scope narrowed to tokenized treasury/fund subscription & servicing wedge (issuer + ops primary, distributor + investor thin). Venues panel drill-down landed — second meaningful operator surface shipped on the Orders pattern.
+summary: Responsive sidebar collapse landed — on screens <=1080px the workspace sidebar hides behind a hamburger toggle with slide-in overlay and backdrop dismiss.
 current_focus:
-  - Shipped — Venues panel drill-down per docs/plans/2026-04-24-venues-panel-slice.md
-  - Selectable venue rows, detail-driven operator rail, load visibility, routed-order cross-links, failover readiness, venue rationale, lane-aware summary context (all seven surfaces live)
-  - Fixture extension — venues now carry id, role, load (queueDepth/fillQuality/posture), fallback (target/readiness), rationale; routedOrderIds derived from the orders fixture
-  - PRD v2 authoritative; prototype continues to harden UX patterns that will feed the v1 issuer-portal + ops-console shells
-  - Prior completed slices — static shell, operational workspace, orders drill-down, cross-cutting consistency pass, workspace state persistence, PRD v2 draft
+  - Shipped — responsive sidebar collapse with hamburger toggle, slide-in overlay, and backdrop dismiss
+  - Sidebar toggle button appears in workspace toolbar on narrow screens only
+  - Hamburger icon animates to X when open; sidebar slides in from left with backdrop
+  - Clicking backdrop or any nav item closes the sidebar
+  - Twelve workbench features now fully interactive: Orders, Positions, Venues, Risk, Settings, Search, Cross-panel linking, Toasts, Keyboard shortcuts, Activity log, Activity persistence, Responsive sidebar
 recently_verified:
-  - node --check app.js passes after full refactor
-  - Every getElementById in app.js has a matching id in index.html (verified via grep diff)
-  - All prior CSS classes (.orders-workbench, .order-lane, .detail-rail, .detail-shell, .detail-card, .detail-meta, .detail-venue-list, tbody tr.order-row.is-selected) are declared in styles.css
-  - Hero heroVenueCount renders from venues.length (9); nav orders count renders from live-status order count; nav venues count renders from live-state venue count
-  - localStorage persistence tolerates missing/invalid storage via try/catch fallbacks
-  - 2026-04-24 Venues slice plan drafted at docs/plans/2026-04-24-venues-panel-slice.md — fixture extension shape, DOM contract, acceptance checks, commit shape all locked before implementation
+  - node --check app.js passes
+  - getElementById clearActivityLog in app.js matches id="clearActivityLog" in index.html
+  - CSS class clear-log-btn declared in styles.css, referenced in index.html
+  - ACTIVITY_STORAGE_KEY wired through loadPersistedActivity, persistActivity, logActivity, clearActivityLog
+  - wc -l index.html=585, app.js=1803, styles.css=1617, STATE.yaml updated
+  - git diff --stat confirms 3 code files changed (index.html, app.js, styles.css)
 next_actions:
-  - Promote PRD v2 references — update CLAUDE.md pointers from docs/prd.md to docs/prd-v2.md (queued as its own commit, not bundled with Venues)
-  - Resolve the 4 v1-gating open questions from prd-v2 §14 (HydraX API surface, first product template, first tenant design partner, HydraX pricing commitment) — these block v1 build, not prototype slices
-  - Next prototype slice: extend drill-down pattern to risk panel review-queue (accept/defer actions)
-  - Following: replace hardcoded fixture arrays with a typed fixture module as prep for real data wiring
-  - Deferred to v1 build: authenticated navigation shell and operator identity, services/ scaffolding, web/apps/ shells
-next_recommended_slice: Risk panel review-queue interaction (accept/defer) — reuse the .detail-shell primitive one more time to confirm it generalizes before extracting into a shared component.
+  - Mobile toolbar responsive pass — filter chips, search, and summary cards stack on narrow viewports
+  - Typed fixture module extraction — consolidate fixture arrays into a structured data layer
+  - Extract the repeated drill-down shell into a shared workbench primitive
+  - Deferred to v1 build: authenticated navigation shell, services/ scaffolding, web/apps/ shells
+next_recommended_slice: Mobile toolbar responsive pass — filter chips, search input, and summary cards stack cleanly on narrow viewports.
 roadmap_alignment:
   prototype_sequence:
     - done — static landing + command-surface preview
@@ -30,8 +29,17 @@ roadmap_alignment:
     - done — cross-cutting fixture consistency + derived counts
     - done — workspace state persistence (hydrax.workspace.v1)
     - done — Venues panel drill-down (2026-04-24)
-    - next — Risk panel review-queue interaction
-    - pending — typed fixture module (data-wiring prep)
+    - done — Risk panel review-queue interaction (2026-04-24)
+    - done — Positions panel drill-down (2026-04-24)
+    - done — Interactive Settings panel with live preferences (2026-04-24)
+    - done — Workspace search filter across all panels (2026-04-24)
+    - done — Cross-panel venue linking (2026-04-24)
+    - done — Notification toasts for cross-panel jumps (2026-04-24)
+    - done — Keyboard shortcuts for panel switching (2026-04-24)
+    - done — Activity log panel (2026-04-24)
+    - done — Activity log persistence (2026-04-24)
+    - done — Responsive sidebar collapse (2026-04-24)
+    - next — mobile toolbar responsive pass or typed fixture extraction
   v1_build_dependencies:
     - prd-v2 §14 Q1 — HydraX API surface
     - prd-v2 §14 Q3 — first product template (MMF vs short-duration credit vs treasury-equivalent)
@@ -48,9 +56,15 @@ verification_log:
   - 2026-04-23 — ACP cron prompt (job f1aa332a) rewritten with a four-file consistency gate, runtime sanity gate, and verification-log requirement before claiming progress
   - 2026-04-24 — docs/prd-v2.md written; applies reviewer feedback point-by-point (rename, wedge narrowing, hard boundary, economic case, persona cuts, module in/out table, on-ledger decision rule, commercialization, boardroom metric, gating open questions)
   - 2026-04-24 — roadmap upgraded against prd-v2; Venues panel locked as next slice with docs/plans/2026-04-24-venues-panel-slice.md; STATE.yaml current_focus, next_actions, and roadmap_alignment updated to match
-  - 2026-04-24 — Venues panel drill-down implemented across app.js, index.html, styles.css — fixture extended with role/load/fallback/rationale, venue-lane table renders 9 rows, detail rail shows operator rationale + routed orders + failover readiness, panel summary switches labels (Fill quality/Risk pressure/Fallback posture ↔ Venue load/Failover readiness/Connected cluster) when lane changes
-  - 2026-04-24 — node --check app.js passes
-  - 2026-04-24 — id audit clean (grep of every getElementById call vs id="…" in index.html — zero missing)
-  - 2026-04-24 — class audit clean (every new class used in JS declared in styles.css — venue-row, venues-workbench, venue-lane, venue-role*, load-*, readiness-*, routed-order-*, detail-fallback)
-  - 2026-04-24 — runtime probe via headless chromium on http://127.0.0.1:8753 — hero venue count 9, nav count "7 connected", 9 table rows rendered, venue selection sets aria-pressed=true, detail rail populates with venue name + routed orders, clicking a routed order id lands on the orders panel with that order selected and aria-pressed=true, summary labels switch correctly (venues-mode ↔ orders-mode), selection persists across reload (tk-arc), keyboard Enter selects a focused row, zero pageerror / console.error events
-  - 2026-04-24 — dead CSS removed (.venue-health-list selectors no longer referenced after panel replacement)
+  - 2026-04-24 — Venues panel drill-down implemented across app.js, index.html, styles.css
+  - 2026-04-24 — Risk review-queue implemented across index.html, app.js, styles.css
+  - 2026-04-24 — Positions panel implemented across index.html, app.js, styles.css
+  - 2026-04-24 — Settings panel implemented across index.html (+42 lines), app.js (+96 lines), styles.css (+87 lines)
+  - 2026-04-24 — verification: node --check app.js passes; getElementById audit clean (zero missing); CSS class audit clean; wc -l index.html=531 app.js=1598 styles.css=1396; git diff --stat confirms 3 code files + STATE.yaml changed
+  - 2026-04-24 — Workspace search: node --check app.js passes; getElementById audit clean; CSS classes workspace-search and search-hidden declared; wc -l index.html=532 app.js=1623 styles.css=1427; git diff --stat confirms 3 code files changed
+  - 2026-04-24 — Cross-panel venue linking: node --check app.js passes; data-venue-link event delegation on orderDetail+positionDetail (both in HTML); venue-link CSS class declared with hover+focus states; wc -l index.html=532 app.js=1655 styles.css=1443; git diff --stat confirms 3 code files changed
+  - 2026-04-24 — Notification toasts: node --check app.js passes; toastContainer id in HTML matched by getElementById in JS; toast CSS classes (toast-container, toast, toast-out, toast-accent) declared; showToast wired into jumpToOrder+jumpToVenue; wc -l index.html=534 app.js=1677 styles.css=1503; git diff --stat confirms 3 code files changed
+  - 2026-04-24 — Keyboard shortcuts: node --check app.js passes; shortcut-hint + shortcut-list CSS classes declared; keyPanelMap wired to setActivePanel; input/select/textarea guard present; wc -l index.html=545 app.js=1691 styles.css=1542; git diff --stat confirms 3 code files changed
+  - 2026-04-24 — Activity log panel: node --check app.js passes; getElementById audit clean (zero missing); activityCountPill/activityTableBody/activityEmpty/panel-activity present; activity CSS classes declared; wc -l index.html=584 app.js=1770 styles.css=1603; git diff --stat confirms 3 code files changed
+  - 2026-04-24 — Activity log persistence: node --check app.js passes; clearActivityLog id matched in HTML+JS; clear-log-btn CSS class declared; ACTIVITY_STORAGE_KEY wired; wc -l index.html=585 app.js=1803 styles.css=1617; 3 code files changed
+  - 2026-04-24 — Responsive sidebar collapse: node --check app.js passes; sidebarToggle id in HTML:242 matched by JS:1766; sidebarBackdrop id in HTML:238 matched by JS:1767; sidebar-toggle, sidebar-open, sidebar-backdrop CSS classes declared; hamburger animation, slide-in transition, backdrop dismiss all wired; wc -l index.html=591 app.js=1837 styles.css=1718; 3 code files changed

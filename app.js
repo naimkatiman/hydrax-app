@@ -91,6 +91,160 @@ const venues = [
   },
 ];
 
+const riskAlerts = [
+  {
+    id: "RA-001",
+    type: "Threshold widening",
+    trigger: "London open spread exceeded 2.1 bps",
+    severity: "high",
+    status: "pending",
+    venue: "London Arc",
+    timestamp: "08:32",
+    rationale: "Operator widened the fill slippage ceiling from 1.8 bps to 2.4 bps during London open volatility. HydraX held the route but flagged for sign-off before re-arming passive mode.",
+    recommendation: "Accept the widened threshold for the current session and auto-revert at London close.",
+    impact: "Allows continued routing through London Arc without manual holds during peak liquidity.",
+  },
+  {
+    id: "RA-002",
+    type: "Passive window reopen",
+    trigger: "Spread normalization on Singapore Nexus",
+    severity: "moderate",
+    status: "pending",
+    venue: "Singapore Nexus",
+    timestamp: "08:18",
+    rationale: "HydraX detected spread normalization after Asia session volatility. Passive routing window can reopen, but operator confirmation is required per guardrail policy.",
+    recommendation: "Reopen passive window with a 15-minute review horizon.",
+    impact: "Restores full routing flexibility on Singapore Nexus for the remainder of the Asia session.",
+  },
+  {
+    id: "RA-003",
+    type: "Inventory skew",
+    trigger: "Asia book skew crossed -0.6% threshold",
+    severity: "low",
+    status: "pending",
+    venue: "Tokyo Arc",
+    timestamp: "07:54",
+    rationale: "Inventory skew in the Asia macro book crossed the -0.6% soft threshold. Currently narrowing, no hard limit breached.",
+    recommendation: "Acknowledge and monitor. No action required unless skew widens past -1.2%.",
+    impact: "Informational. Current trajectory is self-correcting.",
+  },
+  {
+    id: "RA-004",
+    type: "Adverse selection",
+    trigger: "Fill quality dropped below 95% on Frankfurt",
+    severity: "high",
+    status: "pending",
+    venue: "Frankfurt Loop",
+    timestamp: "07:41",
+    rationale: "Frankfurt Loop reported adverse selection pressure after the latency spike. Fill quality dropped to 93.2%. HydraX moved the venue to warm standby and rerouted to London Arc.",
+    recommendation: "Defer re-enabling Frankfurt routing until round-trip stabilizes below 18ms for five minutes.",
+    impact: "Prevents degraded fills during Frankfurt recovery. London Arc absorbs overflow.",
+  },
+];
+
+const positions = [
+  {
+    id: "BK-ASIA",
+    name: "Asia macro book",
+    pnl: "+1.8%",
+    exposure: "$18.4M",
+    status: "active",
+    instruments: 12,
+    topHoldings: [
+      { name: "SGX iShares MSCI", weight: "22%", venue: "Singapore Nexus" },
+      { name: "Nikkei 225 basket", weight: "18%", venue: "Tokyo Arc" },
+      { name: "GCC energy sleeve", weight: "14%", venue: "Dubai Harbor" },
+    ],
+    venueAllocation: [
+      { name: "Singapore Nexus", share: "41%" },
+      { name: "Tokyo Arc", share: "32%" },
+      { name: "Dubai Harbor", share: "19%" },
+      { name: "Seoul Vertex", share: "8%" },
+    ],
+    rationale: "Overweight Asia-Pacific flow during pre-London session. Inventory skew narrowing after the BoJ tape print; queue density improving on Singapore and Tokyo.",
+    riskNote: "Soft threshold at -0.6% inventory skew crossed but self-correcting. No hard limit breached.",
+  },
+  {
+    id: "BK-EUR",
+    name: "Europe dispersion",
+    pnl: "-0.4%",
+    exposure: "$11.2M",
+    status: "watch",
+    instruments: 8,
+    topHoldings: [
+      { name: "DAX futures sleeve", weight: "28%", venue: "Frankfurt Loop" },
+      { name: "Euro Stoxx vol surface", weight: "24%", venue: "London Arc" },
+      { name: "CHF rates overlay", weight: "16%", venue: "Zurich Chain" },
+    ],
+    venueAllocation: [
+      { name: "London Arc", share: "44%" },
+      { name: "Frankfurt Loop", share: "30%" },
+      { name: "Zurich Chain", share: "26%" },
+    ],
+    rationale: "Book tilted defensive after Frankfurt latency spike. London Arc absorbing overflow while Frankfurt recovers. Dispersion trades hedging against implied vol mean-reversion.",
+    riskNote: "Frankfurt Loop in warm standby — DAX sleeve queued until round-trip normalizes below 18ms.",
+  },
+  {
+    id: "BK-HEDGE",
+    name: "Cross-venue hedge",
+    pnl: "+0.9%",
+    exposure: "$6.8M",
+    status: "active",
+    instruments: 5,
+    topHoldings: [
+      { name: "SGD rates curve", weight: "34%", venue: "Singapore Nexus" },
+      { name: "JGB short sleeve", weight: "28%", venue: "Tokyo Arc" },
+      { name: "FX delta neutral", weight: "22%", venue: "New York Relay" },
+    ],
+    venueAllocation: [
+      { name: "Singapore Nexus", share: "38%" },
+      { name: "Tokyo Arc", share: "30%" },
+      { name: "New York Relay", share: "32%" },
+    ],
+    rationale: "Offsetting directional exposure across the Asia and US books. Rate curve positions sized to maintain delta neutrality during the session overlap.",
+    riskNote: "Within tolerance band. Auto-rebalance armed if net delta drifts beyond 0.3%.",
+  },
+  {
+    id: "BK-US",
+    name: "US session book",
+    pnl: "+2.1%",
+    exposure: "$22.6M",
+    status: "active",
+    instruments: 9,
+    topHoldings: [
+      { name: "S&P 500 basket", weight: "30%", venue: "New York Relay" },
+      { name: "Treasury curve", weight: "25%", venue: "New York Relay" },
+      { name: "VIX sleeve", weight: "15%", venue: "New York Relay" },
+    ],
+    venueAllocation: [
+      { name: "New York Relay", share: "72%" },
+      { name: "Zurich Chain", share: "18%" },
+      { name: "London Arc", share: "10%" },
+    ],
+    rationale: "Primary US session exposure. Strongest fill quality in the network during the London-New York overlap window. Treasury curve weighted for yield curve steepening.",
+    riskNote: "Clean. No threshold breach. Passive mode fully armed.",
+  },
+  {
+    id: "BK-APAC",
+    name: "APAC pre-open staging",
+    pnl: "Flat",
+    exposure: "$3.2M",
+    status: "staged",
+    instruments: 3,
+    topHoldings: [
+      { name: "ASX 200 sleeve", weight: "45%", venue: "Sydney Rim" },
+      { name: "KRX flow basket", weight: "35%", venue: "Seoul Vertex" },
+      { name: "NZD overlay", weight: "20%", venue: "Sydney Rim" },
+    ],
+    venueAllocation: [
+      { name: "Sydney Rim", share: "55%" },
+      { name: "Seoul Vertex", share: "45%" },
+    ],
+    rationale: "Pre-open staging for the next APAC session. Orders held in passive ladder until Sydney and Seoul venues warm into primary weight.",
+    riskNote: "No live exposure. Staged orders will activate when venue load thresholds are met.",
+  },
+];
+
 const STORAGE_KEY = "hydrax.workspace.v1";
 
 const modes = [
@@ -231,6 +385,7 @@ const panelTitles = {
   venues: "Venue health",
   risk: "Risk posture",
   settings: "Workspace settings",
+  activity: "Activity log",
 };
 
 const persisted = readPersistedState();
@@ -242,6 +397,8 @@ let activeFilter = persisted.activeFilter || "all";
 let activeState = "loading";
 let selectedOrderId = persisted.selectedOrderId || null;
 let selectedVenueId = persisted.selectedVenueId || null;
+let selectedRiskId = persisted.selectedRiskId || null;
+let selectedPositionId = persisted.selectedPositionId || null;
 
 function readPersistedState() {
   try {
@@ -262,6 +419,8 @@ function persistState() {
       activeFilter,
       selectedOrderId,
       selectedVenueId,
+      selectedRiskId,
+      selectedPositionId,
     }));
   } catch (_err) {
     // ignore — persistence is best-effort
@@ -298,10 +457,98 @@ const heroVenueCount = document.getElementById("heroVenueCount");
 const summaryFillLabel = document.getElementById("summaryFillLabel");
 const summaryRiskLabel = document.getElementById("summaryRiskLabel");
 const summaryFallbackLabel = document.getElementById("summaryFallbackLabel");
+const riskTableBody = document.getElementById("riskTableBody");
+const riskDetail = document.getElementById("riskDetail");
+const riskActivePill = document.getElementById("riskActivePill");
+const positionsTableBody = document.getElementById("positionsTableBody");
+const positionDetail = document.getElementById("positionDetail");
+const positionsActivePill = document.getElementById("positionsActivePill");
 const navCountEls = {
   orders: document.querySelector('[data-nav-count="orders"]'),
   venues: document.querySelector('[data-nav-count="venues"]'),
+  risk: document.querySelector('[data-nav-count="risk"]'),
+  positions: document.querySelector('[data-nav-count="positions"]'),
 };
+const settingModeBias = document.getElementById("settingModeBias");
+const settingAlertCadence = document.getElementById("settingAlertCadence");
+const settingFallbackPolicy = document.getElementById("settingFallbackPolicy");
+const settingDensity = document.getElementById("settingDensity");
+const settingsSavedPill = document.getElementById("settingsSavedPill");
+const readoutModeBias = document.getElementById("readoutModeBias");
+const readoutAlertCadence = document.getElementById("readoutAlertCadence");
+const readoutFallbackPolicy = document.getElementById("readoutFallbackPolicy");
+const readoutDensity = document.getElementById("readoutDensity");
+const workspaceShell = document.querySelector(".workspace-shell");
+const workspaceSearch = document.getElementById("workspaceSearch");
+
+const toastContainer = document.getElementById("toastContainer");
+const activityTableBody = document.getElementById("activityTableBody");
+const activityCountPill = document.getElementById("activityCountPill");
+const activityEmpty = document.getElementById("activityEmpty");
+const navCountActivity = document.querySelector('[data-nav-count="activity"]');
+
+const ACTIVITY_STORAGE_KEY = "hydrax.activity.v1";
+
+const activityLog = loadPersistedActivity();
+
+function loadPersistedActivity() {
+  try {
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem(ACTIVITY_STORAGE_KEY) : null;
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_err) {
+    return [];
+  }
+}
+
+function persistActivity() {
+  try {
+    if (typeof localStorage === "undefined") return;
+    localStorage.setItem(ACTIVITY_STORAGE_KEY, JSON.stringify(activityLog));
+  } catch (_err) {
+    // best-effort
+  }
+}
+
+function logActivity(action, detail) {
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  activityLog.unshift({ time, action, detail });
+  if (activityLog.length > 50) activityLog.length = 50;
+  persistActivity();
+  renderActivityLog();
+}
+
+function clearActivityLog() {
+  activityLog.length = 0;
+  persistActivity();
+  renderActivityLog();
+  updateLaneSummary(filteredOrders());
+}
+
+function renderActivityLog() {
+  if (activityTableBody) {
+    activityTableBody.innerHTML = activityLog.map((entry) => `
+      <tr class="activity-row">
+        <td>${entry.time}</td>
+        <td><span class="activity-action">${entry.action}</span></td>
+        <td><span class="activity-detail">${entry.detail}</span></td>
+      </tr>
+    `).join("");
+  }
+
+  if (activityCountPill) {
+    activityCountPill.textContent = `${activityLog.length} entr${activityLog.length === 1 ? "y" : "ies"}`;
+  }
+  if (navCountActivity) {
+    navCountActivity.textContent = `${activityLog.length} entr${activityLog.length === 1 ? "y" : "ies"}`;
+  }
+  if (activityEmpty) {
+    activityEmpty.classList.toggle("is-hidden", activityLog.length > 0);
+  }
+}
+
 const dashboardButtons = [
   document.getElementById("openDashboardTop"),
   document.getElementById("openDashboardHero"),
@@ -404,7 +651,7 @@ function renderOrderDetail() {
   const statusLabel = selected.status.charAt(0).toUpperCase() + selected.status.slice(1);
 
   const venueRows = selected.venueMix
-    .map((entry) => `<li><span>${entry.name}</span><strong>${entry.share}</strong></li>`)
+    .map((entry) => `<li><span><span class="venue-link" data-venue-link="${entry.name}" role="button" tabindex="0" aria-label="Open ${entry.name} in venues panel">${entry.name}</span></span><strong>${entry.share}</strong></li>`)
     .join("");
 
   orderDetail.innerHTML = `
@@ -419,7 +666,7 @@ function renderOrderDetail() {
 
       <dl class="detail-meta">
         <div><dt>Side</dt><dd>${selected.side}</dd></div>
-        <div><dt>Venue</dt><dd>${selected.venue}</dd></div>
+        <div><dt>Venue</dt><dd><span class="venue-link" data-venue-link="${selected.venue}" role="button" tabindex="0" aria-label="Open ${selected.venue} in venues panel">${selected.venue}</span></dd></div>
         <div><dt>Mode</dt><dd>${selected.mode}</dd></div>
         <div><dt>Exposure</dt><dd>${selected.exposure}</dd></div>
         <div><dt>Fill quality</dt><dd>${selected.fillQuality}</dd></div>
@@ -458,14 +705,43 @@ function selectOrder(orderId) {
 
   persistState();
   renderOrderDetail();
+  if (selectedOrderId) logActivity("Select order", selectedOrderId);
 }
 
 function updateLaneSummary(filtered) {
   if (activePanel === "venues") {
     updateVenuesSummary();
+  } else if (activePanel === "risk") {
+    updateRiskSummary();
+  } else if (activePanel === "positions") {
+    updatePositionsSummary();
+  } else if (activePanel === "activity") {
+    updateActivitySummary();
   } else {
     updateOrdersSummary(filtered);
   }
+}
+
+function updateActivitySummary() {
+  if (!summaryFillValue) return;
+
+  if (summaryFillLabel) summaryFillLabel.textContent = "Log entries";
+  if (summaryRiskLabel) summaryRiskLabel.textContent = "Last action";
+  if (summaryFallbackLabel) summaryFallbackLabel.textContent = "Session";
+
+  summaryFillValue.textContent = `${activityLog.length}`;
+  summaryFillCaption.textContent = `${activityLog.length} action${activityLog.length === 1 ? "" : "s"} recorded this session`;
+
+  if (activityLog.length > 0) {
+    summaryRiskValue.textContent = activityLog[0].action;
+    summaryRiskCaption.textContent = activityLog[0].detail;
+  } else {
+    summaryRiskValue.textContent = "None";
+    summaryRiskCaption.textContent = "No actions recorded yet";
+  }
+
+  summaryFallbackValue.textContent = "Persistent";
+  summaryFallbackCaption.textContent = "Activity persists across sessions via local storage";
 }
 
 function updateOrdersSummary(filtered) {
@@ -715,6 +991,7 @@ function selectVenue(venueId) {
   const exists = venues.some((v) => v.id === venueId);
   if (!exists) return;
 
+  const prev = selectedVenueId;
   selectedVenueId = selectedVenueId === venueId ? null : venueId;
 
   venuesTableBody?.querySelectorAll("tr.venue-row").forEach((row) => {
@@ -725,6 +1002,28 @@ function selectVenue(venueId) {
 
   persistState();
   renderVenueDetail();
+  if (selectedVenueId) {
+    const v = venues.find((v) => v.id === selectedVenueId);
+    if (v) logActivity("Select venue", v.name);
+  }
+}
+
+function showToast(message) {
+  if (!toastContainer) return;
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.innerHTML = '<span class="toast-accent" aria-hidden="true"></span>';
+  const text = document.createElement("span");
+  text.textContent = message;
+  el.appendChild(text);
+  toastContainer.appendChild(el);
+  setTimeout(() => {
+    el.classList.add("toast-out");
+    el.addEventListener("animationend", () => el.remove(), { once: true });
+  }, 3000);
+  while (toastContainer.children.length > 4) {
+    toastContainer.removeChild(toastContainer.firstElementChild);
+  }
 }
 
 function jumpToOrder(orderId) {
@@ -737,14 +1036,397 @@ function jumpToOrder(orderId) {
 
   selectedOrderId = orderId;
   persistState();
-  setActivePanel("orders");
+  setActivePanel("orders", true);
   renderOrders();
+  logActivity("Jump to order", orderId);
+  showToast("Jumped to order " + orderId);
+}
+
+function jumpToVenue(venueName) {
+  const venue = venues.find((v) => v.name === venueName);
+  if (!venue) return;
+
+  selectedVenueId = venue.id;
+  persistState();
+  setActivePanel("venues", true);
+  renderVenueLane();
+  renderVenueDetail();
+  logActivity("Jump to venue", venue.name);
+  showToast("Jumped to " + venue.name);
 }
 
 function updateVenuesPill() {
   if (!venuesActivePill) return;
   const liveCount = venues.filter((v) => v.state === "live").length;
   venuesActivePill.textContent = `${liveCount} live · ${venues.length} total`;
+}
+
+const severityLabel = {
+  high: "High",
+  moderate: "Moderate",
+  low: "Low",
+};
+
+const riskStatusLabel = {
+  pending: "Pending",
+  accepted: "Accepted",
+  deferred: "Deferred",
+};
+
+function pendingRiskCount() {
+  return riskAlerts.filter((a) => a.status === "pending").length;
+}
+
+function renderRiskAlerts() {
+  if (!riskTableBody) return;
+
+  if (selectedRiskId && !riskAlerts.some((a) => a.id === selectedRiskId)) {
+    selectedRiskId = null;
+    persistState();
+  }
+
+  riskTableBody.innerHTML = riskAlerts.map((alert) => {
+    const sevText = severityLabel[alert.severity] || alert.severity;
+    const statusText = riskStatusLabel[alert.status] || alert.status;
+    return `
+      <tr
+        data-risk-id="${alert.id}"
+        class="risk-row${alert.id === selectedRiskId ? " is-selected" : ""}"
+        tabindex="0"
+        role="button"
+        aria-pressed="${alert.id === selectedRiskId ? "true" : "false"}"
+        aria-label="Open ${alert.id} risk detail"
+      >
+        <td>
+          <strong>${alert.type}</strong>
+          <span class="risk-trigger">${alert.trigger}</span>
+        </td>
+        <td><span class="severity-badge severity-${alert.severity}">${sevText}</span></td>
+        <td>${alert.venue}</td>
+        <td><span class="risk-time">${alert.timestamp}</span></td>
+        <td><span class="risk-status-badge risk-status-${alert.status}">${statusText}</span></td>
+      </tr>
+    `;
+  }).join("");
+
+  updateRiskPill();
+  updateRiskNavCount();
+  renderRiskDetail();
+}
+
+function renderRiskDetail() {
+  if (!riskDetail) return;
+
+  const selected = riskAlerts.find((a) => a.id === selectedRiskId);
+
+  if (!selected) {
+    riskDetail.innerHTML = `
+      <div class="detail-placeholder">
+        <p class="panel-label">Review detail</p>
+        <strong>Select an alert to review its context and take action.</strong>
+        <p>Each risk alert carries a trigger, operator rationale, and a recommended action. Accept or defer from this rail.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const sevText = severityLabel[selected.severity] || selected.severity;
+  const statusText = riskStatusLabel[selected.status] || selected.status;
+
+  const actionsMarkup = selected.status === "pending"
+    ? `<div class="risk-actions">
+        <button class="button button-accept" type="button" data-risk-action="accept" data-risk-target="${selected.id}">Accept</button>
+        <button class="button button-defer" type="button" data-risk-action="defer" data-risk-target="${selected.id}">Defer</button>
+      </div>`
+    : `<div class="risk-resolved">
+        <span class="risk-status-badge risk-status-${selected.status}">${statusText}</span>
+      </div>`;
+
+  riskDetail.innerHTML = `
+    <article class="detail-card">
+      <header class="detail-head">
+        <div>
+          <p class="panel-label">${selected.id}</p>
+          <strong>${selected.type}</strong>
+        </div>
+        <span class="severity-badge severity-${selected.severity}">${sevText}</span>
+      </header>
+
+      <dl class="detail-meta">
+        <div><dt>Severity</dt><dd>${sevText}</dd></div>
+        <div><dt>Venue</dt><dd>${selected.venue}</dd></div>
+        <div><dt>Triggered</dt><dd>${selected.timestamp}</dd></div>
+      </dl>
+
+      <section class="detail-section">
+        <p class="panel-label">Trigger</p>
+        <p class="narrative-copy">${selected.trigger}</p>
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Rationale</p>
+        <p class="narrative-copy">${selected.rationale}</p>
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Recommendation</p>
+        <p class="narrative-copy">${selected.recommendation}</p>
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Impact</p>
+        <p class="narrative-copy">${selected.impact}</p>
+      </section>
+
+      ${actionsMarkup}
+    </article>
+  `;
+}
+
+function selectRisk(riskId) {
+  const exists = riskAlerts.some((a) => a.id === riskId);
+  if (!exists) return;
+
+  selectedRiskId = selectedRiskId === riskId ? null : riskId;
+
+  riskTableBody?.querySelectorAll("tr.risk-row").forEach((row) => {
+    const isSelected = row.getAttribute("data-risk-id") === selectedRiskId;
+    row.classList.toggle("is-selected", isSelected);
+    row.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
+
+  persistState();
+  renderRiskDetail();
+  if (selectedRiskId) logActivity("Select risk", selectedRiskId);
+}
+
+function resolveRisk(riskId, resolution) {
+  const alert = riskAlerts.find((a) => a.id === riskId);
+  if (!alert || alert.status !== "pending") return;
+
+  alert.status = resolution;
+  logActivity("Risk " + resolution, alert.id + " — " + alert.type);
+  renderRiskAlerts();
+  updateLaneSummary(filteredOrders());
+}
+
+function updateRiskPill() {
+  if (!riskActivePill) return;
+  const pending = pendingRiskCount();
+  riskActivePill.textContent = `${pending} pending`;
+}
+
+function updateRiskNavCount() {
+  if (!navCountEls.risk) return;
+  const pending = pendingRiskCount();
+  navCountEls.risk.textContent = `${pending} alert${pending === 1 ? "" : "s"}`;
+}
+
+function updateRiskSummary() {
+  if (!summaryFillValue) return;
+
+  if (summaryFillLabel) summaryFillLabel.textContent = "Review queue";
+  if (summaryRiskLabel) summaryRiskLabel.textContent = "Severity profile";
+  if (summaryFallbackLabel) summaryFallbackLabel.textContent = "Resolution rate";
+
+  const pending = riskAlerts.filter((a) => a.status === "pending").length;
+  const accepted = riskAlerts.filter((a) => a.status === "accepted").length;
+  const deferred = riskAlerts.filter((a) => a.status === "deferred").length;
+  const total = riskAlerts.length;
+
+  summaryFillValue.textContent = `${pending} pending`;
+  summaryFillCaption.textContent = `${total} total alert${total === 1 ? "" : "s"} in the review queue`;
+
+  const highCount = riskAlerts.filter((a) => a.severity === "high").length;
+  const modCount = riskAlerts.filter((a) => a.severity === "moderate").length;
+  const lowCount = riskAlerts.filter((a) => a.severity === "low").length;
+
+  let sevLabel;
+  if (highCount > 0) sevLabel = `${highCount} high`;
+  else if (modCount > 0) sevLabel = `${modCount} moderate`;
+  else sevLabel = `${lowCount} low`;
+  summaryRiskValue.textContent = sevLabel;
+  summaryRiskCaption.textContent = `${highCount} high / ${modCount} moderate / ${lowCount} low across ${total} alert${total === 1 ? "" : "s"}`;
+
+  const resolved = accepted + deferred;
+  if (total === 0) {
+    summaryFallbackValue.textContent = "Clear";
+    summaryFallbackCaption.textContent = "No alerts in the review queue";
+  } else if (resolved === total) {
+    summaryFallbackValue.textContent = "All resolved";
+    summaryFallbackCaption.textContent = `${accepted} accepted, ${deferred} deferred`;
+  } else {
+    summaryFallbackValue.textContent = `${resolved} of ${total}`;
+    summaryFallbackCaption.textContent = `${pending} pending review${accepted > 0 ? `, ${accepted} accepted` : ""}${deferred > 0 ? `, ${deferred} deferred` : ""}`;
+  }
+}
+
+const positionStatusLabel = {
+  active: "Active",
+  watch: "Watch",
+  staged: "Staged",
+};
+
+function renderPositions() {
+  if (!positionsTableBody) return;
+
+  if (selectedPositionId && !positions.some((p) => p.id === selectedPositionId)) {
+    selectedPositionId = null;
+    persistState();
+  }
+
+  positionsTableBody.innerHTML = positions.map((pos) => {
+    const statusText = positionStatusLabel[pos.status] || pos.status;
+    return `
+      <tr
+        data-position-id="${pos.id}"
+        class="position-row${pos.id === selectedPositionId ? " is-selected" : ""}"
+        tabindex="0"
+        role="button"
+        aria-pressed="${pos.id === selectedPositionId ? "true" : "false"}"
+        aria-label="Open ${pos.name} position detail"
+      >
+        <td>
+          <strong>${pos.name}</strong>
+          <span class="position-id">${pos.id}</span>
+        </td>
+        <td>${pos.exposure}</td>
+        <td><span class="pnl-value ${parseFloat(pos.pnl) > 0 ? "pnl-positive" : parseFloat(pos.pnl) < 0 ? "pnl-negative" : "pnl-flat"}">${pos.pnl}</span></td>
+        <td class="numeric">${pos.instruments}</td>
+        <td><span class="position-status-badge position-status-${pos.status}">${statusText}</span></td>
+      </tr>
+    `;
+  }).join("");
+
+  updatePositionsPill();
+  updatePositionsNavCount();
+  renderPositionDetail();
+}
+
+function renderPositionDetail() {
+  if (!positionDetail) return;
+
+  const selected = positions.find((p) => p.id === selectedPositionId);
+
+  if (!selected) {
+    positionDetail.innerHTML = `
+      <div class="detail-placeholder">
+        <p class="panel-label">Book detail</p>
+        <strong>Select a book to inspect its holdings and venue allocation.</strong>
+        <p>Each position book carries top holdings, venue distribution, operator rationale, and a risk note.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const statusText = positionStatusLabel[selected.status] || selected.status;
+
+  const holdingsMarkup = selected.topHoldings
+    .map((h) => `<li><span><strong>${h.name}</strong><span class="holding-venue venue-link" data-venue-link="${h.venue}" role="button" tabindex="0" aria-label="Open ${h.venue} in venues panel">${h.venue}</span></span><strong>${h.weight}</strong></li>`)
+    .join("");
+
+  const allocationMarkup = selected.venueAllocation
+    .map((v) => `<li><span><span class="venue-link" data-venue-link="${v.name}" role="button" tabindex="0" aria-label="Open ${v.name} in venues panel">${v.name}</span></span><strong>${v.share}</strong></li>`)
+    .join("");
+
+  positionDetail.innerHTML = `
+    <article class="detail-card">
+      <header class="detail-head">
+        <div>
+          <p class="panel-label">${selected.id}</p>
+          <strong>${selected.name}</strong>
+        </div>
+        <span class="position-status-badge position-status-${selected.status}">${statusText}</span>
+      </header>
+
+      <dl class="detail-meta">
+        <div><dt>Exposure</dt><dd>${selected.exposure}</dd></div>
+        <div><dt>P&L</dt><dd class="pnl-value ${parseFloat(selected.pnl) > 0 ? "pnl-positive" : parseFloat(selected.pnl) < 0 ? "pnl-negative" : "pnl-flat"}">${selected.pnl}</dd></div>
+        <div><dt>Instruments</dt><dd>${selected.instruments}</dd></div>
+      </dl>
+
+      <section class="detail-section">
+        <p class="panel-label">Top holdings</p>
+        <ul class="detail-venue-list">${holdingsMarkup}</ul>
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Venue allocation</p>
+        <ul class="detail-venue-list">${allocationMarkup}</ul>
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Operator rationale</p>
+        <p class="narrative-copy">${selected.rationale}</p>
+      </section>
+
+      <section class="detail-section">
+        <p class="panel-label">Risk note</p>
+        <p class="narrative-copy">${selected.riskNote}</p>
+      </section>
+    </article>
+  `;
+}
+
+function selectPosition(positionId) {
+  const exists = positions.some((p) => p.id === positionId);
+  if (!exists) return;
+
+  selectedPositionId = selectedPositionId === positionId ? null : positionId;
+
+  positionsTableBody?.querySelectorAll("tr.position-row").forEach((row) => {
+    const isSelected = row.getAttribute("data-position-id") === selectedPositionId;
+    row.classList.toggle("is-selected", isSelected);
+    row.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
+
+  persistState();
+  renderPositionDetail();
+  if (selectedPositionId) {
+    const p = positions.find((p) => p.id === selectedPositionId);
+    if (p) logActivity("Select position", p.name);
+  }
+}
+
+function updatePositionsPill() {
+  if (!positionsActivePill) return;
+  const activeCount = positions.filter((p) => p.status === "active").length;
+  positionsActivePill.textContent = `${activeCount} active · ${positions.length} books`;
+}
+
+function updatePositionsNavCount() {
+  if (!navCountEls.positions) return;
+  const activeCount = positions.filter((p) => p.status === "active").length;
+  navCountEls.positions.textContent = `${activeCount} active`;
+}
+
+function updatePositionsSummary() {
+  if (!summaryFillValue) return;
+
+  if (summaryFillLabel) summaryFillLabel.textContent = "Net exposure";
+  if (summaryRiskLabel) summaryRiskLabel.textContent = "Book status";
+  if (summaryFallbackLabel) summaryFallbackLabel.textContent = "Instrument count";
+
+  const totalExposure = positions.reduce((sum, p) => {
+    const val = parseFloat(p.exposure.replace(/[$,M]/g, ""));
+    return sum + (Number.isFinite(val) ? val : 0);
+  }, 0);
+  summaryFillValue.textContent = `$${totalExposure.toFixed(1)}M`;
+  summaryFillCaption.textContent = `Across ${positions.length} book${positions.length === 1 ? "" : "s"}`;
+
+  const activeCount = positions.filter((p) => p.status === "active").length;
+  const watchCount = positions.filter((p) => p.status === "watch").length;
+  const stagedCount = positions.filter((p) => p.status === "staged").length;
+
+  let statusLabel;
+  if (watchCount > 0) statusLabel = `${watchCount} watch`;
+  else statusLabel = `${activeCount} active`;
+  summaryRiskValue.textContent = statusLabel;
+  summaryRiskCaption.textContent = `${activeCount} active / ${watchCount} watch / ${stagedCount} staged`;
+
+  const totalInstruments = positions.reduce((sum, p) => sum + p.instruments, 0);
+  summaryFallbackValue.textContent = `${totalInstruments}`;
+  summaryFallbackCaption.textContent = `${totalInstruments} instrument${totalInstruments === 1 ? "" : "s"} across ${positions.length} book${positions.length === 1 ? "" : "s"}`;
 }
 
 function updateNavCounts() {
@@ -798,8 +1480,30 @@ function setOrderState(nextState) {
   }
 }
 
-function setActivePanel(panel) {
+function applySearch() {
+  const query = workspaceSearch ? workspaceSearch.value.trim().toLowerCase() : "";
+  const panelEl = document.getElementById(`panel-${activePanel}`);
+  if (!panelEl) return;
+  const rows = panelEl.querySelectorAll("tbody tr");
+  rows.forEach((row) => {
+    if (!query) {
+      row.classList.remove("search-hidden");
+      return;
+    }
+    const text = row.textContent.toLowerCase();
+    row.classList.toggle("search-hidden", !text.includes(query));
+  });
+}
+
+function clearSearch() {
+  if (workspaceSearch) {
+    workspaceSearch.value = "";
+  }
+}
+
+function setActivePanel(panel, skipLog) {
   activePanel = panel;
+  clearSearch();
   panelTitle.textContent = panelTitles[panel] || "Workspace";
 
   navButtons.forEach((button) => {
@@ -812,6 +1516,7 @@ function setActivePanel(panel) {
 
   persistState();
   updateLaneSummary(filteredOrders());
+  if (!skipLog) logActivity("Panel switch", panelTitles[panel] || panel);
 }
 
 function setActiveFilter(filter) {
@@ -821,6 +1526,7 @@ function setActiveFilter(filter) {
   });
 
   persistState();
+  logActivity("Filter change", "Orders filtered to: " + filter);
 
   if (activeState === "loading") {
     updateOrdersPill();
@@ -847,7 +1553,10 @@ cycleStateButton?.addEventListener("click", () => {
 });
 
 navButtons.forEach((button) => {
-  button.addEventListener("click", () => setActivePanel(button.dataset.panel));
+  button.addEventListener("click", () => {
+    setActivePanel(button.dataset.panel);
+    closeSidebar();
+  });
 });
 
 filterButtons.forEach((button) => {
@@ -902,27 +1611,228 @@ venueDetail?.addEventListener("keydown", (event) => {
   if (id) jumpToOrder(id);
 });
 
+riskTableBody?.addEventListener("click", (event) => {
+  const row = event.target.closest("tr.risk-row");
+  if (!row) return;
+  const id = row.getAttribute("data-risk-id");
+  if (id) selectRisk(id);
+});
+
+riskTableBody?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const row = event.target.closest("tr.risk-row");
+  if (!row) return;
+  event.preventDefault();
+  const id = row.getAttribute("data-risk-id");
+  if (id) selectRisk(id);
+});
+
+positionsTableBody?.addEventListener("click", (event) => {
+  const row = event.target.closest("tr.position-row");
+  if (!row) return;
+  const id = row.getAttribute("data-position-id");
+  if (id) selectPosition(id);
+});
+
+positionsTableBody?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const row = event.target.closest("tr.position-row");
+  if (!row) return;
+  event.preventDefault();
+  const id = row.getAttribute("data-position-id");
+  if (id) selectPosition(id);
+});
+
+riskDetail?.addEventListener("click", (event) => {
+  const actionBtn = event.target.closest("[data-risk-action]");
+  if (!actionBtn) return;
+  const action = actionBtn.getAttribute("data-risk-action");
+  const targetId = actionBtn.getAttribute("data-risk-target");
+  if (action && targetId) resolveRisk(targetId, action === "accept" ? "accepted" : "deferred");
+});
+
+function handleVenueLinkClick(event) {
+  const link = event.target.closest("[data-venue-link]");
+  if (!link) return;
+  const venueName = link.getAttribute("data-venue-link");
+  if (venueName) jumpToVenue(venueName);
+}
+
+function handleVenueLinkKeydown(event) {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const link = event.target.closest("[data-venue-link]");
+  if (!link) return;
+  event.preventDefault();
+  const venueName = link.getAttribute("data-venue-link");
+  if (venueName) jumpToVenue(venueName);
+}
+
+orderDetail?.addEventListener("click", handleVenueLinkClick);
+orderDetail?.addEventListener("keydown", handleVenueLinkKeydown);
+positionDetail?.addEventListener("click", handleVenueLinkClick);
+positionDetail?.addEventListener("keydown", handleVenueLinkKeydown);
+
 dashboardButtons.forEach((button) => {
   button.addEventListener("click", () => {
     document.getElementById("workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 });
 
+const fallbackPolicyLabels = {
+  graceful: "Graceful degrade",
+  aggressive: "Aggressive reroute",
+  hold: "Hold and wait",
+};
+
+const densityLabels = {
+  comfortable: "Comfortable",
+  compact: "Compact",
+};
+
+let eventFeedInterval = null;
+
+function loadSettings() {
+  if (persisted.modeBias && settingModeBias) settingModeBias.value = persisted.modeBias;
+  if (persisted.alertCadence && settingAlertCadence) settingAlertCadence.value = persisted.alertCadence;
+  if (persisted.fallbackPolicy && settingFallbackPolicy) settingFallbackPolicy.value = persisted.fallbackPolicy;
+  if (persisted.density && settingDensity) settingDensity.value = persisted.density;
+
+  applySettings();
+}
+
+function applySettings() {
+  const modeBias = settingModeBias ? settingModeBias.value : "Balanced Sweep";
+  const cadence = settingAlertCadence ? parseInt(settingAlertCadence.value, 10) : 9000;
+  const fallbackPolicy = settingFallbackPolicy ? settingFallbackPolicy.value : "graceful";
+  const density = settingDensity ? settingDensity.value : "comfortable";
+
+  if (readoutModeBias) readoutModeBias.textContent = modeBias;
+  if (readoutAlertCadence) {
+    const seconds = cadence / 1000;
+    readoutAlertCadence.textContent = `Every ${seconds} second${seconds === 1 ? "" : "s"}`;
+  }
+  if (readoutFallbackPolicy) readoutFallbackPolicy.textContent = fallbackPolicyLabels[fallbackPolicy] || fallbackPolicy;
+  if (readoutDensity) readoutDensity.textContent = densityLabels[density] || density;
+
+  const defaultMode = modes.find((m) => m.mode === modeBias);
+  if (defaultMode) {
+    modeIndex = modes.indexOf(defaultMode);
+    updateMode();
+  }
+
+  if (eventFeedInterval) clearInterval(eventFeedInterval);
+  eventFeedInterval = setInterval(pushEvent, cadence);
+
+  if (workspaceShell) {
+    workspaceShell.classList.toggle("density-compact", density === "compact");
+  }
+}
+
+function flashSavedPill() {
+  if (!settingsSavedPill) return;
+  settingsSavedPill.classList.add("flash");
+  setTimeout(() => settingsSavedPill.classList.remove("flash"), 1200);
+}
+
+function onSettingChange() {
+  const modeBias = settingModeBias ? settingModeBias.value : "Balanced Sweep";
+  const cadence = settingAlertCadence ? settingAlertCadence.value : "9000";
+  const fallbackPolicy = settingFallbackPolicy ? settingFallbackPolicy.value : "graceful";
+  const density = settingDensity ? settingDensity.value : "comfortable";
+
+  try {
+    if (typeof localStorage !== "undefined") {
+      const current = readPersistedState();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        ...current,
+        modeBias,
+        alertCadence: cadence,
+        fallbackPolicy,
+        density,
+      }));
+    }
+  } catch (_err) {
+    // best-effort
+  }
+
+  applySettings();
+  flashSavedPill();
+  logActivity("Settings changed", "Preferences updated");
+}
+
+const clearActivityLogBtn = document.getElementById("clearActivityLog");
+clearActivityLogBtn?.addEventListener("click", clearActivityLog);
+
+const sidebarToggle = document.getElementById("sidebarToggle");
+const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+const workspaceSidebar = document.querySelector(".workspace-sidebar");
+
+function openSidebar() {
+  if (!workspaceSidebar || !sidebarToggle) return;
+  workspaceSidebar.classList.add("sidebar-open");
+  sidebarToggle.setAttribute("aria-expanded", "true");
+  if (sidebarBackdrop) sidebarBackdrop.classList.add("is-visible");
+  logActivity("Sidebar opened", "Responsive sidebar toggled open");
+}
+
+function closeSidebar() {
+  if (!workspaceSidebar || !sidebarToggle) return;
+  workspaceSidebar.classList.remove("sidebar-open");
+  sidebarToggle.setAttribute("aria-expanded", "false");
+  if (sidebarBackdrop) sidebarBackdrop.classList.remove("is-visible");
+}
+
+function toggleSidebar() {
+  const isOpen = workspaceSidebar?.classList.contains("sidebar-open");
+  if (isOpen) {
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
+}
+
+sidebarToggle?.addEventListener("click", toggleSidebar);
+sidebarBackdrop?.addEventListener("click", closeSidebar);
+
+workspaceSearch?.addEventListener("input", applySearch);
+
+if (settingModeBias) settingModeBias.addEventListener("change", onSettingChange);
+if (settingAlertCadence) settingAlertCadence.addEventListener("change", onSettingChange);
+if (settingFallbackPolicy) settingFallbackPolicy.addEventListener("change", onSettingChange);
+if (settingDensity) settingDensity.addEventListener("change", onSettingChange);
+
 filterButtons.forEach((button) => {
   button.classList.toggle("is-active", button.dataset.filter === activeFilter);
 });
 
 renderVenues();
+renderRiskAlerts();
+renderPositions();
+renderActivityLog();
 updateNavCounts();
 updateWorkspaceLivePill();
 updateMode();
-setActivePanel(activePanel);
+setActivePanel(activePanel, true);
 setOrderState("loading");
 renderOrders();
 renderOrderDetail();
 
+loadSettings();
+
+const keyPanelMap = { "1": "orders", "2": "positions", "3": "venues", "4": "risk", "5": "settings", "6": "activity" };
+
+document.addEventListener("keydown", (event) => {
+  const tag = document.activeElement?.tagName;
+  if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+  const panel = keyPanelMap[event.key];
+  if (!panel) return;
+  event.preventDefault();
+  setActivePanel(panel);
+  if (activeState === "loading" && panel === "orders") {
+    // don't force state change on orders during initial load
+  }
+});
+
 setTimeout(() => {
   setOrderState("ready");
 }, 1200);
-
-setInterval(pushEvent, 9000);

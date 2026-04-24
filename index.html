@@ -197,7 +197,7 @@
                 </button>
                 <button class="workspace-nav-item" type="button" data-panel="positions">
                   <span>Positions</span>
-                  <small data-nav-count="positions">4 books</small>
+                  <small data-nav-count="positions">0 active</small>
                 </button>
                 <button class="workspace-nav-item" type="button" data-panel="venues">
                   <span>Venues</span>
@@ -211,6 +211,10 @@
                   <span>Settings</span>
                   <small data-nav-count="settings">Profile</small>
                 </button>
+                <button class="workspace-nav-item" type="button" data-panel="activity">
+                  <span>Activity</span>
+                  <small data-nav-count="activity">0 entries</small>
+                </button>
               </nav>
 
               <div class="sidebar-card">
@@ -218,16 +222,35 @@
                 <strong>Adaptive mesh healthy</strong>
                 <p class="sidebar-copy">Venue failover, posture history, and operator review notes are available from one surface.</p>
               </div>
+
+              <div class="shortcut-hint" id="shortcutHint">
+                <p class="panel-label">Keyboard</p>
+                <ul class="shortcut-list">
+                  <li><kbd>1</kbd><span>Orders</span></li>
+                  <li><kbd>2</kbd><span>Positions</span></li>
+                  <li><kbd>3</kbd><span>Venues</span></li>
+                  <li><kbd>4</kbd><span>Risk</span></li>
+                  <li><kbd>5</kbd><span>Settings</span></li>
+                  <li><kbd>6</kbd><span>Activity</span></li>
+                </ul>
+              </div>
             </aside>
+            <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
 
             <div class="workspace-main">
               <div class="workspace-toolbar">
+                <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle sidebar" aria-expanded="false">
+                  <span class="sidebar-toggle-bar"></span>
+                  <span class="sidebar-toggle-bar"></span>
+                  <span class="sidebar-toggle-bar"></span>
+                </button>
                 <div>
                   <p class="panel-label">Dashboard view</p>
                   <h3 id="panelTitle">Execution orders</h3>
                 </div>
 
                 <div class="toolbar-actions">
+                  <input type="text" class="workspace-search" id="workspaceSearch" placeholder="Filter rows..." aria-label="Filter workspace rows" />
                   <div class="filter-group" aria-label="Execution filters">
                     <button class="filter-chip is-active" type="button" data-filter="all">All</button>
                     <button class="filter-chip" type="button" data-filter="live">Live</button>
@@ -304,7 +327,7 @@
                           <tbody id="ordersTableBody"></tbody>
                         </table>
                       </div>
-                      <p class="table-footnote">Select a route to inspect venue mix, operator rationale, and fallback sequencing without leaving the lane.</p>
+                      <p class="table-footnote">Select a route to inspect venue mix, operator rationale, and fallback sequencing. Venue names link to the venues panel.</p>
                     </div>
 
                     <aside class="detail-rail">
@@ -323,29 +346,37 @@
               </section>
 
               <section class="workspace-panel" id="panel-positions" data-panel-body>
-                <div class="dual-grid">
-                  <article class="data-card">
-                    <div class="card-head">
-                      <div>
-                        <p class="panel-label">Position overview</p>
-                        <strong>Book concentration</strong>
-                      </div>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Position overview</p>
+                      <strong>Book concentration</strong>
                     </div>
-                    <ul class="insight-list">
-                      <li><span>Asia macro book</span><strong>+1.8%</strong></li>
-                      <li><span>Europe dispersion</span><strong>-0.4%</strong></li>
-                      <li><span>Cross-venue hedge</span><strong>+0.9%</strong></li>
-                    </ul>
-                  </article>
-                  <article class="data-card">
-                    <div class="card-head">
-                      <div>
-                        <p class="panel-label">Exposure tone</p>
-                        <strong>Operator note</strong>
+                    <span class="status-pill" id="positionsActivePill">0 active</span>
+                  </div>
+                  <div class="positions-workbench">
+                    <div class="position-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Book</th>
+                              <th>Exposure</th>
+                              <th>P&L</th>
+                              <th class="numeric">Instruments</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="positionsTableBody"></tbody>
+                        </table>
                       </div>
+                      <p class="table-footnote">Select a book to inspect top holdings, venue allocation, and operator rationale. Venue names link to the venues panel.</p>
                     </div>
-                    <p class="narrative-copy">HydraX is holding inventory within the preferred band while preserving headroom for a Tokyo-led liquidity surge.</p>
-                  </article>
+
+                    <aside class="detail-rail">
+                      <div class="detail-shell" id="positionDetail" aria-live="polite"></div>
+                    </aside>
+                  </div>
                 </div>
               </section>
 
@@ -386,29 +417,37 @@
               </section>
 
               <section class="workspace-panel" id="panel-risk" data-panel-body>
-                <div class="dual-grid">
-                  <article class="data-card">
-                    <div class="card-head">
-                      <div>
-                        <p class="panel-label">Risk pressure</p>
-                        <strong>Guardrail monitor</strong>
-                      </div>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Risk review</p>
+                      <strong>Operator review queue</strong>
                     </div>
-                    <ul class="risk-list">
-                      <li><span>Adverse selection</span><strong>Moderate</strong></li>
-                      <li><span>Inventory skew</span><strong>Narrowing</strong></li>
-                      <li><span>Latency burst</span><strong>Contained</strong></li>
-                    </ul>
-                  </article>
-                  <article class="data-card">
-                    <div class="card-head">
-                      <div>
-                        <p class="panel-label">Review queue</p>
-                        <strong>Operator interventions</strong>
+                    <span class="status-pill" id="riskActivePill">0 pending</span>
+                  </div>
+                  <div class="risk-workbench">
+                    <div class="risk-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Alert</th>
+                              <th>Severity</th>
+                              <th>Venue</th>
+                              <th>Time</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="riskTableBody"></tbody>
+                        </table>
                       </div>
+                      <p class="table-footnote">Select an alert to review rationale, recommendation, and take accept or defer action.</p>
                     </div>
-                    <p class="narrative-copy">Two interventions are waiting for sign-off: one for threshold widening during London open, one for passive window reopening after spread normalization.</p>
-                  </article>
+
+                    <aside class="detail-rail">
+                      <div class="detail-shell" id="riskDetail" aria-live="polite"></div>
+                    </aside>
+                  </div>
                 </div>
               </section>
 
@@ -420,22 +459,99 @@
                         <p class="panel-label">Workspace profile</p>
                         <strong>Operator preferences</strong>
                       </div>
+                      <span class="status-pill" id="settingsSavedPill">Saved</span>
                     </div>
-                    <ul class="insight-list">
-                      <li><span>Mode bias</span><strong>Balanced Sweep</strong></li>
-                      <li><span>Alert cadence</span><strong>Every 5 mins</strong></li>
-                      <li><span>Fallback policy</span><strong>Graceful degrade</strong></li>
-                    </ul>
+                    <div class="settings-form">
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingModeBias">Mode bias</label>
+                        <p class="setting-hint">Default routing posture applied to new orders.</p>
+                        <select class="setting-select" id="settingModeBias">
+                          <option value="Balanced Sweep">Balanced Sweep</option>
+                          <option value="Latency Shield">Latency Shield</option>
+                          <option value="Inventory Protect">Inventory Protect</option>
+                          <option value="Passive Ladder">Passive Ladder</option>
+                          <option value="Fallback Mesh">Fallback Mesh</option>
+                        </select>
+                      </div>
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingAlertCadence">Alert cadence</label>
+                        <p class="setting-hint">How often the adaptive feed pushes new system events.</p>
+                        <select class="setting-select" id="settingAlertCadence">
+                          <option value="5000">Every 5 seconds</option>
+                          <option value="9000" selected>Every 9 seconds</option>
+                          <option value="15000">Every 15 seconds</option>
+                          <option value="30000">Every 30 seconds</option>
+                        </select>
+                      </div>
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingFallbackPolicy">Fallback policy</label>
+                        <p class="setting-hint">How HydraX responds when a venue degrades or goes offline.</p>
+                        <select class="setting-select" id="settingFallbackPolicy">
+                          <option value="graceful">Graceful degrade</option>
+                          <option value="aggressive">Aggressive reroute</option>
+                          <option value="hold">Hold and wait</option>
+                        </select>
+                      </div>
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingTheme">Workspace density</label>
+                        <p class="setting-hint">Controls table row height and panel spacing.</p>
+                        <select class="setting-select" id="settingDensity">
+                          <option value="comfortable">Comfortable</option>
+                          <option value="compact">Compact</option>
+                        </select>
+                      </div>
+                    </div>
                   </article>
                   <article class="data-card">
                     <div class="card-head">
                       <div>
-                        <p class="panel-label">Surface intent</p>
-                        <strong>Design note</strong>
+                        <p class="panel-label">Active configuration</p>
+                        <strong>Live workspace state</strong>
                       </div>
                     </div>
-                    <p class="narrative-copy">This slice establishes information architecture, state patterns, and navigation hierarchy before live data wiring.</p>
+                    <ul class="insight-list" id="settingsReadout">
+                      <li><span>Mode bias</span><strong id="readoutModeBias">Balanced Sweep</strong></li>
+                      <li><span>Alert cadence</span><strong id="readoutAlertCadence">Every 9 seconds</strong></li>
+                      <li><span>Fallback policy</span><strong id="readoutFallbackPolicy">Graceful degrade</strong></li>
+                      <li><span>Density</span><strong id="readoutDensity">Comfortable</strong></li>
+                    </ul>
+                    <p class="narrative-copy settings-note">Changes apply immediately and persist across sessions via local storage.</p>
                   </article>
+                </div>
+              </section>
+
+              <section class="workspace-panel" id="panel-activity" data-panel-body>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Operator activity</p>
+                      <strong>Session action log</strong>
+                    </div>
+                    <span class="status-pill" id="activityCountPill">0 entries</span>
+                    <button class="button button-ghost small clear-log-btn" id="clearActivityLog" type="button">Clear log</button>
+                  </div>
+                  <div class="activity-workbench">
+                    <div class="activity-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Time</th>
+                              <th>Action</th>
+                              <th>Detail</th>
+                            </tr>
+                          </thead>
+                          <tbody id="activityTableBody"></tbody>
+                        </table>
+                      </div>
+                      <p class="table-footnote">Actions persist across sessions via local storage. Use Clear log to reset.</p>
+                    </div>
+                    <div class="activity-empty" id="activityEmpty">
+                      <p class="panel-label">No activity yet</p>
+                      <strong>Interact with the workspace to populate the log.</strong>
+                      <p>Panel switches, filter changes, risk resolutions, and cross-panel jumps are recorded here.</p>
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>
@@ -467,6 +583,8 @@
         </section>
       </main>
     </div>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-relevant="additions"></div>
 
     <script src="app.js"></script>
   </body>
