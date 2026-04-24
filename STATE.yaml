@@ -1,26 +1,26 @@
 project: hydrax-app
-updated: 2026-04-24T12:10:00+08:00
+updated: 2026-04-24T13:31:00+08:00
 status: in_progress
-summary: Responsive sidebar collapse landed — on screens <=1080px the workspace sidebar hides behind a hamburger toggle with slide-in overlay and backdrop dismiss.
+summary: Sortable table columns landed — clicking any column header in orders, positions, venues, or risk tables sorts ascending then descending with a visual indicator.
 current_focus:
-  - Shipped — responsive sidebar collapse with hamburger toggle, slide-in overlay, and backdrop dismiss
-  - Sidebar toggle button appears in workspace toolbar on narrow screens only
-  - Hamburger icon animates to X when open; sidebar slides in from left with backdrop
-  - Clicking backdrop or any nav item closes the sidebar
-  - Twelve workbench features now fully interactive: Orders, Positions, Venues, Risk, Settings, Search, Cross-panel linking, Toasts, Keyboard shortcuts, Activity log, Activity persistence, Responsive sidebar
+  - Shipped — sortable table columns across all four workspace panels
+  - Each th has class="sortable" + data-sort-key; click toggles asc/desc
+  - Sort indicator (CSS triangle via ::after) highlights the active column in accent color
+  - Numeric columns (exposure, P&L, instruments, queue depth) parsed correctly
+  - Severity column sorts by rank (high > moderate > low), not alphabetical
+  - Sort actions logged to activity panel
+  - Fifteen workbench features now fully interactive: Orders, Positions, Venues, Risk, Settings, Search, Cross-panel linking, Toasts, Keyboard shortcuts, Activity log, Activity persistence, Responsive sidebar, Mobile toolbar, Topbar responsive, Sortable columns
 recently_verified:
   - node --check app.js passes
-  - getElementById clearActivityLog in app.js matches id="clearActivityLog" in index.html
-  - CSS class clear-log-btn declared in styles.css, referenced in index.html
-  - ACTIVITY_STORAGE_KEY wired through loadPersistedActivity, persistActivity, logActivity, clearActivityLog
-  - wc -l index.html=585, app.js=1803, styles.css=1617, STATE.yaml updated
-  - git diff --stat confirms 3 code files changed (index.html, app.js, styles.css)
+  - 21 data-sort-key attributes in index.html matched by getSortValue paths in app.js
+  - CSS classes th.sortable, .sort-asc, .sort-desc declared in styles.css
+  - wc -l index.html=600, app.js=1978, styles.css=1911, STATE.yaml updated
+  - git diff --stat confirms 3 code files changed (index.html +51/-38, app.js +141, styles.css +197/-1)
 next_actions:
-  - Mobile toolbar responsive pass — filter chips, search, and summary cards stack on narrow viewports
   - Typed fixture module extraction — consolidate fixture arrays into a structured data layer
   - Extract the repeated drill-down shell into a shared workbench primitive
   - Deferred to v1 build: authenticated navigation shell, services/ scaffolding, web/apps/ shells
-next_recommended_slice: Mobile toolbar responsive pass — filter chips, search input, and summary cards stack cleanly on narrow viewports.
+next_recommended_slice: Typed fixture module extraction — consolidate venue, order, position, risk data into a structured data layer with derived counts.
 roadmap_alignment:
   prototype_sequence:
     - done — static landing + command-surface preview
@@ -39,7 +39,10 @@ roadmap_alignment:
     - done — Activity log panel (2026-04-24)
     - done — Activity log persistence (2026-04-24)
     - done — Responsive sidebar collapse (2026-04-24)
-    - next — mobile toolbar responsive pass or typed fixture extraction
+    - done — Mobile toolbar responsive pass (2026-04-24)
+    - done — Topbar responsive collapse (2026-04-24)
+    - done — Sortable table columns (2026-04-24)
+    - next — typed fixture module extraction or shared drill-down primitive
   v1_build_dependencies:
     - prd-v2 §14 Q1 — HydraX API surface
     - prd-v2 §14 Q3 — first product template (MMF vs short-duration credit vs treasury-equivalent)
@@ -68,3 +71,6 @@ verification_log:
   - 2026-04-24 — Activity log panel: node --check app.js passes; getElementById audit clean (zero missing); activityCountPill/activityTableBody/activityEmpty/panel-activity present; activity CSS classes declared; wc -l index.html=584 app.js=1770 styles.css=1603; git diff --stat confirms 3 code files changed
   - 2026-04-24 — Activity log persistence: node --check app.js passes; clearActivityLog id matched in HTML+JS; clear-log-btn CSS class declared; ACTIVITY_STORAGE_KEY wired; wc -l index.html=585 app.js=1803 styles.css=1617; 3 code files changed
   - 2026-04-24 — Responsive sidebar collapse: node --check app.js passes; sidebarToggle id in HTML:242 matched by JS:1766; sidebarBackdrop id in HTML:238 matched by JS:1767; sidebar-toggle, sidebar-open, sidebar-backdrop CSS classes declared; hamburger animation, slide-in transition, backdrop dismiss all wired; wc -l index.html=591 app.js=1837 styles.css=1718; 3 code files changed
+  - 2026-04-24 — Mobile toolbar responsive: node --check app.js passes; searchToggle id in HTML:253 matched by JS:1797; search-toggle, is-active, search-expanded CSS classes declared; summary-grid 1-col at 720px; filter-group flex-wrap; wc -l index.html=594 app.js=1851 styles.css=1782; 3 code files changed
+  - 2026-04-24 — Topbar responsive: node --check app.js passes; topbarToggle id in HTML:43 matched by JS:1797; topbar-toggle, topbar-toggle-bar, topbar-open CSS classes declared; hamburger bars-to-X animation; nav link auto-close; wc -l index.html=600 app.js=1872 styles.css=1866; 3 code files changed
+  - 2026-04-24 — Sortable columns: node --check app.js passes; 21 data-sort-key attrs in HTML matched by getSortValue in JS; CSS th.sortable + .sort-asc + .sort-desc declared; numeric parsing for exposure/pnl/instruments/queueDepth; severity ranked; wc -l index.html=600 app.js=1978 styles.css=1911; 3 code files changed

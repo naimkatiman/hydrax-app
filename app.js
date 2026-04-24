@@ -388,6 +388,34 @@ const panelTitles = {
   activity: "Activity log",
 };
 
+const panelFilters = {
+  orders: [
+    { key: "all", label: "All" },
+    { key: "live", label: "Live" },
+    { key: "review", label: "Needs review" },
+    { key: "queued", label: "Queued" },
+  ],
+  venues: [
+    { key: "all", label: "All" },
+    { key: "live", label: "Live" },
+    { key: "warm", label: "Warm" },
+  ],
+  positions: [
+    { key: "all", label: "All" },
+    { key: "active", label: "Active" },
+    { key: "watch", label: "Watch" },
+    { key: "staged", label: "Staged" },
+  ],
+  risk: [
+    { key: "all", label: "All" },
+    { key: "pending", label: "Pending" },
+    { key: "accepted", label: "Accepted" },
+    { key: "deferred", label: "Deferred" },
+  ],
+  settings: [],
+  activity: [],
+};
+
 const persisted = readPersistedState();
 
 let modeIndex = 0;
@@ -1794,6 +1822,41 @@ function toggleSidebar() {
 sidebarToggle?.addEventListener("click", toggleSidebar);
 sidebarBackdrop?.addEventListener("click", closeSidebar);
 
+const topbarToggle = document.getElementById("topbarToggle");
+const topbar = document.querySelector(".topbar");
+
+function toggleTopbar() {
+  if (!topbar || !topbarToggle) return;
+  const isOpen = topbar.classList.toggle("topbar-open");
+  topbarToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+
+function closeTopbar() {
+  if (!topbar || !topbarToggle) return;
+  topbar.classList.remove("topbar-open");
+  topbarToggle.setAttribute("aria-expanded", "false");
+}
+
+topbarToggle?.addEventListener("click", toggleTopbar);
+
+topbar?.querySelectorAll(".topnav a").forEach((link) => {
+  link.addEventListener("click", closeTopbar);
+});
+
+const searchToggle = document.getElementById("searchToggle");
+
+searchToggle?.addEventListener("click", () => {
+  if (!workspaceSearch) return;
+  const expanded = workspaceSearch.classList.toggle("search-expanded");
+  searchToggle.classList.toggle("is-active", expanded);
+  if (expanded) {
+    workspaceSearch.focus();
+  } else {
+    workspaceSearch.value = "";
+    applySearch();
+  }
+});
+
 workspaceSearch?.addEventListener("input", applySearch);
 
 if (settingModeBias) settingModeBias.addEventListener("change", onSettingChange);
@@ -1818,6 +1881,112 @@ renderOrders();
 renderOrderDetail();
 
 loadSettings();
+
+const sortState = {
+  orders: { key: null, dir: "asc" },
+  positions: { key: null, dir: "asc" },
+  venues: { key: null, dir: "asc" },
+  risk: { key: null, dir: "asc" },
+};
+
+const severityRank = { high: 3, moderate: 2, low: 1 };
+
+function parseNumeric(val) {
+  if (typeof val === "number") return val;
+  var str = String(val).replace(/[$,MK%]/g, "");
+  var num = parseFloat(str);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function getSortValue(item, key, panel) {
+  if (panel === "orders") {
+    if (key === "exposure") return parseNumeric(item.exposure);
+    return item[key] || "";
+  }
+  if (panel === "venues") {
+    if (key === "queueDepth") return item.load.queueDepth;
+    if (key === "fillQuality") return item.load.fillQuality;
+    if (key === "routed") return routedOrdersFor(item.name).length;
+    if (key === "readiness") return item.fallback.readiness;
+    if (key === "name") return item.name;
+    if (key === "state") return item.state;
+    return "";
+  }
+  if (panel === "positions") {
+    if (key === "exposure") return parseNumeric(item.exposure);
+    if (key === "pnl") return parseNumeric(item.pnl);
+    if (key === "instruments") return item.instruments;
+    if (key === "name") return item.name;
+    return item[key] || "";
+  }
+  if (panel === "risk") {
+    if (key === "severity") return severityRank[item.severity] || 0;
+    return item[key] || "";
+  }
+  return "";
+}
+
+function sortData(arr, panel, key, dir) {
+  arr.sort(function (a, b) {
+    var va = getSortValue(a, key, panel);
+    var vb = getSortValue(b, key, panel);
+    if (typeof va === "string") va = va.toLowerCase();
+    if (typeof vb === "string") vb = vb.toLowerCase();
+    var cmp = va < vb ? -1 : va > vb ? 1 : 0;
+    return dir === "desc" ? -cmp : cmp;
+  });
+}
+
+function handleSort(panel, key) {
+  var state = sortState[panel];
+  if (state.key === key) {
+    state.dir = state.dir === "asc" ? "desc" : "asc";
+  } else {
+    state.key = key;
+    state.dir = "asc";
+  }
+
+  if (panel === "orders") {
+    sortData(orders, panel, key, state.dir);
+    renderOrders();
+  } else if (panel === "venues") {
+    sortData(venues, panel, key, state.dir);
+    renderVenueLane();
+    renderVenueDetail();
+    updateVenuesPill();
+  } else if (panel === "positions") {
+    sortData(positions, panel, key, state.dir);
+    renderPositions();
+  } else if (panel === "risk") {
+    sortData(riskAlerts, panel, key, state.dir);
+    renderRiskAlerts();
+  }
+
+  updateSortIndicators(panel);
+  logActivity("Sort", panelTitles[panel] + " by " + key + " " + state.dir);
+}
+
+function updateSortIndicators(panel) {
+  var panelEl = document.getElementById("panel-" + panel);
+  if (!panelEl) return;
+  var state = sortState[panel];
+  panelEl.querySelectorAll("th.sortable").forEach(function (th) {
+    th.classList.remove("sort-asc", "sort-desc");
+    if (th.dataset.sortKey === state.key) {
+      th.classList.add(state.dir === "asc" ? "sort-asc" : "sort-desc");
+    }
+  });
+}
+
+panelBodies.forEach(function (panel) {
+  panel.addEventListener("click", function (event) {
+    var th = event.target.closest("th.sortable");
+    if (!th) return;
+    var key = th.dataset.sortKey;
+    var panelId = panel.id.replace("panel-", "");
+    if (key && sortState[panelId]) handleSort(panelId, key);
+  });
+});
 
 const keyPanelMap = { "1": "orders", "2": "positions", "3": "venues", "4": "risk", "5": "settings", "6": "activity" };
 

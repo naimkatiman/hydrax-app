@@ -39,6 +39,12 @@
           <button class="button button-ghost" id="openDashboardTop" type="button">Open Workspace</button>
           <a class="button button-secondary" href="#mission">Request Access</a>
         </div>
+
+        <button class="topbar-toggle" id="topbarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+          <span class="topbar-toggle-bar"></span>
+          <span class="topbar-toggle-bar"></span>
+          <span class="topbar-toggle-bar"></span>
+        </button>
       </header>
 
       <main>
@@ -250,8 +256,11 @@
                 </div>
 
                 <div class="toolbar-actions">
+                  <button class="search-toggle" id="searchToggle" type="button" aria-label="Toggle search">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  </button>
                   <input type="text" class="workspace-search" id="workspaceSearch" placeholder="Filter rows..." aria-label="Filter workspace rows" />
-                  <div class="filter-group" aria-label="Execution filters">
+                  <div class="filter-group" id="filterGroup" aria-label="Panel filters">
                     <button class="filter-chip is-active" type="button" data-filter="all">All</button>
                     <button class="filter-chip" type="button" data-filter="live">Live</button>
                     <button class="filter-chip" type="button" data-filter="review">Needs review</button>
@@ -317,11 +326,11 @@
                         <table>
                           <thead>
                             <tr>
-                              <th>Order</th>
-                              <th>Venue</th>
-                              <th>Mode</th>
-                              <th>Exposure</th>
-                              <th>Status</th>
+                              <th class="sortable" data-sort-key="id">Order</th>
+                              <th class="sortable" data-sort-key="venue">Venue</th>
+                              <th class="sortable" data-sort-key="mode">Mode</th>
+                              <th class="sortable" data-sort-key="exposure">Exposure</th>
+                              <th class="sortable" data-sort-key="status">Status</th>
                             </tr>
                           </thead>
                           <tbody id="ordersTableBody"></tbody>
@@ -360,11 +369,11 @@
                         <table>
                           <thead>
                             <tr>
-                              <th>Book</th>
-                              <th>Exposure</th>
-                              <th>P&L</th>
-                              <th class="numeric">Instruments</th>
-                              <th>Status</th>
+                              <th class="sortable" data-sort-key="name">Book</th>
+                              <th class="sortable" data-sort-key="exposure">Exposure</th>
+                              <th class="sortable" data-sort-key="pnl">P&amp;L</th>
+                              <th class="sortable numeric" data-sort-key="instruments">Instruments</th>
+                              <th class="sortable" data-sort-key="status">Status</th>
                             </tr>
                           </thead>
                           <tbody id="positionsTableBody"></tbody>
@@ -395,12 +404,12 @@
                         <table>
                           <thead>
                             <tr>
-                              <th>Venue</th>
-                              <th>State</th>
-                              <th>Load</th>
-                              <th class="numeric">Queue</th>
-                              <th>Routed</th>
-                              <th>Failover</th>
+                              <th class="sortable" data-sort-key="name">Venue</th>
+                              <th class="sortable" data-sort-key="state">State</th>
+                              <th class="sortable" data-sort-key="fillQuality">Load</th>
+                              <th class="sortable numeric" data-sort-key="queueDepth">Queue</th>
+                              <th class="sortable" data-sort-key="routed">Routed</th>
+                              <th class="sortable" data-sort-key="readiness">Failover</th>
                             </tr>
                           </thead>
                           <tbody id="venuesTableBody"></tbody>
@@ -431,11 +440,11 @@
                         <table>
                           <thead>
                             <tr>
-                              <th>Alert</th>
-                              <th>Severity</th>
-                              <th>Venue</th>
-                              <th>Time</th>
-                              <th>Status</th>
+                              <th class="sortable" data-sort-key="type">Alert</th>
+                              <th class="sortable" data-sort-key="severity">Severity</th>
+                              <th class="sortable" data-sort-key="venue">Venue</th>
+                              <th class="sortable" data-sort-key="timestamp">Time</th>
+                              <th class="sortable" data-sort-key="status">Status</th>
                             </tr>
                           </thead>
                           <tbody id="riskTableBody"></tbody>
