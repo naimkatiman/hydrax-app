@@ -27,3 +27,61 @@ testHappyPath = script do
   Some final <- queryContractId issuer cid3
   assertMsg "status must be Executed" $ final.status == Executed
   pure ()
+
+testUnauthorizedApprover : Script ()
+testUnauthorizedApprover = script do
+  issuer   <- allocateParty "Issuer"
+  ops1     <- allocateParty "Ops1"
+  intruder <- allocateParty "Intruder"
+
+  cid <- submit issuer $ createCmd GovernanceProposal with
+    proposer          = issuer
+    approvers         = [ops1]
+    observers         = []
+    proposalType      = PolicyChange
+    payload           = "test"
+    requiredApprovals = 1
+    approvals         = []
+    status            = Pending
+
+  submitMustFail intruder $ exerciseCmd cid Approve with approver = intruder
+
+testDoubleApproval : Script ()
+testDoubleApproval = script do
+  issuer <- allocateParty "Issuer"
+  ops1   <- allocateParty "Ops1"
+  ops2   <- allocateParty "Ops2"
+
+  cid0 <- submit issuer $ createCmd GovernanceProposal with
+    proposer          = issuer
+    approvers         = [ops1, ops2]
+    observers         = []
+    proposalType      = SubscriptionApproval
+    payload           = "test"
+    requiredApprovals = 2
+    approvals         = []
+    status            = Pending
+
+  cid1 <- submit ops1 $ exerciseCmd cid0 Approve with approver = ops1
+  submitMustFail ops1 $ exerciseCmd cid1 Approve with approver = ops1
+
+testRejectBlocksExecute : Script ()
+testRejectBlocksExecute = script do
+  issuer <- allocateParty "Issuer"
+  ops1   <- allocateParty "Ops1"
+
+  cid <- submit issuer $ createCmd GovernanceProposal with
+    proposer          = issuer
+    approvers         = [ops1]
+    observers         = []
+    proposalType      = ProductLaunch
+    payload           = "test"
+    requiredApprovals = 1
+    approvals         = []
+    status            = Pending
+
+  rejectedCid <- submit ops1 $ exerciseCmd cid Reject with
+    approver = ops1
+    reason   = "insufficient diligence"
+
+  submitMustFail issuer $ exerciseCmd rejectedCid Execute

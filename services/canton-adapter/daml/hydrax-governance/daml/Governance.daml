@@ -55,3 +55,13 @@ template GovernanceProposal
       do
         assertMsg "not approved" $ status == Approved
         create this with status = Executed
+
+    choice Reject : ContractId GovernanceProposal
+      with
+        approver: Party
+        reason: Text
+      controller approver
+      do
+        assertMsg "approver not authorized" $ approver `elem` approvers
+        assertMsg "not pending"             $ status == Pending
+        create this with status = Rejected
