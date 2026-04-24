@@ -1,5 +1,34 @@
 module Governance where
 
--- HydraX institutional governance spike.
--- See README.md for mental model and non-goals.
--- This is throwaway code. Do not import from other packages.
+import DA.List (unique)
+
+data ProposalType
+  = ProductLaunch
+  | SubscriptionApproval
+  | PolicyChange
+  deriving (Eq, Show)
+
+data ProposalStatus
+  = Pending
+  | Approved
+  | Executed
+  | Rejected
+  deriving (Eq, Show)
+
+template GovernanceProposal
+  with
+    proposer: Party
+    approvers: [Party]
+    observers: [Party]
+    proposalType: ProposalType
+    payload: Text
+    requiredApprovals: Int
+    approvals: [Party]
+    status: ProposalStatus
+  where
+    signatory proposer
+    observer observers, approvers
+
+    ensure requiredApprovals > 0
+        && requiredApprovals <= length approvers
+        && unique approvers
