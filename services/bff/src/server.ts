@@ -51,7 +51,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
       return;
     }
 
-    if (req.url?.startsWith("/v1/products/")) {
+    if (req.url?.startsWith("/v1/products/") && req.method === "GET") {
       const id = decodeURIComponent(req.url.slice("/v1/products/".length));
       try {
         const product = await fetchProduct(id, { workflowSvcUrl: upstreamConfig.workflowSvcUrl });
