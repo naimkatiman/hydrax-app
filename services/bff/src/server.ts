@@ -24,9 +24,14 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     if (req.url === "/v1/products" && req.method === "POST") {
       const chunks: Buffer[] = [];
       for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) {
+        respondJson(res, 413, { error: "payload_too_large" });
+        return;
+      }
       let body: unknown;
       try {
-        body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+        body = JSON.parse(raw.toString("utf8"));
       } catch {
         respondJson(res, 400, { error: "bad_json" });
         return;
@@ -45,7 +50,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
           respondJson(res, status, { error: "products_upstream", message: err.message });
         } else {
-          respondJson(res, 500, { error: "internal", message: err instanceof Error ? err.message : "unknown" });
+          console.error("bff: /v1/products handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }
       return;
@@ -61,7 +67,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
           respondJson(res, status, { error: "products_upstream", message: err.message });
         } else {
-          respondJson(res, 500, { error: "internal", message: err instanceof Error ? err.message : "unknown" });
+          console.error("bff: /v1/products/{id} handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }
       return;
@@ -106,9 +113,10 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
             : 502;
           respondJson(res, status, { error: "market_data_upstream", message: err.message });
         } else {
+          console.error("bff: /v1/market-data/quotes/ handler:", err);
           respondJson(res, 500, {
             error: "internal",
-            message: err instanceof Error ? err.message : "unknown",
+            message: "an internal error occurred",
           });
         }
       }
