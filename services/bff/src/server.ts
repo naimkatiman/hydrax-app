@@ -6,6 +6,7 @@ import { aggregateHealth } from "./healthz/aggregate.js";
 import { fetchQuote, MarketDataUpstreamError } from "./marketdata/proxy.js";
 import { fetchProduct, createProduct, ProductsUpstreamError } from "./products/proxy.js";
 import { fetchSubscription, createSubscription, SubscriptionsUpstreamError } from "./subscriptions/proxy.js";
+import { listEvents, appendEvent, AuditUpstreamError, type ListEventsQuery } from "./audit/proxy.js";
 
 export interface StartOptions {
   port: number;
@@ -128,8 +129,73 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
       return;
     }
 
+    if (req.url === "/v1/audit/events" && req.method === "POST") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) {
+        respondJson(res, 413, { error: "payload_too_large" });
+        return;
+      }
+      let body: unknown;
+      try {
+        body = JSON.parse(raw.toString("utf8"));
+      } catch {
+        respondJson(res, 400, { error: "bad_json" });
+        return;
+      }
+      if (typeof body !== "object" || body === null) {
+        respondJson(res, 400, { error: "bad_body" });
+        return;
+      }
+      try {
+        const event = await appendEvent(body as Parameters<typeof appendEvent>[0], {
+          auditSvcUrl: upstreamConfig.auditSvcUrl,
+        });
+        respondJson(res, 201, event);
+      } catch (err: unknown) {
+        if (err instanceof AuditUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "audit_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/audit/events POST handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
     if (req.method !== "GET") {
       respondJson(res, 405, { error: "method_not_allowed" });
+      return;
+    }
+
+    if (req.url?.startsWith("/v1/audit/events") && req.method === "GET") {
+      const url = new URL(req.url, "http://_");
+      const q: ListEventsQuery = {
+        tenant_id: url.searchParams.get("tenant_id") ?? "",
+        resource_type: url.searchParams.get("resource_type") ?? "",
+        resource_id: url.searchParams.get("resource_id") ?? "",
+      };
+      if (!q.tenant_id || !q.resource_type || !q.resource_id) {
+        respondJson(res, 400, {
+          error: "missing_query_params",
+          message: "tenant_id, resource_type, and resource_id are required",
+        });
+        return;
+      }
+      try {
+        const events = await listEvents(q, { auditSvcUrl: upstreamConfig.auditSvcUrl });
+        respondJson(res, 200, events);
+      } catch (err: unknown) {
+        if (err instanceof AuditUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "audit_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/audit/events GET handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
       return;
     }
 
