@@ -25,10 +25,10 @@ func main() {
 	// Mock-only in v1 per decision 2026-04-25; swap to a real impl
 	// once the HydraX API surface is delivered.
 	rails := hydraxrails.NewMockRails()
-	_ = rails // wired into handlers in a follow-up task
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handlers.Health(serviceName))
+	mux.HandleFunc("POST /v1/issue", handlers.Issue(rails))
 
 	srv := &http.Server{Addr: ":" + port, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	go func() {
