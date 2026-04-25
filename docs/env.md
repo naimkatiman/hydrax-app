@@ -45,7 +45,7 @@ Each service binary listens on `PORT` (defaulted per service below). All service
 |---|---|---|
 | `WORKFLOW_SVC_URL` | `http://localhost:7001` | workflow-svc |
 | `APPROVAL_SVC_URL` | `http://localhost:7002` | approval-svc — consumed by bff `/v1/approvals` proxy (`services/bff/src/approvals/proxy.ts`); approval-svc is in-memory in v1 (persistence deferred) |
-| `AUDIT_SVC_URL` | `http://localhost:7003` | audit-svc — consumed by bff `/v1/audit/events` proxy (`services/bff/src/audit/proxy.ts`) |
+| `AUDIT_SVC_URL` | `http://localhost:7003` | audit-svc — consumed by bff `/v1/audit/events` proxy (`services/bff/src/audit/proxy.ts`) **and** by workflow-svc to emit `product.transitioned` events on successful lifecycle transitions (`services/workflow-svc/internal/auditclient`). When unset on workflow-svc, emission is a no-op (best-effort, never blocks the 200). |
 | `HYDRAX_ADAPTER_URL` | `http://localhost:7004` | hydrax-adapter |
 | `NOTIFY_SVC_URL` | `http://localhost:7101` | notify-svc |
 | `INTEGRATION_SVC_URL` | `http://localhost:7102` | integration-svc |
