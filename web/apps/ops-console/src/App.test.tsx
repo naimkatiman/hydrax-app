@@ -12,7 +12,7 @@ describe("<App> (ops-console)", () => {
     ).toBeInTheDocument();
   });
 
-  it("stamps data-app-name='issuer-portal' on the AppShell wrapper", () => {
+  it("stamps data-app-name='ops-console' on the AppShell wrapper", () => {
     const { container } = render(<App />);
     expect(container.querySelector("[data-app-name='ops-console']")).not.toBeNull();
   });
