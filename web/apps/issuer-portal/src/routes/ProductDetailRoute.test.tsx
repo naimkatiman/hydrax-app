@@ -5,6 +5,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import type { ReactNode } from "react";
 import { hydraxApi } from "@hydrax/api-client";
+import { ToastProvider } from "@hydrax/ui";
 
 import { ProductDetailRoute } from "./ProductDetailRoute";
 
@@ -36,11 +37,13 @@ function Wrapper({
   const store = makeStore();
   return (
     <Provider store={store}>
-      <MemoryRouter initialEntries={[initialPath]}>
-        <Routes>
-          <Route path="/products/:id" element={children} />
-        </Routes>
-      </MemoryRouter>
+      <ToastProvider>
+        <MemoryRouter initialEntries={[initialPath]}>
+          <Routes>
+            <Route path="/products/:id" element={children} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>
     </Provider>
   );
 }
@@ -70,18 +73,13 @@ describe("<ProductDetailRoute>", () => {
     expect(screen.getByLabelText(/loading product/i)).toBeInTheDocument();
   });
 
-  it("renders the product fields once the BFF returns data", async () => {
+  it("renders the product name and a StatusPill once the BFF returns data", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
         JSON.stringify({
-          id: "abc-123",
-          tenant_id: "tenant-1",
-          code: "PROD-001",
-          name: "Prime Credit Note",
-          product_type: "short_duration_credit",
-          status: "draft",
-          created_at: "2026-04-25T00:00:00Z",
-          updated_at: "2026-04-25T00:00:00Z",
+          ...baseProduct,
+          status: "active",
+          allowed_next: ["matured", "cancelled"],
         }),
         { status: 200, headers: { "content-type": "application/json" } },
       ),
@@ -92,9 +90,10 @@ describe("<ProductDetailRoute>", () => {
         screen.getByRole("heading", { level: 1, name: /prime credit note/i }),
       ).toBeInTheDocument();
     });
+    const pill = await screen.findByTestId("status-pill");
+    expect(pill.getAttribute("data-state")).toBe("active");
+    expect(pill).toHaveTextContent(/active/i);
     expect(screen.getByText(/PROD-001/)).toBeInTheDocument();
-    expect(screen.getByText(/short_duration_credit/)).toBeInTheDocument();
-    expect(screen.getByText(/draft/)).toBeInTheDocument();
   });
 
   it("renders an error message when the BFF returns 500", async () => {
@@ -112,37 +111,44 @@ describe("<ProductDetailRoute>", () => {
     });
   });
 
-  it("renders one button per allowed_next state for a pending product", async () => {
+  it("renders status-specific buttons (Approve, Cancel product) for a pending product", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
-        JSON.stringify({ ...baseProduct, allowed_next: ["approved", "cancelled"] }),
+        JSON.stringify({
+          ...baseProduct,
+          allowed_next: ["approved", "cancelled"],
+        }),
         { status: 200, headers: { "content-type": "application/json" } },
       ),
     );
     renderRoute();
-    expect(
-      await screen.findByTestId("transition-approved"),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId("transition-cancelled")).toBeInTheDocument();
-    expect(screen.queryByTestId("transition-active")).toBeNull();
+    const approve = await screen.findByTestId("transition-approved");
+    expect(approve).toHaveTextContent(/^Approve$/);
+    expect(approve.getAttribute("data-variant")).toBe("primary");
+    const cancel = screen.getByTestId("transition-cancelled");
+    expect(cancel).toHaveTextContent(/Cancel product/);
+    expect(cancel.getAttribute("data-variant")).toBe("danger");
   });
 
   it("renders the terminal-state message when allowed_next is empty", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
-        JSON.stringify({ ...baseProduct, status: "matured", allowed_next: [] }),
+        JSON.stringify({
+          ...baseProduct,
+          status: "matured",
+          allowed_next: [],
+        }),
         { status: 200, headers: { "content-type": "application/json" } },
       ),
     );
     renderRoute();
-    expect(
-      await screen.findByTestId("terminal-state"),
-    ).toHaveTextContent(/no further actions/i);
+    expect(await screen.findByTestId("terminal-state")).toHaveTextContent(
+      /no further actions/i,
+    );
     expect(screen.queryByTestId("transition-approved")).toBeNull();
   });
 
   it("renders the terminal-state message when allowed_next is omitted (rolling deploy)", async () => {
-    // Older workflow-svc that does not return allowed_next yet.
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify(baseProduct), {
         status: 200,
@@ -150,9 +156,7 @@ describe("<ProductDetailRoute>", () => {
       }),
     );
     renderRoute();
-    expect(
-      await screen.findByTestId("terminal-state"),
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId("terminal-state")).toBeInTheDocument();
   });
 
   it("disables every transition button while a transition is in flight", async () => {
@@ -160,17 +164,21 @@ describe("<ProductDetailRoute>", () => {
     fetchSpy.mockImplementation(async (input) => {
       const url = typeof input === "string" ? input : (input as Request).url;
       if (url.endsWith("/v1/products/abc-123/transition")) {
-        // Pending forever — keeps RTK Query in isLoading=true after the click.
         return new Promise<Response>(() => {});
       }
       return new Response(
-        JSON.stringify({ ...baseProduct, allowed_next: ["approved", "cancelled"] }),
+        JSON.stringify({
+          ...baseProduct,
+          allowed_next: ["approved", "cancelled"],
+        }),
         { status: 200, headers: { "content-type": "application/json" } },
       );
     });
     renderRoute();
-    const approveBtn = await screen.findByTestId<HTMLButtonElement>("transition-approved");
-    const cancelBtn = screen.getByTestId<HTMLButtonElement>("transition-cancelled");
+    const approveBtn =
+      await screen.findByTestId<HTMLButtonElement>("transition-approved");
+    const cancelBtn =
+      screen.getByTestId<HTMLButtonElement>("transition-cancelled");
     expect(approveBtn).not.toBeDisabled();
     expect(cancelBtn).not.toBeDisabled();
 
@@ -184,16 +192,23 @@ describe("<ProductDetailRoute>", () => {
 
   it("POSTs to /v1/products/{id}/transition when a button is clicked", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
-    fetchSpy.mockImplementation(async (input, init) => {
+    fetchSpy.mockImplementation(async (input) => {
       const url = typeof input === "string" ? input : (input as Request).url;
       if (url.endsWith("/v1/products/abc-123/transition")) {
         return new Response(
-          JSON.stringify({ ...baseProduct, status: "approved", allowed_next: ["active", "cancelled"] }),
+          JSON.stringify({
+            ...baseProduct,
+            status: "approved",
+            allowed_next: ["active", "cancelled"],
+          }),
           { status: 200, headers: { "content-type": "application/json" } },
         );
       }
       return new Response(
-        JSON.stringify({ ...baseProduct, allowed_next: ["approved", "cancelled"] }),
+        JSON.stringify({
+          ...baseProduct,
+          allowed_next: ["approved", "cancelled"],
+        }),
         { status: 200, headers: { "content-type": "application/json" } },
       );
     });
@@ -220,5 +235,60 @@ describe("<ProductDetailRoute>", () => {
             : "";
       expect(bodyText).toBe(JSON.stringify({ to: "approved" }));
     });
+  });
+
+  it("dispatches a success toast after a transition completes", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    fetchSpy.mockImplementation(async (input) => {
+      const url = typeof input === "string" ? input : (input as Request).url;
+      if (url.endsWith("/v1/products/abc-123/transition")) {
+        return new Response(
+          JSON.stringify({
+            ...baseProduct,
+            status: "approved",
+            allowed_next: ["active", "cancelled"],
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      return new Response(
+        JSON.stringify({
+          ...baseProduct,
+          allowed_next: ["approved", "cancelled"],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    });
+    renderRoute();
+    const approveBtn = await screen.findByTestId("transition-approved");
+    approveBtn.click();
+    const toast = await screen.findByTestId("toast-item");
+    expect(toast.getAttribute("data-tone")).toBe("success");
+    expect(toast).toHaveTextContent(/status updated to approved/i);
+  });
+
+  it("dispatches a danger toast when a transition fails", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = typeof input === "string" ? input : (input as Request).url;
+      if (url.endsWith("/v1/products/abc-123/transition")) {
+        return new Response(JSON.stringify({ error: "boom" }), {
+          status: 500,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(
+        JSON.stringify({
+          ...baseProduct,
+          allowed_next: ["approved", "cancelled"],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    });
+    renderRoute();
+    const approveBtn = await screen.findByTestId("transition-approved");
+    approveBtn.click();
+    const toast = await screen.findByTestId("toast-item");
+    expect(toast.getAttribute("data-tone")).toBe("danger");
+    expect(toast).toHaveTextContent(/transition failed/i);
   });
 });
