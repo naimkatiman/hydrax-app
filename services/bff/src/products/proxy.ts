@@ -1,0 +1,82 @@
+export interface Product {
+  readonly id: string;
+  readonly tenant_id: string;
+  readonly code: string;
+  readonly name: string;
+  readonly product_type: string;
+  readonly status: string;
+  readonly rails_product_id?: string;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface CreateProductInput {
+  readonly tenant_id: string;
+  readonly code: string;
+  readonly name: string;
+  readonly product_type: string;
+}
+
+export interface ProxyOptions {
+  readonly workflowSvcUrl: string;
+  readonly fetchImpl?: typeof fetch;
+  readonly timeoutMs?: number;
+}
+
+export class ProductsUpstreamError extends Error {
+  readonly httpStatus?: number;
+  constructor(message: string, httpStatus?: number) {
+    super(message);
+    this.name = "ProductsUpstreamError";
+    this.httpStatus = httpStatus;
+  }
+}
+
+async function withTimeout<T>(timeoutMs: number, fn: (signal: AbortSignal) => Promise<T>): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fn(controller.signal);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function fetchProduct(id: string, opts: Readonly<ProxyOptions>): Promise<Product> {
+  const fetchImpl = opts.fetchImpl ?? fetch;
+  const timeoutMs = opts.timeoutMs ?? 1500;
+  return withTimeout(timeoutMs, async (signal) => {
+    let res: Response;
+    try {
+      res = await fetchImpl(`${opts.workflowSvcUrl}/v1/products/${encodeURIComponent(id)}`, { signal });
+    } catch (err: unknown) {
+      throw new ProductsUpstreamError(err instanceof Error ? err.message : "transport error");
+    }
+    if (!res.ok) {
+      throw new ProductsUpstreamError(`workflow-svc returned ${res.status}`, res.status);
+    }
+    return (await res.json()) as Product;
+  });
+}
+
+export async function createProduct(input: Readonly<CreateProductInput>, opts: Readonly<ProxyOptions>): Promise<Product> {
+  const fetchImpl = opts.fetchImpl ?? fetch;
+  const timeoutMs = opts.timeoutMs ?? 1500;
+  return withTimeout(timeoutMs, async (signal) => {
+    let res: Response;
+    try {
+      res = await fetchImpl(`${opts.workflowSvcUrl}/v1/products`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+        signal,
+      });
+    } catch (err: unknown) {
+      throw new ProductsUpstreamError(err instanceof Error ? err.message : "transport error");
+    }
+    if (!res.ok) {
+      throw new ProductsUpstreamError(`workflow-svc returned ${res.status}`, res.status);
+    }
+    return (await res.json()) as Product;
+  });
+}
