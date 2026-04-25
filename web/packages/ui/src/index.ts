@@ -10,3 +10,5 @@ export { EmptyState } from "./EmptyState";
 export { NavItem } from "./NavItem";
 export type { NavItemLinkProps } from "./NavItem";
 export { Avatar } from "./Avatar";
+export { StatusPill } from "./StatusPill";
+export type { LifecycleState } from "./StatusPill";
