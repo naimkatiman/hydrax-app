@@ -1,9 +1,16 @@
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 
+import { openPool, redactDsn, type Pool } from "./db.js";
+import { mountAuthRoutes, type AuthHandlerOptions } from "./auth/handlers.js";
+import { Sessions } from "./auth/repo.js";
+
 export interface StartOptions {
   port: number;
   service: string;
+  pool?: Pool;
+  devLoginEnabled?: boolean;
+  ttlSeconds?: number;
 }
 
 export interface StartResult {
@@ -12,12 +19,22 @@ export interface StartResult {
 }
 
 export function startServer(opts: StartOptions): Promise<StartResult> {
+  const authOpts: AuthHandlerOptions | null = opts.pool
+    ? {
+        repo: new Sessions(opts.pool),
+        ttlSeconds: opts.ttlSeconds ?? 60 * 60 * 12,
+        devLoginEnabled: opts.devLoginEnabled ?? false,
+      }
+    : null;
+
   const server = http.createServer((req, res) => {
     if (req.url === "/healthz" && req.method === "GET") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ service: opts.service, status: "ok" }));
       return;
     }
+    if (authOpts && mountAuthRoutes(req, res, authOpts)) return;
+
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "not found" }));
   });
@@ -33,7 +50,25 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
 const isMain = import.meta.url === `file://${process.argv[1]}`;
 if (isMain) {
   const port = Number(process.env.PORT ?? 7102);
-  startServer({ port, service: "integration-svc" }).then(({ baseUrl }) => {
-    console.log(`integration-svc listening on ${baseUrl}`);
-  });
+  const dsn = process.env.INTEGRATION_SVC_DATABASE_URL ?? process.env.DATABASE_URL ?? "";
+  const devLoginEnabled = process.env.AUTH_DEV_LOGIN === "1";
+  const ttlSeconds = Number(process.env.SESSION_TTL_SECONDS ?? 60 * 60 * 12);
+
+  const pool = dsn ? openPool({ connectionString: dsn }) : undefined;
+  if (!dsn) {
+    console.warn(
+      "integration-svc: INTEGRATION_SVC_DATABASE_URL/DATABASE_URL unset — auth routes disabled, only /healthz served",
+    );
+  } else {
+    console.log(`integration-svc: DB pool ready (${redactDsn(dsn)})`);
+    if (!devLoginEnabled) {
+      console.log("integration-svc: AUTH_DEV_LOGIN!=1 — dev/login disabled (returns 404)");
+    }
+  }
+
+  startServer({ port, service: "integration-svc", pool, devLoginEnabled, ttlSeconds }).then(
+    ({ baseUrl }) => {
+      console.log(`integration-svc listening on ${baseUrl}`);
+    },
+  );
 }
