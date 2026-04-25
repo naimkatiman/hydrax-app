@@ -42,5 +42,16 @@
     "consumed_by": "web/apps/admin/src/routes/HomeRoute.tsx (empty-state for activity panel)",
     "license": "Generated; treat as project-owned per nano-banana / OpenRouter terms",
     "notes": "Key + permission tree evokes platform admin role/identity governance. Consistent visual language with issuer-empty-state.jpg."
+  },
+  "investor-empty-state.jpg": {
+    "generated": "2026-04-25",
+    "tool": "nano-banana (Gemini 3.1 flash image preview via OpenRouter)",
+    "subcommand": "generate",
+    "aspect": "4:3",
+    "dimensions": "1200x896",
+    "prompt_summary": "Minimalist institutional portfolio line art on near-black canvas (hsl(220, 16%, 8%)). A single doughnut/pie chart centered, soft white strokes (1.5px), divided into six approximately-equal slices around a hollow center. One slice accented in cyan (hsl(190, 90%, 55%)). No text, no gradients, no glow, no people, no logos, no photorealism. Subtle data-grid backdrop. Editorial, restrained, 4:3 aspect, 1200x896.",
+    "consumed_by": "web/apps/investor-portal/src/routes/HomeRoute.tsx (empty-state for activity panel)",
+    "license": "Generated; treat as project-owned per nano-banana / OpenRouter terms",
+    "notes": "Doughnut with one accented slice evokes investor portfolio allocation. Consistent visual language with issuer-empty-state.jpg."
   }
 }

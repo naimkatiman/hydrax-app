@@ -6,6 +6,7 @@ const ASSETS = [
   "distributor-empty-state.jpg",
   "ops-console-empty-state.jpg",
   "admin-empty-state.jpg",
+  "investor-empty-state.jpg",
 ] as const;
 
 const PORTAL_BY_ASSET: Record<(typeof ASSETS)[number], string> = {
@@ -13,6 +14,7 @@ const PORTAL_BY_ASSET: Record<(typeof ASSETS)[number], string> = {
   "distributor-empty-state.jpg": "distributor-portal",
   "ops-console-empty-state.jpg": "ops-console",
   "admin-empty-state.jpg": "admin",
+  "investor-empty-state.jpg": "investor-portal",
 };
 
 describe("ui asset registry", () => {
