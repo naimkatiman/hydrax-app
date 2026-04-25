@@ -50,9 +50,22 @@ Each service binary listens on `PORT` (defaulted per service below). All service
 | `NOTIFY_SVC_URL` | `http://localhost:7101` | notify-svc |
 | `INTEGRATION_SVC_URL` | `http://localhost:7102` | integration-svc |
 
+### `DATABASE_URL` (workflow-svc)
+
+Postgres DSN. Required for product routes (`POST /v1/products`,
+`GET /v1/products/{id}`). If unset, the binary still serves `/healthz`
+but logs `DATABASE_URL unset — product routes disabled`. workflow-svc
+runs a 3-second startup `PingContext` against the DSN — a bad URL fails
+fast at boot rather than at first query.
+
+- **Local:** `postgres://hydrax:hydrax@localhost:5433/hydrax?sslmode=disable`
+  (start the stack with `docker compose -f db/postgres/docker-compose.test.yml up -d`)
+- **Railway:** the Postgres addon injects `DATABASE_URL` automatically once provisioned.
+  See "Railway provisioning runbook" in `docs/plans/2026-04-25-persistence-foundation.md`.
+
 ### Deferred
 
-`DATABASE_URL`, `MONGODB_URI`, KYC/SSO/CRM provider credentials, HydraX rails credentials — all deferred until the corresponding domain logic lands. Document each here at the same commit that introduces the dependency.
+`MONGODB_URI`, KYC/SSO/CRM provider credentials, HydraX rails credentials — all deferred until the corresponding domain logic lands. Document each here at the same commit that introduces the dependency.
 
 ## Web app env vars (web monorepo scaffold — added 2026-04-25)
 

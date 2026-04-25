@@ -1729,3 +1729,44 @@ Plan: docs/plans/2026-04-25-persistence-foundation.md"
 - Tier 1 item 4 (workflow lifecycle for short-duration credit — Q3)
 - Tier 1 item 5 (issuer-portal /products page using the BFF proxy this plan ships)
 - RTK Query hooks in `@hydrax/api-client` for the new BFF endpoints (small follow-up — mirrors `useGetHealthzCompositeQuery`)
+
+---
+
+## Railway Provisioning Runbook (USER ACTION — not automated)
+
+The persistence-foundation plan delivers a working local stack. Railway
+provisioning is documented here so the user can run it manually when
+ready. The plan does NOT execute these steps.
+
+1. **Provision the addon:**
+
+       railway link hydrax-app   # if the project isn't linked yet
+       railway add --plugin postgresql
+
+   This creates a Postgres service in the linked project. Railway
+   injects `DATABASE_URL` into other services in the same project.
+
+2. **Apply migrations against Railway Postgres:**
+
+       railway run --service workflow-svc -- bash -c 'echo $DATABASE_URL'
+       # take that DSN and:
+       DATABASE_URL='<the dsn>' db/postgres/apply.sh
+
+3. **Verify:**
+
+       railway run --service workflow-svc -- psql $DATABASE_URL -c "\\dt"
+
+   Expected: all five tables (`tenants, users, products, subscriptions, audit_events`).
+
+4. **Wire workflow-svc to the addon:**
+
+   In the Railway dashboard, on the workflow-svc service, add a service
+   variable reference to the Postgres addon: `DATABASE_URL = ${{Postgres.DATABASE_URL}}`.
+   Redeploy.
+
+5. **Smoke the deployed service:**
+
+       curl -sS https://<workflow-svc-railway-url>/healthz
+       # then POST a product as in Task 5 Step 7
+
+   If the response logs `DATABASE_URL unset`, the wire-up did not take.
