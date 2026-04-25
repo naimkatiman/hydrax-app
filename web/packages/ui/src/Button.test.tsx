@@ -30,4 +30,13 @@ describe("<Button>", () => {
     await userEvent.click(screen.getByRole("button"));
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it("renders the 'danger' variant with destructive token-driven styling", () => {
+    render(<Button variant="danger">Delete</Button>);
+    const btn = screen.getByRole("button", { name: "Delete" });
+    expect(btn.getAttribute("data-variant")).toBe("danger");
+    expect(btn.getAttribute("style") ?? "").toContain(
+      "var(--hydrax-color-danger)",
+    );
+  });
 });

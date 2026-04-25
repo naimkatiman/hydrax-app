@@ -1,6 +1,6 @@
 import type { CSSProperties, ButtonHTMLAttributes } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   readonly variant?: ButtonVariant;
@@ -21,6 +21,11 @@ const VARIANT_STYLE: Record<ButtonVariant, CSSProperties> = {
     background: "transparent",
     color: "var(--hydrax-color-text-muted)",
     border: "1px solid transparent",
+  },
+  danger: {
+    background: "transparent",
+    color: "var(--hydrax-color-danger)",
+    border: "1px solid var(--hydrax-color-danger)",
   },
 };
 
