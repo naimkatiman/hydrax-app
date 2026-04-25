@@ -186,6 +186,26 @@ Installed at user-level from `naimkatiman/continuous-improvement`. Optional — 
 6. Institutional identity / entitlement standards to support first?
 7. When does multi-domain Canton become necessary?
 
+## Web Monorepo — Invariants
+
+Locked by [docs/plans/2026-04-25-web-monorepo-scaffold.md](docs/plans/2026-04-25-web-monorepo-scaffold.md). Do not relitigate without a new plan doc.
+
+- pnpm 9 workspace at the repo root. Workspaces: `services/{notify-svc,integration-svc,bff}` (Node), `web/packages/*` (3 packages), `web/apps/*` (5 apps). Lockfile is `pnpm-lock.yaml`. `package-lock.json` is dead history kept for now; do not add npm-managed deps to it.
+- Two TypeScript bases. **Do not merge them.**
+  - `tsconfig.base.json` — Node-shaped (`module: NodeNext`, `types: ["node"]`, `lib: ["ES2022"]`). Used by `services/{notify-svc,integration-svc,bff}/tsconfig.json`.
+  - `tsconfig.web.json` — Browser-shaped (`module: ESNext`, `moduleResolution: Bundler`, `jsx: react-jsx`, `lib: ["ES2022","DOM","DOM.Iterable"]`, `types: []`). Used by everything under `web/`.
+- Apps: Vite 5 + React 18 + RTK + react-router-dom 6 + vitest. No Tailwind, no Next, no Turbo. App `tsconfig.json` adds `"types": ["vite/client"]` for `import.meta.env` typing.
+- `@hydrax/ui` ships UI primitives. Icons are `lucide-react` only, wrapped in `<Icon icon=… label=… />` (a11y `aria-label` is mandatory). **No emoji in JSX.** Lucide `MonitorCog` does NOT exist in v0.378.0 — ops-console uses `Settings` (gear).
+- Tenant theming is CSS variables on `:root` written by `<ThemeProvider>` from `@hydrax/tenant-theme`. New tokens land in `TenantThemeTokens` first, then `applyTheme`'s map, then consumers.
+- `@hydrax/api-client` is the only place that reads BFF URLs. Env var: `VITE_BFF_URL` (see [docs/env.md](docs/env.md)). Default `http://localhost:8080`. `api-client/tsconfig.json` carries `"types": ["node"]` to allow `process.env` fallback for tests.
+- Apps depend on packages via `workspace:*`. Apps never import another app.
+- vitest with `globals: false` requires explicit `afterEach(cleanup)` in `src/test-setup.ts` for any web workspace that uses `@testing-library/react`. The 7-line setup file shape is consistent across `tenant-theme`, `ui`, and the 5 apps.
+- Per-app dev ports are reserved: issuer-portal 5173, distributor-portal 5174, investor-portal 5175, ops-console 5176, admin 5177.
+- Verification gates (mandatory before commit on any web workspace): `pnpm -r --if-present typecheck`, `pnpm -r --if-present test -- --run`, `pnpm -r --if-present build`. Three green or no commit. Note the `--` separator before `--run` (pnpm intercepts a bare `--run`).
+- Visual polish is out of scope for the scaffold. Real layouts, real colors, hero imagery land under separate plans invoked through `frontend-design` + `taste-skill` + `design-system` + `nano-banana`.
+
 ## Past Mistakes
 
 - **2026-04-24 — Commit-message mismatch from stale auto-context.** Commit `78888d3` was titled `feat(ui): persist activity log across sessions with Clear Log action` but the actual file diff shipped sortable-table-columns work. Root cause: assistant read STATE.yaml from session-start auto-context describing the prior slice, then wrote a commit message off that stale summary without running `git diff --stat` against the actual working tree first. **Prevention:** before drafting any commit message, run `git diff --stat` and skim each file's diff. Do not trust STATE.yaml's `summary` field as authoritative for what the current working tree contains.
+
+- **2026-04-25 — Web scaffold Phases 5-8 shipped 8 commits where the plan called for 4.** A subagent-driven implementer scaffolded distributor-portal, investor-portal, ops-console, and admin from the issuer-portal template, then noticed each `App.test.tsx` had a stale `data-app-name='issuer-portal'` string in the test description (the assertion itself was correct, so tests passed on first run). The implementer made one extra cosmetic commit per app to fix the description string. Root cause: the substitution table in the dispatch prompt did not call out the test description string explicitly — only the assertion. **Prevention:** when dispatching a template-substitution implementer, enumerate every textual occurrence to substitute, including descriptions, JSDoc, comments, and any `it("name", …)` / `describe("name", …)` strings — not just code lines. The work was correct, but the rule "ONE commit per app" was violated.
