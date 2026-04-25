@@ -1,10 +1,11 @@
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Wallet, Home as HomeIcon } from "lucide-react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Wallet, Home as HomeIcon, Activity } from "lucide-react";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
 import { AppShell, Card, Icon } from "@hydrax/ui";
+import { HealthRoute } from "./HealthRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -18,6 +19,15 @@ function HomeRoute() {
     </Card>
   );
 }
+
+const navLinkStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  color: "var(--hydrax-color-text)",
+  textDecoration: "none",
+  padding: "6px 0",
+};
 
 export function App() {
   return (
@@ -33,16 +43,21 @@ export function App() {
               </span>
             }
             sidebar={
-              <nav>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <Link to="/" style={navLinkStyle}>
                   <Icon icon={HomeIcon} label="Home" size={16} />
                   Home
-                </span>
+                </Link>
+                <Link to="/health" style={navLinkStyle}>
+                  <Icon icon={Activity} label="Platform health" size={16} />
+                  Health
+                </Link>
               </nav>
             }
           >
             <Routes>
               <Route path="/" element={<HomeRoute />} />
+              <Route path="/health" element={<HealthRoute />} />
             </Routes>
           </AppShell>
         </BrowserRouter>
