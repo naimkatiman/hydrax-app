@@ -53,3 +53,13 @@ Each service binary listens on `PORT` (defaulted per service below). All service
 ### Deferred
 
 `DATABASE_URL`, `MONGODB_URI`, KYC/SSO/CRM provider credentials, HydraX rails credentials — all deferred until the corresponding domain logic lands. Document each here at the same commit that introduces the dependency.
+
+## Web app env vars (web monorepo scaffold — added 2026-04-25)
+
+### `VITE_BFF_URL`
+
+- Used by: `web/packages/api-client` (read via `import.meta.env` in browser bundles; falls back to `process.env.VITE_BFF_URL` in Node tests).
+- Default: `http://localhost:8080` when unset.
+- Where set: each `web/apps/*/.env.local` for development, Railway service env for staging/prod. The bff service (port 7103) is the canonical target in v1.
+- Why: api-client's `fetchBaseQuery` baseUrl. Apps consume RTK Query hooks; no other surface reads this var.
+- Precedence: `import.meta.env` is replaced at Vite build time and works in deployed bundles. `process.env` is the fallback for `vitest`/Node-only test environments. Order matters — see Past Mistakes 2026-04-25 in [CLAUDE.md](../CLAUDE.md).

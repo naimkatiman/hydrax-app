@@ -10,6 +10,26 @@
 
 ---
 
+## Reconciliation Note — 2026-04-25 (added before any phase ran)
+
+Between drafting this plan and starting execution, the parallel backend-services-scaffold plan ([docs/plans/2026-04-25-backend-services-scaffold.md](2026-04-25-backend-services-scaffold.md)) shipped its Task 0 (commit `b7a2dea`) and Task 1 (workflow-svc), and is mid-flight on Task 2 (approval-svc) under `/ralph-loop:ralph-loop`. Its Task 0 already created `pnpm-workspace.yaml`, `tsconfig.base.json`, `go.work`, modified `package.json` and `.gitignore` — the same foundation files my original Phase 0 was going to create.
+
+Two material conflicts:
+- The committed `tsconfig.base.json` is Node-shaped (`module: NodeNext`, `types: ["node"]`, `lib: ["ES2022"]`) because backend services 6-8 (notify-svc, integration-svc, bff) extend it. Apps need `module: ESNext`, `moduleResolution: Bundler`, `jsx: react-jsx`, and DOM lib — incompatible.
+- The committed `pnpm-workspace.yaml` lists only the three Node services. My web packages and apps need to be added without dropping those entries.
+
+**Execution model adjusted:**
+- All web work runs in a separate git worktree on branch `feat/web-monorepo-scaffold` at `/home/naim/.openclaw/workspace/hydrax-app.web-scaffold/` to avoid racing ralph-loop on `pnpm-lock.yaml`, `STATE.yaml`, and the foundation files.
+- `tsconfig.base.json` is **not modified**. A new `tsconfig.web.json` lives at the repo root, extends `tsconfig.base.json`, and overrides only the browser-specific compiler options. Web packages and apps extend `tsconfig.web.json`. Backend services keep extending `tsconfig.base.json`.
+- `package.json` and `.gitignore` are **not modified** — the existing entries already cover web (`pnpm -r typecheck` walks every workspace; `dist/`, `.vite/`, `coverage/`, `*.tsbuildinfo` already ignored).
+- `pnpm-workspace.yaml` is **edited additively** to append `web/packages/*` and `web/apps/*` — does not remove or reorder existing entries.
+- `package-lock.json` is **left alone** (the backend plan did not delete it; cleanup belongs in a separate plan).
+- Merge of `feat/web-monorepo-scaffold` back to `main` will resolve `pnpm-workspace.yaml` mechanically (both sides only added) and regenerate `pnpm-lock.yaml` via `pnpm install`.
+
+Phase 0 below has been **rewritten** to reflect this. Phases 1-9 are structurally unchanged; the only file-level diff is that web tsconfigs extend `../../../tsconfig.web.json` (not `../../../tsconfig.base.json`).
+
+---
+
 ## Boundary Conditions (read before starting)
 
 1. **PRD §14 gates are still open.** This plan ships **structure only** — no tenant assumptions, no product types, no real HydraX rails calls. Anything that would prejudice a Q1–Q7 decision belongs in a later plan. If a step here looks like it's making a domain decision, stop and escalate.
@@ -109,160 +129,152 @@ If any gate fails, fix the underlying cause. Never `--no-verify`. Never delete a
 
 ---
 
-## Phase 0: Monorepo Plumbing
+## Phase 0: Monorepo Plumbing (reconciled)
+
+**Working directory for all phases:** `/home/naim/.openclaw/workspace/hydrax-app.web-scaffold/` (worktree on branch `feat/web-monorepo-scaffold`).
 
 **Files:**
-- Create: `pnpm-workspace.yaml`
-- Create: `.npmrc`
-- Create: `tsconfig.base.json`
-- Modify: `package.json` (root)
-- Modify: `.gitignore`
+- Create: `tsconfig.web.json` (sibling to existing `tsconfig.base.json`)
+- Modify: `pnpm-workspace.yaml` (additive — append two entries, do not remove existing service entries)
 - Create: `web/.gitkeep`
 
-**Goal:** Make the root a pnpm workspace without breaking the existing prototype `start` script.
+**NOT touched:** `tsconfig.base.json`, `package.json`, `.gitignore`, `package-lock.json`, `go.work`, anything under `services/`.
+
+**Goal:** Add the browser-shaped TypeScript base config and register the web workspace globs so the existing pnpm setup picks up `web/packages/*` and `web/apps/*` once they're created in later phases.
 
 - [ ] **Step 1: Confirm Node + pnpm versions**
 
-Run:
+Run from worktree root:
 ```bash
 node --version
-pnpm --version || corepack enable pnpm && corepack prepare pnpm@9.12.0 --activate
 pnpm --version
 ```
-Expected: `node` ≥ v20, `pnpm` ≥ 9.0.0. If pnpm is missing and corepack is unavailable, install with `npm i -g pnpm@9` and re-run.
+Expected: `node` ≥ v20.x, `pnpm` ≥ 9.0.0. (Both should already be installed because the backend services Task 0 already ran `pnpm install`.) If `pnpm` is missing, run `corepack enable pnpm && corepack prepare pnpm@9.12.0 --activate`.
 
-- [ ] **Step 2: Create `pnpm-workspace.yaml`**
+- [ ] **Step 2: Verify the backend foundation is present and untouched**
 
-Path: `/home/naim/.openclaw/workspace/hydrax-app/pnpm-workspace.yaml`
-
-```yaml
-packages:
-  - "web/packages/*"
-  - "web/apps/*"
+```bash
+test -f tsconfig.base.json && echo "tsconfig.base.json present"
+test -f pnpm-workspace.yaml && echo "pnpm-workspace.yaml present"
+test -f go.work && echo "go.work present"
+grep -F 'services/notify-svc' pnpm-workspace.yaml
+grep -F '"types": ["node"]' tsconfig.base.json
 ```
+Expected: all four prints succeed; the two `grep` lines emit the matching content. If any fails, stop — the worktree is not based on the expected commit and Phase 0 should not proceed.
 
-- [ ] **Step 3: Create `.npmrc`**
+- [ ] **Step 3: Create `tsconfig.web.json`**
 
-Path: `/home/naim/.openclaw/workspace/hydrax-app/.npmrc`
-
-```ini
-strict-peer-dependencies=false
-auto-install-peers=true
-shamefully-hoist=false
-```
-
-- [ ] **Step 4: Create `tsconfig.base.json`**
-
-Path: `/home/naim/.openclaw/workspace/hydrax-app/tsconfig.base.json`
+Path (absolute): `/home/naim/.openclaw/workspace/hydrax-app.web-scaffold/tsconfig.web.json`
 
 ```json
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
+    "types": [],
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": true,
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": false,
     "useDefineForClassFields": true
   }
 }
 ```
 
-- [ ] **Step 5: Modify root `package.json` to add workspace scripts**
+Note: `types: []` deliberately overrides the base's `types: ["node"]` so browser-side type checking does not pull in Node ambient types. `module/moduleResolution/lib/jsx` are the four browser-required overrides. The remaining flags (`noFallthroughCasesInSwitch`, `exactOptionalPropertyTypes`, etc.) tighten browser code without affecting backend services.
 
-Replace the entire file at `/home/naim/.openclaw/workspace/hydrax-app/package.json` with:
+- [ ] **Step 4: Edit `pnpm-workspace.yaml` additively**
 
-```json
-{
-  "name": "hydrax-prototype",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Static HTML/JS/CSS prototype of the HydraX operator console + web monorepo (apps/packages).",
-  "scripts": {
-    "start": "serve -s . -l tcp://0.0.0.0:${PORT:-3000} --no-clipboard",
-    "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test --run",
-    "build": "pnpm -r --if-present build",
-    "dev": "pnpm -r --parallel --if-present dev"
-  },
-  "dependencies": {
-    "serve": "^14.2.4"
-  },
-  "devDependencies": {
-    "typescript": "5.4.5"
-  },
-  "engines": {
-    "node": ">=20",
-    "pnpm": ">=9"
-  }
-}
+The current file content is:
+```yaml
+packages:
+  - 'services/notify-svc'
+  - 'services/integration-svc'
+  - 'services/bff'
 ```
 
-- [ ] **Step 6: Append to `.gitignore`**
-
-Append to `/home/naim/.openclaw/workspace/hydrax-app/.gitignore`:
-
-```
-# Web monorepo build outputs
-web/**/dist/
-web/**/.vite/
-web/**/coverage/
-*.tsbuildinfo
+Replace it with:
+```yaml
+packages:
+  - 'services/notify-svc'
+  - 'services/integration-svc'
+  - 'services/bff'
+  - 'web/packages/*'
+  - 'web/apps/*'
 ```
 
-- [ ] **Step 7: Create the empty `web/` tree placeholders**
+Use `Edit` (not `Write`) — the change must be additive only. Do not reorder, do not change quoting style.
+
+- [ ] **Step 5: Create the empty `web/` tree placeholder**
 
 ```bash
 mkdir -p web/packages web/apps
 touch web/.gitkeep
 ```
 
-- [ ] **Step 8: Install workspace root deps**
+- [ ] **Step 6: Confirm pnpm still resolves the workspace**
 
-Run from repo root:
+Run from worktree root:
 ```bash
 pnpm install
 ```
-Expected: `Done in <Xs>`. No errors. A `pnpm-lock.yaml` is generated at the root. The prototype's `node_modules` is now under pnpm management; the existing `package-lock.json` becomes redundant — **delete it** (`git rm package-lock.json`) since pnpm is now the single source of truth.
+Expected: `Done in <Xs>` with no errors. The lockfile may update if pnpm shifts cache hashes; if any lockfile churn beyond the Node services already linked appears, stop and inspect — there should be none because no new `package.json` files exist under `web/` yet.
 
-- [ ] **Step 9: Confirm prototype start script still works**
+- [ ] **Step 7: Confirm prototype start script still works**
 
 ```bash
 pnpm start &
 sleep 2
 curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost:3000/
-kill %1
+kill %1 2>/dev/null
 ```
-Expected: prints `200`. Then kill the background server.
+Expected: prints `200`.
+
+- [ ] **Step 8: Smoke-test that backend services still typecheck**
+
+```bash
+pnpm -F @hydrax/notify-svc typecheck 2>&1 | tail -5 || true
+```
+This may print "no script: typecheck" if the backend ralph-loop has not yet created notify-svc — that's acceptable. The point is to confirm the foundation files we touched did NOT break anything that already works. If a backend package was present and typechecked before my Phase 0 ran, it must still typecheck now.
+
+- [ ] **Step 9: Stage exactly the three files the plan allows**
+
+```bash
+git status --short
+git add tsconfig.web.json pnpm-workspace.yaml web/.gitkeep
+git diff --cached --stat
+```
+Expected `git diff --cached --stat`: exactly 3 files — `tsconfig.web.json` (new), `pnpm-workspace.yaml` (modified, +2 lines), `web/.gitkeep` (new). If any other file is staged, `git restore --staged <file>` to unstage and investigate.
+
+If `pnpm-lock.yaml` shows churn but you did not intend to commit it, leave it unstaged for this commit. Lockfile drift on a no-op `pnpm install` is fine to keep working; we'll commit it cleanly with Phase 1 when the first web package adds real deps.
 
 - [ ] **Step 10: Commit Phase 0**
 
 ```bash
-git add pnpm-workspace.yaml .npmrc tsconfig.base.json package.json pnpm-lock.yaml .gitignore web/.gitkeep
-git rm package-lock.json
-git commit -m "chore(monorepo): convert root to pnpm workspace for web/
+git commit -m "feat(web): add tsconfig.web.json + register web workspace globs
+
+Sibling browser-shaped tsconfig (extends tsconfig.base.json) so apps and
+packages under web/ can override module/moduleResolution/jsx/lib without
+disturbing the Node-shaped base used by services/. pnpm-workspace.yaml
+gains web/packages/* and web/apps/* additively.
 
 Plan: docs/plans/2026-04-25-web-monorepo-scaffold.md (Phase 0)"
 ```
 
-- [ ] **Step 11: Update STATE.yaml**
+- [ ] **Step 11: Verify the commit**
 
-Append a `verification_log` entry:
+```bash
+git show --stat HEAD
+git log --oneline -3
 ```
-- 2026-04-25 — web monorepo Phase 0: pnpm 9 workspace at root; pnpm-workspace.yaml, .npmrc, tsconfig.base.json present; root package.json adds typecheck/test/build/dev workspace scripts; pnpm-lock.yaml generated; package-lock.json removed; pnpm start serves prototype HTTP 200 on :3000; git diff --stat confirms 7 files changed (1 deleted)
-```
-Update `current_focus` to: `Web monorepo scaffold — Phase 0 monorepo plumbing landed; next is shared packages (tenant-theme, ui, api-client).`
+Expected: HEAD is the new commit with exactly 3 files changed; previous commit is on `main` (e.g., `0cbdaeb feat(approval-svc): scaffold approval-chain service with health endpoint` or whatever main was at when the worktree was created).
+
+- [ ] **Step 12: Update STATE.yaml — DEFERRED**
+
+STATE.yaml is a frequent-write file on `main` (ralph-loop is updating it every iteration). Updating it inside the worktree will conflict at merge-time. **Do not edit `STATE.yaml` in this worktree.** Instead, every phase records its verification line in this plan doc itself (under a "Verification log (worktree-local)" section appended at the end of the plan after Phase 9). When the branch merges back, those lines get migrated into `STATE.yaml` in one shot during the merge commit.
 
 ---
 
@@ -329,7 +341,7 @@ Path: `web/packages/tenant-theme/tsconfig.json`
 
 ```json
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.web.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
@@ -725,7 +737,7 @@ Path: `web/packages/ui/tsconfig.json`
 
 ```json
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.web.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
@@ -1139,7 +1151,7 @@ Path: `web/packages/api-client/tsconfig.json`
 
 ```json
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.web.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
@@ -1356,7 +1368,7 @@ Path: `web/apps/issuer-portal/tsconfig.json`
 
 ```json
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../../tsconfig.web.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
