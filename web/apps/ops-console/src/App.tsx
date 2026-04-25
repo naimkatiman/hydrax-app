@@ -1,21 +1,31 @@
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Settings, Home as HomeIcon } from "lucide-react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
-import { AppShell, Card, Icon } from "@hydrax/ui";
+import { AppShell } from "@hydrax/ui";
+import { OpsSidebar, OpsBrand } from "./components/OpsSidebar";
+import { OpsTopBar } from "./components/OpsTopBar";
+import { HomeRoute } from "./routes/HomeRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
   middleware: (getDefault) => getDefault().concat(hydraxApi.middleware),
 });
 
-function HomeRoute() {
+function ShellContents() {
+  const location = useLocation();
   return (
-    <Card title={<h1 style={{ margin: 0, fontSize: 20 }}>Home</h1>}>
-      <p>Ops Console scaffold. Real home content lands in a follow-up plan.</p>
-    </Card>
+    <AppShell
+      appName="ops-console"
+      brand={<OpsBrand />}
+      sidebar={<OpsSidebar currentPath={location.pathname} />}
+      topbar={<OpsTopBar userName="Ops Operator" />}
+    >
+      <Routes>
+        <Route path="/" element={<HomeRoute />} />
+      </Routes>
+    </AppShell>
   );
 }
 
@@ -24,27 +34,7 @@ export function App() {
     <Provider store={store}>
       <ThemeProvider theme={DEFAULT_TENANT_THEME}>
         <BrowserRouter>
-          <AppShell
-            appName="ops-console"
-            topbar={
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <Icon icon={Settings} label="Ops Console logo" size={18} />
-                Ops Console
-              </span>
-            }
-            sidebar={
-              <nav>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  <Icon icon={HomeIcon} label="Home" size={16} />
-                  Home
-                </span>
-              </nav>
-            }
-          >
-            <Routes>
-              <Route path="/" element={<HomeRoute />} />
-            </Routes>
-          </AppShell>
+          <ShellContents />
         </BrowserRouter>
       </ThemeProvider>
     </Provider>
