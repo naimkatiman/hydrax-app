@@ -4,7 +4,12 @@ import type { AddressInfo } from "node:net";
 import { loadUpstreamConfig, type UpstreamConfig } from "./bff/bff.js";
 import { aggregateHealth } from "./healthz/aggregate.js";
 import { fetchQuote, MarketDataUpstreamError } from "./marketdata/proxy.js";
-import { fetchProduct, createProduct, ProductsUpstreamError } from "./products/proxy.js";
+import {
+  fetchProduct,
+  createProduct,
+  transitionProduct,
+  ProductsUpstreamError,
+} from "./products/proxy.js";
 import { fetchSubscription, createSubscription, SubscriptionsUpstreamError } from "./subscriptions/proxy.js";
 import { listEvents, appendEvent, AuditUpstreamError, type ListEventsQuery } from "./audit/proxy.js";
 import {
@@ -60,6 +65,50 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           respondJson(res, status, { error: "products_upstream", message: err.message });
         } else {
           console.error("bff: /v1/products handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    // /v1/products/{id}/transition POST — must be matched BEFORE the bare
+    // /v1/products/{id} GET below.
+    if (req.url?.match(/^\/v1\/products\/[^/]+\/transition$/) && req.method === "POST") {
+      const segments = req.url.split("/");
+      const id = decodeURIComponent(segments[3] ?? "");
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) {
+        respondJson(res, 413, { error: "payload_too_large" });
+        return;
+      }
+      let body: unknown;
+      try {
+        body = JSON.parse(raw.toString("utf8"));
+      } catch {
+        respondJson(res, 400, { error: "bad_json" });
+        return;
+      }
+      if (typeof body !== "object" || body === null) {
+        respondJson(res, 400, { error: "bad_body" });
+        return;
+      }
+      try {
+        const product = await transitionProduct(
+          id,
+          body as Parameters<typeof transitionProduct>[1],
+          { workflowSvcUrl: upstreamConfig.workflowSvcUrl },
+        );
+        respondJson(res, 200, product);
+      } catch (err: unknown) {
+        if (err instanceof ProductsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600
+            ? err.httpStatus
+            : 502;
+          respondJson(res, status, { error: "products_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/products/{id}/transition handler:", err);
           respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }

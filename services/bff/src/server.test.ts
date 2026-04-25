@@ -285,3 +285,86 @@ describe("bff /v1/subscriptions/{id} GET", () => {
     }
   });
 });
+
+describe("bff /v1/products/{id}/transition POST", () => {
+  it("forwards body to workflow-svc and returns 200 with the updated product", async () => {
+    const upstream = await startMockWorkflowSvc({
+      "POST /v1/products/abc/transition": {
+        status: 200,
+        body: {
+          id: "abc",
+          tenant_id: "t-1",
+          code: "C",
+          name: "N",
+          product_type: "credit-note",
+          status: "approved",
+          allowed_next: ["active", "cancelled"],
+          created_at: "2026-04-25T00:00:00.000000Z",
+          updated_at: "2026-04-25T00:00:01.000000Z",
+        },
+      },
+    });
+    const bff = await startBffWithUpstream(upstream.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/products/abc/transition`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: "approved" }),
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { id: string; status: string; allowed_next: string[] };
+      expect(body.id).toBe("abc");
+      expect(body.status).toBe("approved");
+      expect(body.allowed_next).toEqual(["active", "cancelled"]);
+      expect(upstream.received[0]?.method).toBe("POST");
+      expect(upstream.received[0]?.url).toBe("/v1/products/abc/transition");
+      expect(upstream.received[0]?.body).toBe(JSON.stringify({ to: "approved" }));
+    } finally {
+      await bff.close();
+      await upstream.close();
+    }
+  });
+
+  it("passes through upstream 422 with products_upstream envelope", async () => {
+    const upstream = await startMockWorkflowSvc({
+      "POST /v1/products/abc/transition": {
+        status: 422,
+        body: { error: "invalid_transition", message: "pending->matured not allowed" },
+      },
+    });
+    const bff = await startBffWithUpstream(upstream.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/products/abc/transition`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: "matured" }),
+      });
+      expect(res.status).toBe(422);
+      const body = (await res.json()) as { error: string };
+      expect(body.error).toBe("products_upstream");
+    } finally {
+      await bff.close();
+      await upstream.close();
+    }
+  });
+
+  it("returns 502 on upstream transport error", async () => {
+    const upstream = await startMockWorkflowSvc({
+      "POST /v1/products/abc/transition": { status: 0, body: null, transportError: true },
+    });
+    const bff = await startBffWithUpstream(upstream.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/products/abc/transition`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: "approved" }),
+      });
+      expect(res.status).toBe(502);
+      const body = (await res.json()) as { error: string };
+      expect(body.error).toBe("products_upstream");
+    } finally {
+      await bff.close();
+      await upstream.close();
+    }
+  });
+});
