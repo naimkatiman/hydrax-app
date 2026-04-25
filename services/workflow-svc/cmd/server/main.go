@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/auditclient"
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/db"
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/handlers"
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/products"
@@ -34,6 +35,15 @@ func main() {
 	rails := railsclient.New(hydraxURL, 5*time.Second)
 	_ = rails // wired in a follow-up plan when workflow logic dispatches to hydrax
 
+	// AUDIT_SVC_URL unset → emitter is nil and the Transition handler
+	// short-circuits the emission. Local dev does not require audit-svc
+	// running; production is expected to set this so the audit log
+	// stays current.
+	var auditEmitter handlers.AuditEmitter
+	if u := os.Getenv("AUDIT_SVC_URL"); u != "" {
+		auditEmitter = auditclient.New(u, 2*time.Second)
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handlers.Health(serviceName))
 
@@ -56,7 +66,7 @@ func main() {
 		mux.HandleFunc("POST /v1/products", handlers.Create(repo))
 		mux.HandleFunc("GET /v1/products", handlers.List(repo))
 		mux.HandleFunc("GET /v1/products/{id}", handlers.Get(repo))
-		mux.HandleFunc("POST /v1/products/{id}/transition", handlers.Transition(repo))
+		mux.HandleFunc("POST /v1/products/{id}/transition", handlers.Transition(repo, auditEmitter))
 		log.Printf("%s product routes enabled (db=%s)", serviceName, redactDSN(dbURL))
 		subRepo := subscriptions.New(p)
 		mux.HandleFunc("POST /v1/subscriptions", handlers.CreateSubscription(subRepo))

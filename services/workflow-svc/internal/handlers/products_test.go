@@ -5,17 +5,71 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"sort"
 	"strconv"
+	"sync"
 	"testing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/products"
 )
+
+// recordingEmitter is the test double for AuditEmitter — it buffers
+// every EmitProductTransitioned call. emitErr controls what the call
+// returns so the "audit-svc failed but transition still 200" path is
+// directly testable.
+type recordingEmitter struct {
+	mu      sync.Mutex
+	calls   []emitCall
+	emitErr error
+}
+
+type emitCall struct {
+	tenantID  string
+	productID string
+	from      string
+	to        string
+}
+
+func (r *recordingEmitter) EmitProductTransitioned(_ context.Context, tenantID, productID, from, to string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.calls = append(r.calls, emitCall{tenantID, productID, from, to})
+	return r.emitErr
+}
+
+func (r *recordingEmitter) snapshot() []emitCall {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := make([]emitCall, len(r.calls))
+	copy(out, r.calls)
+	return out
+}
+
+// errAuditTestFailure is the canned error the recordingEmitter returns
+// when a test wants to simulate audit-svc rejecting the emission. Used
+// to prove the handler still returns 200 on the 2xx path even when the
+// emitter fails.
+var errAuditTestFailure = errors.New("audit emission rejected (test fixture)")
+
+// tenantIDForProduct reads the tenant_id of an already-inserted product
+// out of the same Tx the repo is bound to. Lets the emit-asserting
+// tests verify the AuditEmitter saw the right tenant scope.
+func tenantIDForProduct(t *testing.T, repo *products.Products, productID string) string {
+	t.Helper()
+	var tenantID string
+	if err := repo.Tx().QueryRowContext(context.Background(),
+		`SELECT tenant_id FROM products WHERE id = $1`, productID,
+	).Scan(&tenantID); err != nil {
+		t.Fatalf("tenantIDForProduct(%s): %v", productID, err)
+	}
+	return tenantID
+}
 
 // txProducts spins up a *products.Products bound to a Tx that rolls back
 // on test cleanup, so handler tests share the same isolation as the
@@ -149,6 +203,8 @@ func TestGetProduct404OnUnknown(t *testing.T) {
 func TestTransitionPendingToApprovedReturns200WithUpdatedProduct(t *testing.T) {
 	repo := txProducts(t)
 	id := seedPendingProduct(t, repo, "t1xa", "T1XA-CODE")
+	tenantID := tenantIDForProduct(t, repo, id)
+	emitter := &recordingEmitter{}
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
 		bytes.NewReader([]byte(`{"to":"approved"}`)))
@@ -156,7 +212,7 @@ func TestTransitionPendingToApprovedReturns200WithUpdatedProduct(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo)(rr, req)
+	Transition(repo, emitter)(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
@@ -172,11 +228,21 @@ func TestTransitionPendingToApprovedReturns200WithUpdatedProduct(t *testing.T) {
 	if !equalStringSets(got.AllowedNext, wantNext) {
 		t.Errorf("allowed_next = %v, want %v (any order)", got.AllowedNext, wantNext)
 	}
+
+	calls := emitter.snapshot()
+	if len(calls) != 1 {
+		t.Fatalf("emitter calls: got %d, want 1; calls=%+v", len(calls), calls)
+	}
+	want := emitCall{tenantID: tenantID, productID: id, from: "pending", to: "approved"}
+	if calls[0] != want {
+		t.Errorf("emitter call: got %+v, want %+v", calls[0], want)
+	}
 }
 
 func TestTransitionPendingToActiveReturns422(t *testing.T) {
 	repo := txProducts(t)
 	id := seedPendingProduct(t, repo, "t2xa", "T2XA-CODE")
+	emitter := &recordingEmitter{}
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
 		bytes.NewReader([]byte(`{"to":"active"}`)))
@@ -184,7 +250,7 @@ func TestTransitionPendingToActiveReturns422(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo)(rr, req)
+	Transition(repo, emitter)(rr, req)
 
 	if rr.Code != http.StatusUnprocessableEntity {
 		t.Fatalf("status: got %d want 422; body=%s", rr.Code, rr.Body.String())
@@ -196,11 +262,15 @@ func TestTransitionPendingToActiveReturns422(t *testing.T) {
 	if errBody["error"] != "invalid_transition" {
 		t.Errorf("error code = %q, want invalid_transition", errBody["error"])
 	}
+	if calls := emitter.snapshot(); len(calls) != 0 {
+		t.Errorf("422 path must not emit audit event, got %d call(s): %+v", len(calls), calls)
+	}
 }
 
 func TestTransitionUnknownIDReturns404(t *testing.T) {
 	repo := txProducts(t)
 	bogus := "00000000-0000-0000-0000-000000000000"
+	emitter := &recordingEmitter{}
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+bogus+"/transition",
 		bytes.NewReader([]byte(`{"to":"approved"}`)))
@@ -208,16 +278,20 @@ func TestTransitionUnknownIDReturns404(t *testing.T) {
 	req.SetPathValue("id", bogus)
 	rr := httptest.NewRecorder()
 
-	Transition(repo)(rr, req)
+	Transition(repo, emitter)(rr, req)
 
 	if rr.Code != http.StatusNotFound {
 		t.Errorf("status: got %d want 404; body=%s", rr.Code, rr.Body.String())
+	}
+	if calls := emitter.snapshot(); len(calls) != 0 {
+		t.Errorf("404 path must not emit audit event, got %d call(s)", len(calls))
 	}
 }
 
 func TestTransitionMissingToFieldReturns400(t *testing.T) {
 	repo := txProducts(t)
 	id := seedPendingProduct(t, repo, "t3xa", "T3XA-CODE")
+	emitter := &recordingEmitter{}
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
 		bytes.NewReader([]byte(`{}`)))
@@ -225,10 +299,59 @@ func TestTransitionMissingToFieldReturns400(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo)(rr, req)
+	Transition(repo, emitter)(rr, req)
 
 	if rr.Code != http.StatusBadRequest {
 		t.Errorf("status: got %d want 400; body=%s", rr.Code, rr.Body.String())
+	}
+	if calls := emitter.snapshot(); len(calls) != 0 {
+		t.Errorf("400 path must not emit audit event, got %d call(s)", len(calls))
+	}
+}
+
+// TestTransitionEmitFailureStill200 covers the contract that audit
+// emission is best-effort: even if audit-svc returns an error, the
+// transition itself succeeded in the DB and the originating caller
+// must still see 200.
+func TestTransitionEmitFailureStill200(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "t5xa", "T5XA-CODE")
+	emitter := &recordingEmitter{emitErr: errAuditTestFailure}
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"approved"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo, emitter)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200 (emit failure must not block transition); body=%s",
+			rr.Code, rr.Body.String())
+	}
+	if calls := emitter.snapshot(); len(calls) != 1 {
+		t.Errorf("emitter must still be invoked exactly once on the 2xx path; got %d", len(calls))
+	}
+}
+
+// TestTransitionNilEmitterStill200 covers the local-dev path where
+// AUDIT_SVC_URL is unset and main.go passes a nil emitter — the 2xx
+// flow must still succeed without panicking on the nil dereference.
+func TestTransitionNilEmitterStill200(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "t6xa", "T6XA-CODE")
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"approved"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo, nil)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
 	}
 }
 

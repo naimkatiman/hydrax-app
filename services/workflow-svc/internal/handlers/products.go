@@ -1,16 +1,31 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/lifecycle"
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/products"
 )
+
+// AuditEmitter is the small audit-svc surface the Transition handler
+// needs. The real implementation lives in internal/auditclient; tests
+// inject a recording fake. Emission failures are best-effort — they
+// log and the handler still returns 2xx for the originating request.
+type AuditEmitter interface {
+	EmitProductTransitioned(ctx context.Context, tenantID, productID, from, to string) error
+}
+
+// auditEmitTimeout caps the inline audit POST budget. Derived from
+// context.Background(), not r.Context(), so it survives the response
+// writer closing.
+const auditEmitTimeout = 2 * time.Second
 
 type createBody struct {
 	TenantID    string `json:"tenant_id"`
@@ -247,6 +262,14 @@ type transitionBody struct {
 // reachable here, the approval-svc audit trail and multi-approver
 // chain are bypassed if you call this directly.
 //
+// On 2xx the handler emits a product.transitioned event to audit-svc
+// via the supplied AuditEmitter. Emission is best-effort: a failure is
+// logged and the 200 still flows back to the caller. The audit_events
+// table is append-only and replay-safe; durability is a future slice.
+// The emitter call uses a derived 2-second context (NOT r.Context())
+// so it survives the response writer closing. A nil emitter is the
+// no-op default — used during local dev when AUDIT_SVC_URL is unset.
+//
 // Returns:
 //
 //	200 with updated product on success
@@ -255,7 +278,7 @@ type transitionBody struct {
 //	409 when status drifted between GetByID and UpdateStatus (race) or id is unknown by the time UpdateStatus runs
 //	422 when (current_status, body.to) is not a legal lifecycle edge
 //	500 on other errors
-func Transition(repo *products.Products) http.HandlerFunc {
+func Transition(repo *products.Products, emitter AuditEmitter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "POST only")
@@ -310,5 +333,14 @@ func Transition(repo *products.Products) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(toResponse(updated))
+
+		if emitter != nil {
+			emitCtx, cancel := context.WithTimeout(context.Background(), auditEmitTimeout)
+			defer cancel()
+			if err := emitter.EmitProductTransitioned(emitCtx, current.TenantID, id, current.Status, body.To); err != nil {
+				log.Printf("workflow-svc: audit emission failed for product=%s transition=%s->%s: %v",
+					id, current.Status, body.To, err)
+			}
+		}
 	}
 }
