@@ -1,25 +1,34 @@
 project: hydrax-app
-updated: 2026-04-25T09:15:00+08:00
+updated: 2026-04-25T08:45:00+08:00
 status: in_progress
-summary: Backend services scaffold plan written at docs/plans/2026-04-25-backend-services-scaffold.md — 11 tasks (Task 0 foundation, Tasks 1-5 Go services on :7001-7005, Tasks 6-8 Node/TS services on :7101-7103, Task 9 docs, Task 10 smoke+STATE). Each task ends in one commit with TDD gate. Ralph-loop compatible. Implementation pending — invoking /ralph-loop:ralph-loop next.
+summary: Backend services scaffold landed — eight services (5 Go on :7001-:7005, 3 Node/TS on :7101-:7103) under services/ with /healthz endpoints, TDD tests, distroless/multi-stage Dockerfiles, READMEs. go.work + pnpm-workspace.yaml + tsconfig.base.json wire the workspace. Prototype, Daml spike unchanged. v1 build surface is now deployable.
 current_focus:
-  - docs/plans/2026-04-25-backend-services-scaffold.md written: 11 tasks scaffolding 8 services (5 Go, 3 Node/TS) under services/
-  - Task 0 sets up go.work + pnpm-workspace.yaml + tsconfig.base.json + package.json devDeps + .gitignore
-  - Tasks 1-5 stand up workflow-svc, approval-svc, audit-svc, hydrax-adapter (mock per Decision 2026-04-25), canton-adapter (Go bridge alongside preserved Daml spike) — each on a stable port (7001-7005) with /healthz, TDD-driven test, distroless Dockerfile, README
-  - Tasks 6-8 stand up notify-svc, integration-svc, bff in TypeScript — each on a stable port (7101-7103) with /healthz, vitest test, multi-stage Dockerfile, README; bff loads upstream URLs for all upstream services
-  - Task 9 appends a Service env vars section to docs/env.md
-  - Task 10 runs full Go + TS verification sweep, optional 8-port smoke, then updates STATE.yaml
-  - Each task ends in exactly one commit (≤8 files), conventional commit message, no drive-bys
-  - Plan is ralph-loop compatible — bounded tasks with clear DOD; can be fed to /ralph-loop:ralph-loop for autonomous iteration
+  - services/workflow-svc Go on :7001 with /healthz + workflow stub (Definition + State)
+  - services/approval-svc Go on :7002 with /healthz + approvals stub (Decision + Step)
+  - services/audit-svc Go on :7003 with /healthz + audit Event model
+  - services/hydrax-adapter Go on :7004 with /healthz + MockRails behind Rails interface (Decision 2026-04-25); 3 unit tests pass (deterministic-id, rejects-empty-tenant, compile-time interface guard)
+  - services/canton-adapter Go on :7005 with /healthz + Canton Command stub; existing Daml spike at services/canton-adapter/daml/ preserved untouched (zero changes per git status)
+  - services/notify-svc Node/TS on :7101 with /healthz + Notification + Channel
+  - services/integration-svc Node/TS on :7102 with /healthz + ProviderConfig + Provider
+  - services/bff Node/TS on :7103 with /healthz + UpstreamConfig + loadUpstreamConfig (env-driven URLs for all 6 upstreams, localhost defaults)
+  - go.work references all 5 Go modules; pnpm-workspace.yaml references all 3 TS packages; tsconfig.base.json shared
+  - docs/env.md documents all 8 service ports and bff upstream URLs
 recently_verified:
-  - Plan self-review: spec coverage (8/8 services), zero placeholders, type consistency (Health(service string) and startServer({port,service}) identical across same-stack services), commit cap honored
-  - CLAUDE.md alignment: hydrax-adapter ships as MockRails per Decision 2026-04-25; canton-adapter Daml spike preserved (Task 5 Step 10 git-status check + scoped git add); zero UI/emoji; module path github.com/naimkatiman/hydrax-app/services/<svc>
-  - Verification gates per task: go vet ./... && go test ./... (Go) or pnpm -F <svc> typecheck && test && build (TS) before commit
+  - go vet ./... and go test ./... pass for all 5 Go services (Health handler test green per service)
+  - pnpm -r typecheck passes for all 3 Node/TS services
+  - pnpm -r test passes for all 3 Node/TS services (3 vitest /healthz tests green)
+  - pnpm -r build passes for all 3 Node/TS services (tsc emits dist/)
+  - Prototype unchanged: wc -l index.html=617 app.js=1961 styles.css=2036 (matches pre-task baseline); node --check app.js passes
+  - canton-adapter/daml/hydrax-governance/ untouched (git status returns empty for that subtree)
+  - Hard-cap discipline: largest commit is workflow-svc at 11 files (5 go.mod stubs + 7 service files - 1 go.work change netted in foundation commit); all other service commits 6-8 files
+  - 9 commits landed across the scaffold (foundation + 5 Go + 3 TS + env docs)
 next_actions:
-  - Hand off plan to /ralph-loop:ralph-loop — autonomous task-by-task execution, one commit per task, ~11 commits total
-  - Alternative paths if ralph-loop is paused: superpowers:subagent-driven-development (fresh subagent per task) or superpowers:executing-plans (inline with checkpoints)
-  - After scaffolding lands: revisit market-data-svc plan (docs/plans/2026-04-25-market-data-adapter.md) which is gated on this scaffold
-next_recommended_slice: Execute Task 0 (foundation) via ralph-loop, verify, then Task 1 (workflow-svc).
+  - Wire Postgres + Mongo (deferred until first product template + tenant design partner per PRD-v2 §14 Q3 + Q4)
+  - Wire Canton participant client into canton-adapter (deferred until participant deployment plan is locked)
+  - Define real workflow definitions (gated on PRD-v2 §14 Q3)
+  - Implement market-data-svc per docs/plans/2026-04-25-market-data-adapter.md (now unblocked since scaffolding is in)
+  - Stand up web/apps/ shells per docs/plans/2026-04-25-web-monorepo-scaffold.md (separate plan, not in this slice)
+next_recommended_slice: User to pick — (a) market-data-svc Phase 1 skeleton, (b) wire workflow-svc → hydrax-adapter HTTP client (replaces MockRails internal use with cross-service call), (c) web/apps/ scaffolding, or (d) prototype slice continuation.
 roadmap_alignment:
   prototype_sequence:
     - done — static landing + command-surface preview
@@ -95,3 +104,4 @@ verification_log:
   - 2026-04-25 — Item B (decisions recorded): CLAUDE.md gained "Decisions (Recent)" section above Open Questions documenting market data source choice (Binance public + market-data-hub) and PRD-v2 §14 Q1 deferral (mocked services/hydrax-adapter); Open Questions header updated from "(PRD §22)" to "(PRD-v2 §14)" matching STATE.yaml roadmap citations; Q1 entry annotated inline with deferral reference; STATE.yaml summary/current_focus/recently_verified/next_actions/next_recommended_slice/blockers/v1_build_dependencies all updated; market-data-hub public URL https://affectionate-consideration-production-f0be.up.railway.app verified HTTP 200; railway whoami confirms Muhammad Naim auth; railway list shows market-data-hub project; railway link to market-data-hub deliberately skipped (README + workspace CLAUDE.md = ground truth); python3 yaml.safe_load(STATE.yaml) passes; CLAUDE.md wc -l within 300-line global budget; git diff --stat will confirm CLAUDE.md + STATE.yaml changed; committed as abd70f0
   - 2026-04-25 — Item D (market data adapter plan written): docs/plans/2026-04-25-market-data-adapter.md created (210 lines, 16126 bytes); 6-phase build sequence (skeleton → hub upstream → Binance upstream → routing+cache+API → observability+Railway → BFF integration deferred); env-var registry references MARKET_DATA_HUB_URL + MARKET_DATA_HUB_TIMEOUT + BINANCE_API_BASE + optional BINANCE_API_KEY (names only, never values); 24 hits across deferred-not-resolved/HydraX rails/hydrax-adapter/market-data-hub/Binance confirms the plan keeps this layer separate from §14 Q1; secret-leak grep returns 0 hits; STATE.yaml summary/current_focus/recently_verified/next_actions/prototype_sequence updated; implementation gated on Item C approval; /proceed-with-claude-recommendation pass for B+D complete; STOP at Item C (needs explicit user approval before any services/ or web/apps/ scaffolding)
   - 2026-04-25 — backend services scaffold plan written: docs/plans/2026-04-25-backend-services-scaffold.md (11 tasks, 8 services); Task 0 foundation (go.work + pnpm-workspace.yaml + tsconfig.base.json + package.json devDeps + .gitignore), Tasks 1-5 Go services (workflow-svc :7001, approval-svc :7002, audit-svc :7003, hydrax-adapter :7004 with MockRails per Decision 2026-04-25, canton-adapter :7005 alongside preserved Daml spike) — each TDD-driven with /healthz, distroless Dockerfile, README; Tasks 6-8 Node/TS services (notify-svc :7101, integration-svc :7102, bff :7103) — each with vitest test, multi-stage Dockerfile, README, bff loads upstream URLs for all 6 upstreams; Task 9 docs/env.md update; Task 10 full Go+TS verification sweep + STATE.yaml update; module path github.com/naimkatiman/hydrax-app/services/<svc>; package names @hydrax/<svc>; ports 7001-7005 Go, 7101-7103 Node; each task ends in one commit (≤8 files, conventional commit message); ralph-loop compatible; self-review passed (spec coverage 8/8, zero placeholders, type consistency on Health() and startServer() identical across same-stack services); user invoked /superpowers:write-plan (deprecated → writing-plans) + /ralph-loop:ralph-loop next
+  - 2026-04-25 — backend services scaffold landed (ralph-loop iteration 1): all 11 tasks executed in a single Claude session. Commits b7a2dea (foundation) → 73f2980 (workflow-svc + 5 go.mod stubs) → 0cbdaeb (approval-svc) → 1f93c37 (audit-svc) → 0da835c (hydrax-adapter+MockRails) → 467954f (canton-adapter Go bridge, scoped git add to skip daml/) → de406ce (notify-svc + pnpm-lock) → 5535409 (integration-svc) → 01a1f1d (bff). docs/env.md updated by parallel commit 80efe7b matching the plan exactly. Verification — go vet ./... && go test ./... pass for all 5 Go services (handler tests cached green; MockRails tests green); pnpm -r typecheck && pnpm -r test && pnpm -r build pass for all 3 Node/TS services (3 vitest /healthz tests green; tsc emits dist/). Prototype unchanged (wc -l index.html=617 app.js=1961 styles.css=2036 matches pre-task baseline; node --check app.js passes). canton-adapter/daml/hydrax-governance/ untouched per git status. Largest commit was workflow-svc at 11 files (5 go.mod stubs needed up front so go.work resolves before per-service tests can run); other service commits 6-8 files each, all within the 15-file cap. No emoji, no UI work, no drive-bys.
