@@ -45,7 +45,7 @@ Each service binary listens on `PORT` (defaulted per service below). All service
 |---|---|---|
 | `WORKFLOW_SVC_URL` | `http://localhost:7001` | workflow-svc |
 | `APPROVAL_SVC_URL` | `http://localhost:7002` | approval-svc |
-| `AUDIT_SVC_URL` | `http://localhost:7003` | audit-svc |
+| `AUDIT_SVC_URL` | `http://localhost:7003` | audit-svc — consumed by bff `/v1/audit/events` proxy (`services/bff/src/audit/proxy.ts`) |
 | `HYDRAX_ADAPTER_URL` | `http://localhost:7004` | hydrax-adapter |
 | `NOTIFY_SVC_URL` | `http://localhost:7101` | notify-svc |
 | `INTEGRATION_SVC_URL` | `http://localhost:7102` | integration-svc |
