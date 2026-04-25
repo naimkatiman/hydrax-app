@@ -155,6 +155,33 @@ describe("<ProductDetailRoute>", () => {
     ).toBeInTheDocument();
   });
 
+  it("disables every transition button while a transition is in flight", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    fetchSpy.mockImplementation(async (input) => {
+      const url = typeof input === "string" ? input : (input as Request).url;
+      if (url.endsWith("/v1/products/abc-123/transition")) {
+        // Pending forever — keeps RTK Query in isLoading=true after the click.
+        return new Promise<Response>(() => {});
+      }
+      return new Response(
+        JSON.stringify({ ...baseProduct, allowed_next: ["approved", "cancelled"] }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    });
+    renderRoute();
+    const approveBtn = await screen.findByTestId<HTMLButtonElement>("transition-approved");
+    const cancelBtn = screen.getByTestId<HTMLButtonElement>("transition-cancelled");
+    expect(approveBtn).not.toBeDisabled();
+    expect(cancelBtn).not.toBeDisabled();
+
+    approveBtn.click();
+
+    await waitFor(() => {
+      expect(approveBtn).toBeDisabled();
+      expect(cancelBtn).toBeDisabled();
+    });
+  });
+
   it("POSTs to /v1/products/{id}/transition when a button is clicked", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     fetchSpy.mockImplementation(async (input, init) => {
