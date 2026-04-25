@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Hydrax passkey smoke</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; max-width: 760px; margin: 32px auto; padding: 0 16px; color: #1a1a1a; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.meta { color: #666; margin: 0 0 24px; }
+  fieldset { border: 1px solid #ddd; border-radius: 6px; padding: 12px 16px; margin: 0 0 16px; }
+  legend { font-weight: 600; padding: 0 6px; }
+  label { display: block; margin: 8px 0 4px; }
+  input { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+  button { padding: 8px 14px; margin: 4px 4px 4px 0; border: 1px solid #1a1a1a; background: #1a1a1a; color: #fff; border-radius: 4px; cursor: pointer; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  pre { background: #f4f4f6; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; max-height: 240px; overflow-y: auto; }
+  .ok { color: #006600; }
+  .err { color: #aa0000; }
+  .step { margin: 12px 0; }
+</style>
+</head>
+<body>
+
+<h1>Hydrax passkey smoke harness</h1>
+<p class="meta">Slice 2a closure gate. Drives the full register &rarr; auth &rarr; whoami round-trip against a real WebAuthn authenticator. Open the browser console for verbose request/response logs. <strong>Serve this file from <code>http://localhost:5173</code></strong> (matches the default <code>WEBAUTHN_ORIGIN</code>) — opening as <code>file://</code> will break WebAuthn.</p>
+
+<fieldset>
+  <legend>Config</legend>
+  <label>BFF URL <input id="bffUrl" value="http://localhost:8080" /></label>
+  <label>Tenant slug <input id="tenantSlug" value="pk-smoke" /></label>
+  <label>Email <input id="email" value="pk-smoke@example.test" /></label>
+</fieldset>
+
+<fieldset>
+  <legend>Step 1 &mdash; bootstrap session via dev/login (slice 1)</legend>
+  <button id="loginBtn">POST /v1/auth/dev/login</button>
+  <pre id="loginOut">(idle)</pre>
+</fieldset>
+
+<fieldset>
+  <legend>Step 2 &mdash; register a passkey (requires session bearer)</legend>
+  <button id="registerBtn" disabled>Register passkey</button>
+  <pre id="registerOut">(idle)</pre>
+</fieldset>
+
+<fieldset>
+  <legend>Step 3 &mdash; authenticate with the passkey (no bearer; allowList lookup)</legend>
+  <button id="authBtn" disabled>Authenticate with passkey</button>
+  <pre id="authOut">(idle)</pre>
+</fieldset>
+
+<fieldset>
+  <legend>Step 4 &mdash; verify the new session via /whoami</legend>
+  <button id="whoamiBtn" disabled>GET /v1/auth/whoami</button>
+  <pre id="whoamiOut">(idle)</pre>
+</fieldset>
+
+<script type="module">
+import {
+  startRegistration,
+  startAuthentication,
+} from "https://esm.sh/@simplewebauthn/browser@13";
+
+const $ = (id) => document.getElementById(id);
+let bootstrapToken = "";
+let passkeyToken = "";
+
+const cfg = () => ({
+  bff: $("bffUrl").value.replace(/\/$/, ""),
+  tenant: $("tenantSlug").value,
+  email: $("email").value,
+});
+
+function show(el, body, ok = true) {
+  el.textContent = typeof body === "string" ? body : JSON.stringify(body, null, 2);
+  el.className = ok ? "ok" : "err";
+}
+
+$("loginBtn").addEventListener("click", async () => {
+  const c = cfg();
+  try {
+    const r = await fetch(`${c.bff}/v1/auth/dev/login`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ tenant_slug: c.tenant, email: c.email }),
+    });
+    const body = await r.json();
+    if (!r.ok) throw new Error(`HTTP ${r.status}: ${JSON.stringify(body)}`);
+    bootstrapToken = body.token;
+    show($("loginOut"), { ok: true, status: r.status, token_len: bootstrapToken.length, session: body.session });
+    $("registerBtn").disabled = false;
+    $("authBtn").disabled = false;
+  } catch (e) { show($("loginOut"), String(e), false); }
+});
+
+$("registerBtn").addEventListener("click", async () => {
+  const c = cfg();
+  try {
+    const optsRes = await fetch(`${c.bff}/v1/auth/passkeys/register/options`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${bootstrapToken}` },
+    });
+    const opts = await optsRes.json();
+    if (!optsRes.ok) throw new Error(`options HTTP ${optsRes.status}: ${JSON.stringify(opts)}`);
+    console.log("[register/options]", opts);
+    const cred = await startRegistration({ optionsJSON: opts });
+    console.log("[startRegistration result]", cred);
+    const verifyRes = await fetch(`${c.bff}/v1/auth/passkeys/register/verify`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${bootstrapToken}` },
+      body: JSON.stringify({ response: cred }),
+    });
+    const verify = await verifyRes.json();
+    if (!verifyRes.ok) throw new Error(`verify HTTP ${verifyRes.status}: ${JSON.stringify(verify)}`);
+    show($("registerOut"), { ok: true, verified: verify.verified });
+  } catch (e) { show($("registerOut"), String(e), false); }
+});
+
+$("authBtn").addEventListener("click", async () => {
+  const c = cfg();
+  try {
+    const optsRes = await fetch(`${c.bff}/v1/auth/passkeys/auth/options`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ tenant_slug: c.tenant, email: c.email }),
+    });
+    const opts = await optsRes.json();
+    if (!optsRes.ok) throw new Error(`auth/options HTTP ${optsRes.status}: ${JSON.stringify(opts)}`);
+    console.log("[auth/options]", opts);
+    const cred = await startAuthentication({ optionsJSON: opts });
+    console.log("[startAuthentication result]", cred);
+    const verifyRes = await fetch(`${c.bff}/v1/auth/passkeys/auth/verify`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ tenant_slug: c.tenant, email: c.email, response: cred }),
+    });
+    const session = await verifyRes.json();
+    if (!verifyRes.ok) throw new Error(`auth/verify HTTP ${verifyRes.status}: ${JSON.stringify(session)}`);
+    passkeyToken = session.token;
+    show($("authOut"), { ok: true, token_len: passkeyToken.length, session: session.session });
+    $("whoamiBtn").disabled = false;
+  } catch (e) { show($("authOut"), String(e), false); }
+});
+
+$("whoamiBtn").addEventListener("click", async () => {
+  const c = cfg();
+  try {
+    const r = await fetch(`${c.bff}/v1/auth/whoami`, {
+      headers: { authorization: `Bearer ${passkeyToken}` },
+    });
+    const body = await r.json();
+    if (!r.ok) throw new Error(`HTTP ${r.status}: ${JSON.stringify(body)}`);
+    show($("whoamiOut"), { ok: true, ...body });
+  } catch (e) { show($("whoamiOut"), String(e), false); }
+});
+</script>
+
+</body>
+</html>
