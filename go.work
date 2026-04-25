@@ -1,0 +1,9 @@
+go 1.22
+
+use (
+	./services/workflow-svc
+	./services/approval-svc
+	./services/audit-svc
+	./services/hydrax-adapter
+	./services/canton-adapter
+)

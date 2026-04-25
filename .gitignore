@@ -4,3 +4,14 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
+
+# Go
+bin/
+*.test
+*.out
+
+# TypeScript / Node services
+dist/
+*.tsbuildinfo
+.vite/
+coverage/

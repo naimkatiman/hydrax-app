@@ -1,0 +1,4 @@
+packages:
+  - 'services/notify-svc'
+  - 'services/integration-svc'
+  - 'services/bff'
