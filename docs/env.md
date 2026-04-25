@@ -14,4 +14,9 @@ Every environment variable and toolchain dependency used anywhere in the repo is
 
 ## Environment variables
 
-(None yet — this document starts empty because no service binaries exist.)
+### `VITE_BFF_URL`
+
+- Used by: `web/packages/api-client` (read via `import.meta.env` in apps; falls back to `process.env.VITE_BFF_URL` in tests).
+- Default: `http://localhost:8080` when unset.
+- Where set: each `web/apps/*/.env.local` for development, Railway service env for staging/prod.
+- Why: api-client's `fetchBaseQuery` baseUrl. Apps consume RTK Query hooks; no other surface reads this var.
