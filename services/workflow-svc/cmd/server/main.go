@@ -15,6 +15,7 @@ import (
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/handlers"
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/products"
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/railsclient"
+	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/subscriptions"
 )
 
 const serviceName = "workflow-svc"
@@ -55,8 +56,13 @@ func main() {
 		mux.HandleFunc("POST /v1/products", handlers.Create(repo))
 		mux.HandleFunc("GET /v1/products/{id}", handlers.Get(repo))
 		log.Printf("%s product routes enabled (db=%s)", serviceName, redactDSN(dbURL))
+		subRepo := subscriptions.New(p)
+		mux.HandleFunc("POST /v1/subscriptions", handlers.CreateSubscription(subRepo))
+		mux.HandleFunc("GET /v1/subscriptions/{id}", handlers.GetSubscription(subRepo))
+		log.Printf("%s subscription routes enabled (db=%s)", serviceName, redactDSN(dbURL))
 	} else {
 		log.Printf("%s DATABASE_URL unset — product routes disabled (health only)", serviceName)
+		log.Printf("%s DATABASE_URL unset — subscription routes disabled (health only)", serviceName)
 	}
 
 	srv := &http.Server{
