@@ -5,6 +5,7 @@ import { loadUpstreamConfig, type UpstreamConfig } from "./bff/bff.js";
 import { aggregateHealth } from "./healthz/aggregate.js";
 import { fetchQuote, MarketDataUpstreamError } from "./marketdata/proxy.js";
 import { fetchProduct, createProduct, ProductsUpstreamError } from "./products/proxy.js";
+import { fetchSubscription, createSubscription, SubscriptionsUpstreamError } from "./subscriptions/proxy.js";
 
 export interface StartOptions {
   port: number;
@@ -68,6 +69,59 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           respondJson(res, status, { error: "products_upstream", message: err.message });
         } else {
           console.error("bff: /v1/products/{id} handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url === "/v1/subscriptions" && req.method === "POST") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) {
+        respondJson(res, 413, { error: "payload_too_large" });
+        return;
+      }
+      let body: unknown;
+      try {
+        body = JSON.parse(raw.toString("utf8"));
+      } catch {
+        respondJson(res, 400, { error: "bad_json" });
+        return;
+      }
+      if (typeof body !== "object" || body === null) {
+        respondJson(res, 400, { error: "bad_body" });
+        return;
+      }
+      try {
+        const subscription = await createSubscription(body as Parameters<typeof createSubscription>[0], {
+          workflowSvcUrl: upstreamConfig.workflowSvcUrl,
+        });
+        respondJson(res, 201, subscription);
+      } catch (err: unknown) {
+        if (err instanceof SubscriptionsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "subscriptions_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/subscriptions handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url?.startsWith("/v1/subscriptions/") && req.method === "GET") {
+      const id = decodeURIComponent(req.url.slice("/v1/subscriptions/".length));
+      try {
+        const subscription = await fetchSubscription(id, { workflowSvcUrl: upstreamConfig.workflowSvcUrl });
+        respondJson(res, 200, subscription);
+      } catch (err: unknown) {
+        if (err instanceof SubscriptionsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "subscriptions_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/subscriptions/{id} handler:", err);
           respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }
