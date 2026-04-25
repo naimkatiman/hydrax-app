@@ -96,16 +96,9 @@ web/apps/issuer-portal/src/App.tsx
 - Files: `docs/plans/2026-04-26-issuer-portal-products-list.md` (this file)
 - Verification: file exists, plan reads cleanly.
 
-### Commit 2 — `feat(workflow-svc): list products by tenant` — **DEFERRED (concurrent session collision)**
+### Commit 2 — `feat(workflow-svc): list products by tenant` — **RECOVERED (landed 2026-04-26 in fcf464a)**
 
-> **Status (2026-04-26):** This commit was NOT landed in the implementer session. While the implementer was editing `services/workflow-svc/internal/{handlers,products}/`, a parallel session running the audit-emission slice was actively mutating the same files (changing `Transition`'s signature to accept an `AuditEmitter`). The shared working tree kept oscillating between the two sessions' versions; deterministic build verification was impossible. The implementer's hand-written work for this commit (querier+List+handler+5 tests+2 repo tests) is preserved in `stash@{0}` titled `concurrent-and-mine-mixed` — it interleaves with the audit-emission session's diff.
->
-> **To land this commit, a follow-up session must:**
-> 1. Confirm the audit-emission slice has either landed or been abandoned (check `git log` and the working tree).
-> 2. Cherry-pick the four pieces below from `stash@{0}` (or rewrite from this plan; the implementation is small and well-specified).
-> 3. Run `(cd services/workflow-svc && go vet ./... && go build ./... && go test ./...)` green.
->
-> The other 4 layers (BFF, api-client, UI, plan doc) DID land. With workflow-svc missing, end-to-end requests will hit BFF → workflow-svc 404 → 502 → UI error card. All test suites pass because they all use mocked fetch — production behavior of the list page is BROKEN until commit 2 lands.
+> **Status (2026-04-26, post-recovery):** Originally deferred when the implementer hit a concurrent-session collision on `services/workflow-svc/internal/{handlers,products}/` (parallel audit-emission slice was mutating the same files). The hand-written work was preserved in `stash@{0}` and recovered in the main session — landed as commit `fcf464a` (`feat(workflow-svc): GET /v1/products list endpoint with tenant scoping`) with 6 httptest cases (200-with-rows, 200-empty, 400-missing-tenant, 400-bad-limit, 405-non-GET, 200-next-offset-when-page-full). Verification: `go vet ./... && go test ./...` green for workflow-svc; pnpm -r typecheck/test/build green workspace-wide. The end-to-end UI → BFF → workflow-svc path is now wired. Stash dropped post-recovery. See STATE.yaml verification_log entry dated 2026-04-26 for the full recovery audit trail.
 
 - Files (4):
   - `services/workflow-svc/internal/products/repo.go` (querier extended; `List` method added)
