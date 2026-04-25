@@ -35,6 +35,13 @@ func New(tx querier) *Products {
 	return &Products{tx: tx}
 }
 
+// Tx returns the underlying querier — only useful in tests that need to
+// seed FK rows inside the same transaction. Production callers should
+// not depend on this.
+func (p *Products) Tx() querier {
+	return p.tx
+}
+
 // Insert persists a new product and returns the row including server
 // defaults (id, status, created_at, updated_at).
 func (p *Products) Insert(ctx context.Context, in ProductInput) (*Product, error) {
