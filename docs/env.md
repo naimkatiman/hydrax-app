@@ -72,7 +72,20 @@ fast at boot rather than at first query.
 | `SESSION_TTL_SECONDS` | integration-svc | `43200` (12h) | TTL for sessions issued via dev/login |
 | `INTEGRATION_SVC_URL` | bff | `http://localhost:7102` | Upstream URL for auth proxy + composite healthz (already listed in bff upstream URLs table above) |
 
-Slice 2 (passkeys or OIDC) will add: `WEBAUTHN_RP_ID`, `WEBAUTHN_ORIGIN`, magic-link email creds (passkeys path) OR `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` (OIDC path).
+### Auth Slice 2a — WebAuthn (Passkeys, server substrate)
+
+| Var | Service | Default | Purpose |
+|---|---|---|---|
+| `WEBAUTHN_RP_ID` | integration-svc | `localhost` | RP ID for WebAuthn ceremonies. **Production: must match the eTLD+1 of the portal origin.** Single-valued — RP-ID-across-multiple-portal-subdomains is a deferred deployment decision (see slice 2d plan). |
+| `WEBAUTHN_RP_NAME` | integration-svc | `Hydrax` | Display name shown in the OS/browser passkey prompt |
+| `WEBAUTHN_ORIGIN` | integration-svc | `http://localhost:5173` | Expected origin of the calling browser. Production: must be HTTPS (browsers reject WebAuthn over plain HTTP except for `localhost`). |
+| `WEBAUTHN_CHALLENGE_TTL_SECONDS` | integration-svc | `60` | Challenge LRU TTL. Range 30–300. Validated at startup; bad value crashes the process. |
+
+**Slice 2a is server-side substrate only.** New users have no first-credential bootstrap path until slice 2b (magic-link enrollment) ships. Slice 2a's prototype path uses `AUTH_DEV_LOGIN=1` to bootstrap, which is fail-closed in production.
+
+Slice 2c (email transport) and slice 2d (portal UI) will add: SMTP / SES / Resend creds, browser asset paths, etc.
+
+If OIDC is later chosen as a complementary auth path: `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` will be added then.
 
 ### Deferred
 
