@@ -4,6 +4,10 @@ export {
   useGetHealthzCompositeQuery,
   useCreateProductMutation,
   useGetProductQuery,
+  useListAuditEventsQuery,
+  useListPendingApprovalsQuery,
+  useDecideApprovalMutation,
+  useGetSubscriptionQuery,
 } from "./api";
 export type {
   HealthResponse,
@@ -13,4 +17,10 @@ export type {
   CompositeHealthStatus,
   Product,
   CreateProductInput,
+  AuditEvent,
+  ListEventsArgs,
+  Approval,
+  ApprovalStatus,
+  DecideApprovalArgs,
+  Subscription,
 } from "./api";
