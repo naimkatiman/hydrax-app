@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import { hydraxApi, useGetProductQuery } from "@hydrax/api-client";
+import {
+  useGetProductQuery,
+  useTransitionProductMutation,
+} from "@hydrax/api-client";
 import { Button, Heading, Skeleton, Stack, Text } from "@hydrax/ui";
-
-const useTransitionProductMutation =
-  hydraxApi.endpoints.transitionProduct.useMutation;
 
 export function ProductDetailRoute() {
   const { id = "" } = useParams<{ id: string }>();
