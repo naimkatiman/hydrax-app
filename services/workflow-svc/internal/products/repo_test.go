@@ -115,6 +115,68 @@ func TestGetByIDReturnsErrNotFoundForUnknown(t *testing.T) {
 	}
 }
 
+func TestUpdateStatusHappyPath(t *testing.T) {
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
+
+	created, err := repo.Insert(ctx, ProductInput{
+		TenantID:    tenantID,
+		Code:        "T1-HAPPY",
+		Name:        "Update happy path",
+		ProductType: "short_duration_credit",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+	if created.Status != "pending" {
+		t.Fatalf("expected status=pending, got %q", created.Status)
+	}
+
+	got, err := repo.UpdateStatus(ctx, created.ID, "pending", "approved")
+	if err != nil {
+		t.Fatalf("UpdateStatus pending->approved: %v", err)
+	}
+	if got.Status != "approved" {
+		t.Errorf("status = %q, want approved", got.Status)
+	}
+	if !got.UpdatedAt.After(created.UpdatedAt) && !got.UpdatedAt.Equal(created.UpdatedAt) {
+		t.Errorf("UpdatedAt did not advance or hold steady: created=%v got=%v", created.UpdatedAt, got.UpdatedAt)
+	}
+}
+
+func TestUpdateStatusStaleStatusReturnsSentinel(t *testing.T) {
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
+	created, err := repo.Insert(ctx, ProductInput{
+		TenantID:    tenantID,
+		Code:        "T1-STALE",
+		Name:        "Stale test",
+		ProductType: "short_duration_credit",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+	// Caller claims fromStatus=approved but the row is actually pending.
+	_, err = repo.UpdateStatus(ctx, created.ID, "approved", "active")
+	if err == nil {
+		t.Fatal("UpdateStatus with mismatched fromStatus should fail, got nil")
+	}
+	if !IsStaleStatus(err) {
+		t.Errorf("expected IsStaleStatus(err)==true, got %v", err)
+	}
+}
+
+func TestUpdateStatusUnknownIDReturnsStale(t *testing.T) {
+	ctx, repo, _ := withTx(t)
+	_, err := repo.UpdateStatus(ctx, "00000000-0000-0000-0000-000000000000", "pending", "approved")
+	if err == nil {
+		t.Fatal("UpdateStatus on missing id should fail, got nil")
+	}
+	if !IsStaleStatus(err) {
+		t.Errorf("expected IsStaleStatus(err)==true (missing id is indistinguishable from drift), got %v", err)
+	}
+}
+
 func TestInsertRejectsDuplicateTenantCode(t *testing.T) {
 	ctx, repo, tx := withTx(t)
 	tenantID := seedTenant(t, ctx, tx)
