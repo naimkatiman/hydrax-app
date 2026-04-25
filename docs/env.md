@@ -28,6 +28,16 @@ Each service binary listens on `PORT` (defaulted per service below). All service
 | notify-svc | 7101 | Node/TS. Owns email + in-app + webhook notifications. |
 | integration-svc | 7102 | Node/TS. Owns KYC/KYB, SSO, CRM. |
 | bff | 7103 | Node/TS. Aggregates the above for React portals. |
+| market-data-svc | 7006 | Go. Crypto via Binance public REST + FX/commodities via market-data-hub. /healthz + /v1/candles + /v1/quotes + /v1/fx. |
+
+### market-data-svc env vars (added 2026-04-25)
+
+| Env var | Required | Default | Notes |
+|---|---|---|---|
+| `MARKET_DATA_HUB_URL` | yes | — | The market-data-hub Railway URL (e.g. `https://affectionate-consideration-production-f0be.up.railway.app`). Service refuses to start without it. |
+| `MARKET_DATA_HUB_TIMEOUT` | no | `5s` | HTTP timeout for hub requests. Parsed as `time.Duration`. |
+| `BINANCE_API_BASE` | no | `https://api.binance.com` | Override for testnet/proxy. |
+| `BINANCE_API_KEY` | no | — | Optional; raises rate limits only. **Public market endpoints work without it.** |
 
 ### bff upstream URLs (set at deploy time)
 
