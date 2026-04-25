@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/products"
@@ -58,6 +59,7 @@ func Create(repo *products.Products) http.HandlerFunc {
 			return
 		}
 		var body createBody
+		r.Body = http.MaxBytesReader(w, r.Body, 64*1024)
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			errorJSON(w, http.StatusBadRequest, "bad_json", err.Error())
 			return
@@ -83,7 +85,8 @@ func Create(repo *products.Products) http.HandlerFunc {
 					"a product with this code already exists for this tenant")
 				return
 			}
-			errorJSON(w, http.StatusInternalServerError, "internal", err.Error())
+			log.Printf("workflow-svc: products.Create: %v", err)
+			errorJSON(w, http.StatusInternalServerError, "internal", "an internal error occurred")
 			return
 		}
 
