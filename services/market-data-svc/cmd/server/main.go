@@ -10,8 +10,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/api"
+	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/cache"
 	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/config"
 	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/handlers"
+	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/upstream/binance"
+	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/upstream/hub"
 )
 
 const serviceName = "market-data-svc"
@@ -22,8 +26,24 @@ func main() {
 		log.Fatalf("config: %v", err)
 	}
 
+	binClient := binance.New(cfg.BinanceAPIBase, cfg.BinanceAPIKey, 5*time.Second)
+	hubClient := hub.New(cfg.HubURL, cfg.HubTimeout)
+
+	apiHandlers := &api.Handlers{
+		Binance:      binClient,
+		Hub:          hubClient,
+		CandlesCache: cache.New[api.CandleResponse](512, nil),
+		QuoteCache:   cache.New[api.QuoteResponse](128, nil),
+		FXCache:      cache.New[api.FXResponse](128, nil),
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handlers.Health(serviceName))
+
+	// Mount /v1 sub-tree onto the main mux. ServeMux's pattern syntax
+	// (Go 1.22+) lets us delegate via Handle.
+	v1Mux := apiHandlers.ServeMux()
+	mux.Handle("/v1/", v1Mux)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
@@ -32,7 +52,8 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("%s listening on :%s (hub=%s)", serviceName, cfg.Port, cfg.HubURL)
+		log.Printf("%s listening on :%s (hub=%s binance=%s)",
+			serviceName, cfg.Port, cfg.HubURL, cfg.BinanceAPIBase)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("listen: %v", err)
 		}

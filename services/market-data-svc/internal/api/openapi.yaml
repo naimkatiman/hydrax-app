@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: market-data-svc
+  description: |
+    Internal market-data feed for hydrax-app. Sources crypto from Binance
+    public REST and FX/commodities from market-data-hub. BFF and downstream
+    services consume this contract; nothing else in hydrax-app talks
+    directly to Binance or Twelve Data.
+  version: 0.1.0
+servers:
+  - url: http://localhost:7006
+    description: Local dev
+paths:
+  /healthz:
+    get:
+      summary: Liveness probe
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service: { type: string, example: market-data-svc }
+                  status:  { type: string, example: ok }
+
+  /v1/candles/{symbol}:
+    get:
+      summary: OHLCV candles for a symbol
+      description: |
+        Crypto symbols (BTC/USD, ETH/USD, SOL/USD) route to Binance.
+        FX (18 pairs) and commodity (XAU/USD, XAG/USD) symbols route to
+        the hub. Symbol must be url-encoded ("BTC%2FUSD").
+      parameters:
+        - in: path
+          name: symbol
+          required: true
+          schema: { type: string, example: BTC/USD }
+        - in: query
+          name: interval
+          schema:
+            type: string
+            enum: [1min, 5min, 15min, 30min, 1h, 4h, 1day, 1week]
+            default: 5min
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+      responses:
+        "200":
+          description: Candle bars
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandleResponse"
+        "400": { description: Invalid interval or limit }
+        "404": { description: Symbol not in registry }
+        "502": { description: Upstream unavailable }
+
+  /v1/quotes/{symbol}:
+    get:
+      summary: Latest ticker quote (crypto only)
+      description: |
+        Returns the latest spot price from Binance. FX symbols are rejected
+        with 400 — use /v1/fx/{base}/{quote} instead.
+      parameters:
+        - in: path
+          name: symbol
+          required: true
+          schema: { type: string, example: BTC/USD }
+      responses:
+        "200":
+          description: Quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        "400": { description: FX symbol passed; use /v1/fx instead }
+        "404": { description: Symbol not in registry }
+        "502": { description: Upstream unavailable }
+
+  /v1/fx/{base}/{quote}:
+    get:
+      summary: FX rate for a currency pair
+      description: |
+        Looks up the pair in the hub's /api/exchange-rates payload.
+        Both segments are case-sensitive ISO codes (EUR, USD, JPY, etc.).
+      parameters:
+        - in: path
+          name: base
+          required: true
+          schema: { type: string, example: EUR }
+        - in: path
+          name: quote
+          required: true
+          schema: { type: string, example: USD }
+      responses:
+        "200":
+          description: FX rate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FXResponse"
+        "404": { description: Pair not in registry or not in hub response }
+        "502": { description: Upstream unavailable }
+
+components:
+  schemas:
+    CandleBar:
+      type: object
+      properties:
+        open_time:  { type: integer, format: int64 }
+        close_time: { type: integer, format: int64 }
+        open:       { type: number, format: double }
+        high:       { type: number, format: double }
+        low:        { type: number, format: double }
+        close:      { type: number, format: double }
+        volume:     { type: number, format: double }
+
+    CandleResponse:
+      type: object
+      properties:
+        symbol:   { type: string, example: BTC/USD }
+        interval: { type: string, example: 5min }
+        bars:
+          type: array
+          items: { $ref: "#/components/schemas/CandleBar" }
+
+    QuoteResponse:
+      type: object
+      properties:
+        symbol: { type: string, example: BTC/USD }
+        price:  { type: number, format: double, example: 42345.12 }
+
+    FXResponse:
+      type: object
+      properties:
+        base:      { type: string, example: EUR }
+        quote:     { type: string, example: USD }
+        rate:      { type: number, format: double, example: 1.1721 }
+        timestamp: { type: integer, format: int64 }
