@@ -7,6 +7,8 @@ import { AppShell } from "@hydrax/ui";
 import { IssuerSidebar, IssuerBrand } from "./components/IssuerSidebar";
 import { IssuerTopBar } from "./components/IssuerTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
+import { ProductNewRoute } from "./routes/ProductNewRoute";
+import { ProductDetailRoute } from "./routes/ProductDetailRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -24,6 +26,8 @@ function ShellContents() {
     >
       <Routes>
         <Route path="/" element={<HomeRoute />} />
+        <Route path="/products/new" element={<ProductNewRoute />} />
+        <Route path="/products/:id" element={<ProductDetailRoute />} />
       </Routes>
     </AppShell>
   );

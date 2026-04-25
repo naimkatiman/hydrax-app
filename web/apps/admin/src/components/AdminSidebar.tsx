@@ -1,17 +1,17 @@
 import {
-  Building2,
+  ShieldCheck,
   LayoutDashboard,
-  Boxes,
-  PackagePlus,
-  ClipboardCheck,
+  Building2,
   Users,
-  History,
+  KeyRound,
+  ScrollText,
+  Plug,
   Settings,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NavItem, type NavItemLinkProps } from "@hydrax/ui";
 
-interface IssuerSidebarProps {
+interface AdminSidebarProps {
   readonly currentPath: string;
 }
 
@@ -29,15 +29,15 @@ const NAV: ReadonlyArray<{
   readonly icon: typeof LayoutDashboard;
 }> = [
   { label: "Home", path: "/", icon: LayoutDashboard },
-  { label: "Products", path: "/products", icon: Boxes },
-  { label: "New product", path: "/products/new", icon: PackagePlus },
-  { label: "Approvals", path: "/approvals", icon: ClipboardCheck },
-  { label: "Investors", path: "/investors", icon: Users },
-  { label: "Activity", path: "/activity", icon: History },
+  { label: "Tenants", path: "/tenants", icon: Building2 },
+  { label: "Users", path: "/users", icon: Users },
+  { label: "Roles", path: "/roles", icon: KeyRound },
+  { label: "Audit log", path: "/audit", icon: ScrollText },
+  { label: "Integrations", path: "/integrations", icon: Plug },
   { label: "Settings", path: "/settings", icon: Settings },
 ];
 
-export function IssuerSidebar({ currentPath }: IssuerSidebarProps) {
+export function AdminSidebar({ currentPath }: AdminSidebarProps) {
   return (
     <>
       {NAV.map((item) => (
@@ -54,11 +54,11 @@ export function IssuerSidebar({ currentPath }: IssuerSidebarProps) {
   );
 }
 
-export function IssuerBrand() {
+export function AdminBrand() {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-      <Building2 aria-label="Issuer Portal" role="img" size={16} />
-      <span>Issuer Portal</span>
+      <ShieldCheck aria-label="Admin" role="img" size={16} />
+      <span>Admin</span>
     </span>
   );
 }
