@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/cache"
+	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/observability"
 	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/router"
 	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/symbols"
 	"github.com/naimkatiman/hydrax-app/services/market-data-svc/internal/upstream/binance"
@@ -119,9 +120,11 @@ func (h *Handlers) candles(w http.ResponseWriter, r *http.Request) {
 	cacheKey := fmt.Sprintf("%s|%s|%d|%s", sym, interval, limit, upstream)
 
 	if cached, ok := h.CandlesCache.Get(cacheKey); ok {
+		observability.RecordCacheHit("candles")
 		writeJSON(w, http.StatusOK, cached)
 		return
 	}
+	observability.RecordCacheMiss("candles")
 
 	resp, err := h.fetchCandles(r.Context(), upstream, sym, interval, limit)
 	if err != nil {
@@ -139,7 +142,9 @@ func (h *Handlers) fetchCandles(ctx context.Context, up router.Upstream, sym, in
 
 	switch up {
 	case router.UpstreamBinance:
+		start := time.Now()
 		klines, err := h.Binance.Klines(ctx, sym, interval, limit)
+		observability.RecordUpstream("binance", "klines", time.Since(start))
 		if err != nil {
 			return nil, err
 		}
@@ -155,7 +160,9 @@ func (h *Handlers) fetchCandles(ctx context.Context, up router.Upstream, sym, in
 			})
 		}
 	case router.UpstreamHub:
+		start := time.Now()
 		cr, err := h.Hub.Candles(ctx, sym, interval, limit)
+		observability.RecordUpstream("hub", "candles", time.Since(start))
 		if err != nil {
 			return nil, err
 		}
@@ -190,11 +197,15 @@ func (h *Handlers) quote(w http.ResponseWriter, r *http.Request) {
 	cacheKey := sym
 
 	if cached, ok := h.QuoteCache.Get(cacheKey); ok {
+		observability.RecordCacheHit("quote")
 		writeJSON(w, http.StatusOK, cached)
 		return
 	}
+	observability.RecordCacheMiss("quote")
 
+	start := time.Now()
 	t, err := h.Binance.Ticker(r.Context(), sym)
+	observability.RecordUpstream("binance", "ticker", time.Since(start))
 	if err != nil {
 		writeError(w, http.StatusBadGateway, "upstream_unavailable", err.Error())
 		return
@@ -217,11 +228,15 @@ func (h *Handlers) fx(w http.ResponseWriter, r *http.Request) {
 
 	cacheKey := sym
 	if cached, ok := h.FXCache.Get(cacheKey); ok {
+		observability.RecordCacheHit("fx")
 		writeJSON(w, http.StatusOK, cached)
 		return
 	}
+	observability.RecordCacheMiss("fx")
 
+	start := time.Now()
 	rates, err := h.Hub.ExchangeRates(r.Context())
+	observability.RecordUpstream("hub", "exchange-rates", time.Since(start))
 	if err != nil {
 		writeError(w, http.StatusBadGateway, "upstream_unavailable", err.Error())
 		return
