@@ -26,3 +26,4 @@ export type {
   DecideApprovalArgs,
   Subscription,
 } from "./api";
+export * from "./auth.js";
