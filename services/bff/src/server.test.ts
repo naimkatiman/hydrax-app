@@ -44,13 +44,40 @@ interface MockUpstream {
   readonly received: Array<{ method: string; url: string; body: string }>;
 }
 
-async function startMockIntegrationSvc(): Promise<MockUpstream> {
+async function startMockIntegrationSvc(
+  routes?: Record<string, MockHandlerSpec>,
+): Promise<MockUpstream> {
   const received: Array<{ method: string; url: string; body: string }> = [];
   const server = http.createServer(async (req, res) => {
     const chunks: Buffer[] = [];
     for await (const chunk of req) chunks.push(chunk as Buffer);
     const body = Buffer.concat(chunks).toString("utf8");
     received.push({ method: req.method ?? "", url: req.url ?? "", body });
+
+    if (routes) {
+      const key = `${req.method} ${req.url}`;
+      const matchKey =
+        Object.keys(routes).find((k) => k === key) ??
+        Object.keys(routes).find((k) => {
+          const [m, u] = k.split(" ");
+          return m === req.method && u && req.url?.startsWith(u);
+        });
+      if (matchKey) {
+        const spec = routes[matchKey];
+        if (!spec) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "mock_misconfigured" }));
+          return;
+        }
+        if (spec.transportError) {
+          req.socket.destroy();
+          return;
+        }
+        res.writeHead(spec.status, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(spec.body));
+        return;
+      }
+    }
 
     if (req.url === "/v1/auth/whoami" && req.method === "GET") {
       const auth = req.headers["authorization"];
@@ -500,6 +527,134 @@ describe("bff /v1/products GET (list)", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
+    }
+  });
+});
+
+describe("passkey routes proxy to integration-svc", () => {
+  it("POST /v1/auth/passkeys/register/options forwards bearer to upstream", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "POST /v1/auth/passkeys/register/options": {
+        status: 200,
+        body: { challenge: "C", rp: { id: "localhost", name: "Hydrax" } },
+      },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/passkeys/register/options`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${TEST_TOKEN}` },
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { challenge: string };
+      expect(body.challenge).toBe("C");
+      expect(integrationSvc.received[0]?.method).toBe("POST");
+      expect(integrationSvc.received[0]?.url).toBe("/v1/auth/passkeys/register/options");
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
+    }
+  });
+
+  it("POST /v1/auth/passkeys/register/verify forwards bearer + body", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "POST /v1/auth/passkeys/register/verify": {
+        status: 200,
+        body: { verified: true },
+      },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/passkeys/register/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TEST_TOKEN}` },
+        body: JSON.stringify({ response: { id: "cred-1" } }),
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { verified: boolean };
+      expect(body.verified).toBe(true);
+      expect(integrationSvc.received[0]?.method).toBe("POST");
+      expect(integrationSvc.received[0]?.url).toBe("/v1/auth/passkeys/register/verify");
+      expect(integrationSvc.received[0]?.body).toBe(JSON.stringify({ response: { id: "cred-1" } }));
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
+    }
+  });
+
+  it("POST /v1/auth/passkeys/auth/options forwards body (no bearer)", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "POST /v1/auth/passkeys/auth/options": {
+        status: 200,
+        body: { challenge: "C2", allowCredentials: [{ id: "abc" }] },
+      },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/passkeys/auth/options`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant_slug: "acme", email: "alice@acme.com" }),
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { challenge: string; allowCredentials: Array<{ id: string }> };
+      expect(body.challenge).toBe("C2");
+      expect(body.allowCredentials[0]?.id).toBe("abc");
+      expect(integrationSvc.received[0]?.method).toBe("POST");
+      expect(integrationSvc.received[0]?.url).toBe("/v1/auth/passkeys/auth/options");
+      expect(integrationSvc.received[0]?.body).toBe(
+        JSON.stringify({ tenant_slug: "acme", email: "alice@acme.com" }),
+      );
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
+    }
+  });
+
+  it("POST /v1/auth/passkeys/auth/verify returns session token from upstream", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "POST /v1/auth/passkeys/auth/verify": {
+        status: 200,
+        body: {
+          token: "tok-xyz",
+          session: {
+            id: "s-1",
+            user_id: "u-1",
+            tenant_id: "ten-1",
+            role: "admin",
+            expires_at: "2030-01-01T00:00:00Z",
+          },
+        },
+      },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/passkeys/auth/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_slug: "acme",
+          email: "alice@acme.com",
+          response: { id: "cred-1" },
+        }),
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { token: string; session: { id: string } };
+      expect(body.token).toBe("tok-xyz");
+      expect(body.session.id).toBe("s-1");
+      expect(integrationSvc.received[0]?.method).toBe("POST");
+      expect(integrationSvc.received[0]?.url).toBe("/v1/auth/passkeys/auth/verify");
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
       await integrationSvc.close();
     }
   });

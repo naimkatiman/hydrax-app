@@ -21,6 +21,12 @@ import {
   ApprovalsUpstreamError,
 } from "./approvals/proxy.js";
 import { proxyDevLogin, proxyLogout, AuthUpstreamError } from "./auth/proxy.js";
+import {
+  proxyPasskeyAuthOptions,
+  proxyPasskeyAuthVerify,
+  proxyPasskeyRegisterOptions,
+  proxyPasskeyRegisterVerify,
+} from "./auth/passkey-proxy.js";
 import { extractBearer, requireSession } from "./auth/middleware.js";
 
 export interface StartOptions {
@@ -82,6 +88,98 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           respondJson(res, status, { error: "auth_upstream", message: err.message });
         } else {
           console.error("bff: /v1/auth/logout handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url === "/v1/auth/passkeys/register/options" && req.method === "POST") {
+      const auth = extractBearer(req) ?? "";
+      if (!auth) { respondJson(res, 401, { error: "unauthenticated" }); return; }
+      try {
+        const result = await proxyPasskeyRegisterOptions(auth, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+        respondJson(res, 200, result);
+      } catch (err) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: passkey register options:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url === "/v1/auth/passkeys/register/verify" && req.method === "POST") {
+      const auth = extractBearer(req) ?? "";
+      if (!auth) { respondJson(res, 401, { error: "unauthenticated" }); return; }
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) { respondJson(res, 413, { error: "payload_too_large" }); return; }
+      let body: unknown;
+      try { body = JSON.parse(raw.toString("utf8")); }
+      catch { respondJson(res, 400, { error: "bad_json" }); return; }
+      if (typeof body !== "object" || body === null) { respondJson(res, 400, { error: "bad_body" }); return; }
+      try {
+        const result = await proxyPasskeyRegisterVerify(body as Parameters<typeof proxyPasskeyRegisterVerify>[0], auth, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+        respondJson(res, 200, result);
+      } catch (err) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: passkey register verify:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url === "/v1/auth/passkeys/auth/options" && req.method === "POST") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) { respondJson(res, 413, { error: "payload_too_large" }); return; }
+      let body: unknown;
+      try { body = JSON.parse(raw.toString("utf8")); }
+      catch { respondJson(res, 400, { error: "bad_json" }); return; }
+      if (typeof body !== "object" || body === null) { respondJson(res, 400, { error: "bad_body" }); return; }
+      try {
+        const result = await proxyPasskeyAuthOptions(body as Parameters<typeof proxyPasskeyAuthOptions>[0], { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+        respondJson(res, 200, result);
+      } catch (err) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: passkey auth options:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url === "/v1/auth/passkeys/auth/verify" && req.method === "POST") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) { respondJson(res, 413, { error: "payload_too_large" }); return; }
+      let body: unknown;
+      try { body = JSON.parse(raw.toString("utf8")); }
+      catch { respondJson(res, 400, { error: "bad_json" }); return; }
+      if (typeof body !== "object" || body === null) { respondJson(res, 400, { error: "bad_body" }); return; }
+      try {
+        const result = await proxyPasskeyAuthVerify(body as Parameters<typeof proxyPasskeyAuthVerify>[0], { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+        respondJson(res, 200, result);
+      } catch (err) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: passkey auth verify:", err);
           respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }
