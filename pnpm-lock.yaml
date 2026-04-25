@@ -25,6 +25,8 @@ importers:
         specifier: ^1.5.0
         version: 1.6.1(@types/node@20.19.39)
 
+  services/integration-svc: {}
+
   services/notify-svc: {}
 
 packages:
