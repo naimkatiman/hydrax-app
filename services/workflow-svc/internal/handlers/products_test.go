@@ -98,3 +98,48 @@ func TestCreateProduct405OnGet(t *testing.T) {
 		t.Fatalf("status: got %d want 405", rr.Code)
 	}
 }
+
+func TestGetProduct200Returns(t *testing.T) {
+	repo := txProducts(t)
+	var tenantID string
+	err := repo.Tx().QueryRowContext(context.Background(),
+		`INSERT INTO tenants (slug, name, persona) VALUES ($1, $2, 'issuer') RETURNING id`,
+		"gtest", "GTest",
+	).Scan(&tenantID)
+	if err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+	created, err := repo.Insert(context.Background(), products.ProductInput{
+		TenantID: tenantID, Code: "GET-001", Name: "Get Test", ProductType: "short_duration_credit",
+	})
+	if err != nil {
+		t.Fatalf("insert: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/products/"+created.ID, nil)
+	req.SetPathValue("id", created.ID)
+	rr := httptest.NewRecorder()
+	Get(repo)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var got map[string]any
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got["id"] != created.ID {
+		t.Errorf("id mismatch: got %v want %s", got["id"], created.ID)
+	}
+}
+
+func TestGetProduct404OnUnknown(t *testing.T) {
+	repo := txProducts(t)
+	req := httptest.NewRequest(http.MethodGet, "/v1/products/00000000-0000-0000-0000-000000000000", nil)
+	req.SetPathValue("id", "00000000-0000-0000-0000-000000000000")
+	rr := httptest.NewRecorder()
+	Get(repo)(rr, req)
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("status: got %d want 404", rr.Code)
+	}
+}

@@ -109,3 +109,32 @@ func isUniqueViolation(err error) bool {
 	}
 	return false
 }
+
+// Get handles GET /v1/products/{id}. Returns 200 with the row, 404 if
+// not found, 405 on non-GET, 500 otherwise.
+func Get(repo *products.Products) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "GET only")
+			return
+		}
+		id := r.PathValue("id")
+		if id == "" {
+			errorJSON(w, http.StatusBadRequest, "missing_id", "id path param required")
+			return
+		}
+		got, err := repo.GetByID(r.Context(), id)
+		if err != nil {
+			if products.IsNotFound(err) {
+				errorJSON(w, http.StatusNotFound, "not_found", "no product with that id")
+				return
+			}
+			log.Printf("workflow-svc: products.Get(%q): %v", id, err)
+			errorJSON(w, http.StatusInternalServerError, "internal", "an internal error occurred")
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(toResponse(got))
+	}
+}
