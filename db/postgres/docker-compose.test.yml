@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hydrax-pg-test
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hydrax
+      POSTGRES_PASSWORD: hydrax
+      POSTGRES_DB: hydrax
+    ports:
+      - "5433:5432"
+    volumes:
+      - hydrax-pg-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hydrax -d hydrax"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+volumes:
+  hydrax-pg-test-data:
