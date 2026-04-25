@@ -2,6 +2,8 @@ export {
   hydraxApi,
   useGetHealthQuery,
   useGetHealthzCompositeQuery,
+  useCreateProductMutation,
+  useGetProductQuery,
 } from "./api";
 export type {
   HealthResponse,
@@ -9,4 +11,6 @@ export type {
   UpstreamHealthStatus,
   CompositeHealth,
   CompositeHealthStatus,
+  Product,
+  CreateProductInput,
 } from "./api";

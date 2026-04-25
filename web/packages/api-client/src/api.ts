@@ -23,6 +23,25 @@ export interface CompositeHealth {
   readonly upstreams: ReadonlyArray<UpstreamHealth>;
 }
 
+export interface Product {
+  readonly id: string;
+  readonly tenant_id: string;
+  readonly code: string;
+  readonly name: string;
+  readonly product_type: string;
+  readonly status: string;
+  readonly rails_product_id?: string;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface CreateProductInput {
+  readonly tenant_id: string;
+  readonly code: string;
+  readonly name: string;
+  readonly product_type: string;
+}
+
 type ViteEnv = { readonly VITE_BFF_URL?: string };
 
 function readBffUrl(): string {
@@ -46,6 +65,12 @@ export const hydraxApi = createApi({
     getHealthzComposite: builder.query<CompositeHealth, void>({
       query: () => "/healthz/composite",
     }),
+    createProduct: builder.mutation<Product, CreateProductInput>({
+      query: (body) => ({ url: "/v1/products", method: "POST", body }),
+    }),
+    getProduct: builder.query<Product, string>({
+      query: (id) => ({ url: `/v1/products/${encodeURIComponent(id)}` }),
+    }),
   }),
 });
 
@@ -54,3 +79,9 @@ export const useGetHealthQuery: typeof hydraxApi.endpoints.getHealth.useQuery =
 
 export const useGetHealthzCompositeQuery: typeof hydraxApi.endpoints.getHealthzComposite.useQuery =
   hydraxApi.endpoints.getHealthzComposite.useQuery;
+
+export const useCreateProductMutation: typeof hydraxApi.endpoints.createProduct.useMutation =
+  hydraxApi.endpoints.createProduct.useMutation;
+
+export const useGetProductQuery: typeof hydraxApi.endpoints.getProduct.useQuery =
+  hydraxApi.endpoints.getProduct.useQuery;
