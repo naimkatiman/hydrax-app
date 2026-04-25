@@ -31,6 +31,7 @@ export interface Product {
   readonly product_type: string;
   readonly status: string;
   readonly rails_product_id?: string;
+  readonly allowed_next?: readonly string[];
   readonly created_at: string;
   readonly updated_at: string;
 }
@@ -40,6 +41,11 @@ export interface CreateProductInput {
   readonly code: string;
   readonly name: string;
   readonly product_type: string;
+}
+
+export interface TransitionProductArgs {
+  readonly id: string;
+  readonly to: string;
 }
 
 export interface AuditEvent {
@@ -118,6 +124,13 @@ export const hydraxApi = createApi({
     getProduct: builder.query<Product, string>({
       query: (id) => ({ url: `/v1/products/${encodeURIComponent(id)}` }),
     }),
+    transitionProduct: builder.mutation<Product, TransitionProductArgs>({
+      query: ({ id, to }) => ({
+        url: `/v1/products/${encodeURIComponent(id)}/transition`,
+        method: "POST",
+        body: { to },
+      }),
+    }),
     listAuditEvents: builder.query<ReadonlyArray<AuditEvent>, ListEventsArgs>({
       query: ({ tenant_id, resource_type, resource_id }) =>
         `/v1/audit/events?tenant_id=${encodeURIComponent(tenant_id)}&resource_type=${encodeURIComponent(resource_type)}&resource_id=${encodeURIComponent(resource_id)}`,
@@ -149,6 +162,9 @@ export const useCreateProductMutation: typeof hydraxApi.endpoints.createProduct.
 
 export const useGetProductQuery: typeof hydraxApi.endpoints.getProduct.useQuery =
   hydraxApi.endpoints.getProduct.useQuery;
+
+export const useTransitionProductMutation: typeof hydraxApi.endpoints.transitionProduct.useMutation =
+  hydraxApi.endpoints.transitionProduct.useMutation;
 
 export const useListAuditEventsQuery: typeof hydraxApi.endpoints.listAuditEvents.useQuery =
   hydraxApi.endpoints.listAuditEvents.useQuery;
