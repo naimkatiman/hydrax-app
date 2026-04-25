@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { TypedUseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface HealthResponse {
   readonly ok: boolean;
@@ -28,5 +27,5 @@ export const hydraxApi = createApi({
   }),
 });
 
-export const useGetHealthQuery: TypedUseQuery<HealthResponse, void, ReturnType<typeof fetchBaseQuery>> =
+export const useGetHealthQuery: typeof hydraxApi.endpoints.getHealth.useQuery =
   hydraxApi.endpoints.getHealth.useQuery;

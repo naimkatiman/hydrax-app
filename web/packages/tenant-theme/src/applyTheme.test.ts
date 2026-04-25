@@ -30,7 +30,7 @@ describe("applyTheme", () => {
     expect(document.documentElement.getAttribute("data-tenant")).toBe("acme");
   });
 
-  it("clears previously applied tokens when called again", () => {
+  it("overwrites previous token values and updates data-tenant on re-application", () => {
     applyTheme(DEFAULT_TENANT_THEME);
     applyTheme({
       id: "minimal",

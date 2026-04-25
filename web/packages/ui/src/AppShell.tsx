@@ -40,7 +40,8 @@ export function AppShell({ appName, sidebar, topbar, children }: AppShellProps) 
         </aside>
       ) : null}
       {topbar ? (
-        <div
+        <header
+          role="banner"
           style={{
             gridArea: "topbar",
             borderBottom: "1px solid var(--hydrax-color-border)",
@@ -50,7 +51,7 @@ export function AppShell({ appName, sidebar, topbar, children }: AppShellProps) 
           }}
         >
           {topbar}
-        </div>
+        </header>
       ) : null}
       <main style={{ gridArea: "main", padding: 24 }}>{children}</main>
     </div>
