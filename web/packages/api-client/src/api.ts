@@ -43,6 +43,16 @@ export interface CreateProductInput {
   readonly product_type: string;
 }
 
+export interface ListProductsArgs {
+  readonly limit?: number;
+  readonly offset?: number;
+}
+
+export interface ListProductsResponse {
+  readonly products: ReadonlyArray<Product>;
+  readonly next_offset: number | null;
+}
+
 export interface TransitionProductArgs {
   readonly id: string;
   readonly to: string;
@@ -121,6 +131,15 @@ export const hydraxApi = createApi({
     createProduct: builder.mutation<Product, CreateProductInput>({
       query: (body) => ({ url: "/v1/products", method: "POST", body }),
     }),
+    listProducts: builder.query<ListProductsResponse, ListProductsArgs | void>({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args && args.limit !== undefined) params.set("limit", String(args.limit));
+        if (args && args.offset !== undefined) params.set("offset", String(args.offset));
+        const qs = params.toString();
+        return qs ? `/v1/products?${qs}` : "/v1/products";
+      },
+    }),
     getProduct: builder.query<Product, string>({
       query: (id) => ({ url: `/v1/products/${encodeURIComponent(id)}` }),
     }),
@@ -162,6 +181,9 @@ export const useCreateProductMutation: typeof hydraxApi.endpoints.createProduct.
 
 export const useGetProductQuery: typeof hydraxApi.endpoints.getProduct.useQuery =
   hydraxApi.endpoints.getProduct.useQuery;
+
+export const useListProductsQuery: typeof hydraxApi.endpoints.listProducts.useQuery =
+  hydraxApi.endpoints.listProducts.useQuery;
 
 export const useTransitionProductMutation: typeof hydraxApi.endpoints.transitionProduct.useMutation =
   hydraxApi.endpoints.transitionProduct.useMutation;
