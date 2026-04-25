@@ -1,10 +1,14 @@
 import { useParams } from "react-router-dom";
-import { useGetProductQuery } from "@hydrax/api-client";
-import { Heading, Skeleton, Stack, Text } from "@hydrax/ui";
+import { hydraxApi, useGetProductQuery } from "@hydrax/api-client";
+import { Button, Heading, Skeleton, Stack, Text } from "@hydrax/ui";
+
+const useTransitionProductMutation =
+  hydraxApi.endpoints.transitionProduct.useMutation;
 
 export function ProductDetailRoute() {
   const { id = "" } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useGetProductQuery(id, { skip: !id });
+  const [transition, transitionState] = useTransitionProductMutation();
 
   if (isLoading) {
     return <Skeleton aria-label="Loading product" />;
@@ -17,6 +21,12 @@ export function ProductDetailRoute() {
       </Text>
     );
   }
+
+  const allowed = data.allowed_next ?? [];
+  const handleTransition = (to: string): void => {
+    if (!id) return;
+    void transition({ id, to });
+  };
 
   return (
     <Stack gap="lg">
@@ -38,6 +48,32 @@ export function ProductDetailRoute() {
           <Text tone="muted">Created: </Text>
           {data.created_at}
         </Text>
+      </Stack>
+      <Stack gap="sm">
+        <Heading level="h2">Lifecycle actions</Heading>
+        {allowed.length === 0 ? (
+          <Text tone="muted" data-testid="terminal-state">
+            No further actions — product is in a terminal state.
+          </Text>
+        ) : (
+          <Stack gap="sm">
+            {allowed.map((to) => (
+              <Button
+                key={to}
+                data-testid={`transition-${to}`}
+                disabled={transitionState.isLoading}
+                onClick={() => handleTransition(to)}
+              >
+                {`Transition to ${to}`}
+              </Button>
+            ))}
+          </Stack>
+        )}
+        {transitionState.isError && (
+          <Text tone="danger" role="alert" data-testid="transition-error">
+            Transition failed.
+          </Text>
+        )}
       </Stack>
     </Stack>
   );
