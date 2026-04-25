@@ -3,6 +3,7 @@ import type { AddressInfo } from "node:net";
 
 import { loadUpstreamConfig, type UpstreamConfig } from "./bff/bff.js";
 import { aggregateHealth } from "./healthz/aggregate.js";
+import { fetchQuote, MarketDataUpstreamError } from "./marketdata/proxy.js";
 
 export interface StartOptions {
   port: number;
@@ -40,6 +41,29 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           error: "aggregate_failed",
           message: err instanceof Error ? err.message : "unknown",
         });
+      }
+      return;
+    }
+
+    if (req.url?.startsWith("/v1/market-data/quotes/")) {
+      const symbol = decodeURIComponent(req.url.slice("/v1/market-data/quotes/".length));
+      try {
+        const quote = await fetchQuote(symbol, {
+          marketDataSvcUrl: upstreamConfig.marketDataSvcUrl,
+        });
+        respondJson(res, 200, quote);
+      } catch (err: unknown) {
+        if (err instanceof MarketDataUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600
+            ? err.httpStatus
+            : 502;
+          respondJson(res, status, { error: "market_data_upstream", message: err.message });
+        } else {
+          respondJson(res, 500, {
+            error: "internal",
+            message: err instanceof Error ? err.message : "unknown",
+          });
+        }
       }
       return;
     }
