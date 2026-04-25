@@ -1,11 +1,12 @@
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { Wallet, Home as HomeIcon, Activity } from "lucide-react";
+import { Wallet, Home as HomeIcon, Activity, FileSignature } from "lucide-react";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
 import { AppShell, Card, Icon } from "@hydrax/ui";
 import { HealthRoute } from "./HealthRoute";
+import { SubscriptionsRoute } from "./SubscriptionsRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -52,12 +53,17 @@ export function App() {
                   <Icon icon={Activity} label="Platform health" size={16} />
                   Health
                 </Link>
+                <Link to="/subscriptions" style={navLinkStyle}>
+                  <Icon icon={FileSignature} label="Subscriptions" size={16} />
+                  Subscriptions
+                </Link>
               </nav>
             }
           >
             <Routes>
               <Route path="/" element={<HomeRoute />} />
               <Route path="/health" element={<HealthRoute />} />
+              <Route path="/subscriptions" element={<SubscriptionsRoute />} />
             </Routes>
           </AppShell>
         </BrowserRouter>
