@@ -6,4 +6,5 @@ use (
 	./services/audit-svc
 	./services/hydrax-adapter
 	./services/canton-adapter
+	./services/market-data-svc
 )
