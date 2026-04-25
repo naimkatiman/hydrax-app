@@ -7,6 +7,7 @@ import { AppShell } from "@hydrax/ui";
 import { OpsSidebar, OpsBrand } from "./components/OpsSidebar";
 import { OpsTopBar } from "./components/OpsTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
+import { AuditRoute } from "./routes/AuditRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -24,6 +25,7 @@ function ShellContents() {
     >
       <Routes>
         <Route path="/" element={<HomeRoute />} />
+        <Route path="/audit" element={<AuditRoute />} />
       </Routes>
     </AppShell>
   );
