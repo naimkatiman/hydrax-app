@@ -1,59 +1,118 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 interface AppShellProps {
   readonly appName: string;
-  readonly sidebar?: ReactNode;
+  readonly brand?: ReactNode;
   readonly topbar?: ReactNode;
+  readonly sidebar?: ReactNode;
+  readonly sidebarFooter?: ReactNode;
   readonly children: ReactNode;
 }
 
-export function AppShell({ appName, sidebar, topbar, children }: AppShellProps) {
+const SHIMMER_KEYFRAMES = `
+@keyframes hydrax-skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+`;
+
+const sidebarStyle: CSSProperties = {
+  gridArea: "sidebar",
+  borderRight: "1px solid var(--hydrax-color-border)",
+  background: "var(--hydrax-color-surface)",
+  display: "flex",
+  flexDirection: "column",
+};
+
+const sidebarBrandStyle: CSSProperties = {
+  height: 56,
+  padding: "0 var(--hydrax-space-lg)",
+  display: "flex",
+  alignItems: "center",
+  borderBottom: "1px solid var(--hydrax-color-border)",
+  fontFamily: "var(--hydrax-font-sans)",
+  fontWeight: 600,
+  color: "var(--hydrax-color-text-strong)",
+};
+
+const sidebarBodyStyle: CSSProperties = {
+  flex: 1,
+  overflowY: "auto",
+  padding: "var(--hydrax-space-md)",
+  display: "flex",
+  flexDirection: "column",
+  gap: "var(--hydrax-space-xs)",
+};
+
+const sidebarFooterStyle: CSSProperties = {
+  padding: "var(--hydrax-space-md) var(--hydrax-space-lg)",
+  borderTop: "1px solid var(--hydrax-color-border)",
+};
+
+const topbarStyle: CSSProperties = {
+  gridArea: "topbar",
+  borderBottom: "1px solid var(--hydrax-color-border)",
+  background: "var(--hydrax-color-bg)",
+  padding: "0 var(--hydrax-space-xl)",
+  display: "flex",
+  alignItems: "center",
+  gap: "var(--hydrax-space-md)",
+};
+
+const mainStyle: CSSProperties = {
+  gridArea: "main",
+  padding: "var(--hydrax-space-xl)",
+  overflowY: "auto",
+};
+
+export function AppShell({
+  appName,
+  brand,
+  topbar,
+  sidebar,
+  sidebarFooter,
+  children,
+}: AppShellProps) {
+  const hasSidebar = Boolean(sidebar) || Boolean(brand);
+  const hasTopbar = Boolean(topbar);
+
   return (
     <div
       data-app-name={appName}
       style={{
         minHeight: "100vh",
+        height: "100vh",
         background: "var(--hydrax-color-bg)",
         color: "var(--hydrax-color-text)",
         fontFamily: "var(--hydrax-font-sans)",
+        fontSize: "var(--hydrax-type-body-size)",
+        lineHeight: "var(--hydrax-type-body-line-height)",
         display: "grid",
-        gridTemplateColumns: sidebar ? "240px 1fr" : "1fr",
-        gridTemplateRows: topbar ? "56px 1fr" : "1fr",
-        gridTemplateAreas: sidebar
-          ? topbar
+        gridTemplateColumns: hasSidebar ? "240px 1fr" : "1fr",
+        gridTemplateRows: hasTopbar ? "56px 1fr" : "1fr",
+        gridTemplateAreas: hasSidebar
+          ? hasTopbar
             ? `"sidebar topbar" "sidebar main"`
             : `"sidebar main"`
-          : topbar
+          : hasTopbar
             ? `"topbar" "main"`
             : `"main"`,
       }}
     >
-      {sidebar ? (
-        <aside
-          style={{
-            gridArea: "sidebar",
-            borderRight: "1px solid var(--hydrax-color-border)",
-            padding: 16,
-          }}
-        >
-          {sidebar}
+      <style>{SHIMMER_KEYFRAMES}</style>
+      {hasSidebar ? (
+        <aside style={sidebarStyle}>
+          {brand ? <div style={sidebarBrandStyle}>{brand}</div> : null}
+          {sidebar ? <nav style={sidebarBodyStyle}>{sidebar}</nav> : null}
+          {sidebarFooter ? <div style={sidebarFooterStyle}>{sidebarFooter}</div> : null}
         </aside>
       ) : null}
-      {topbar ? (
-        <header
-          role="banner"
-          style={{
-            gridArea: "topbar",
-            borderBottom: "1px solid var(--hydrax-color-border)",
-            padding: "0 16px",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
+      {hasTopbar ? (
+        <header role="banner" style={topbarStyle}>
           {topbar}
         </header>
       ) : null}
-      <main style={{ gridArea: "main", padding: 24 }}>{children}</main>
+      <main style={mainStyle}>{children}</main>
     </div>
   );
 }
