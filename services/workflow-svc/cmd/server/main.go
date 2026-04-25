@@ -32,8 +32,19 @@ func main() {
 	}
 	dbURL := os.Getenv("DATABASE_URL")
 
+	// HYDRAX_ADAPTER_URL is always defaulted above, so the issuer is
+	// always wired. Wrap *railsclient.Client in a RailsIssuerFunc so
+	// the handlers package never imports railsclient. The Transition
+	// handler invokes IssueProduct only on pending->approved; failures
+	// are best-effort and do not block the originating transition.
 	rails := railsclient.New(hydraxURL, 5*time.Second)
-	_ = rails // wired in a follow-up plan when workflow logic dispatches to hydrax
+	railsIssuer := handlers.RailsIssuerFunc(func(ctx context.Context, tenantID, productCode string) (string, error) {
+		res, err := rails.IssueProduct(ctx, tenantID, productCode)
+		if err != nil {
+			return "", err
+		}
+		return res.ProductID, nil
+	})
 
 	// AUDIT_SVC_URL unset → emitter is nil and the Transition handler
 	// short-circuits the emission. Local dev does not require audit-svc
@@ -66,7 +77,7 @@ func main() {
 		mux.HandleFunc("POST /v1/products", handlers.Create(repo))
 		mux.HandleFunc("GET /v1/products", handlers.List(repo))
 		mux.HandleFunc("GET /v1/products/{id}", handlers.Get(repo))
-		mux.HandleFunc("POST /v1/products/{id}/transition", handlers.Transition(repo, auditEmitter))
+		mux.HandleFunc("POST /v1/products/{id}/transition", handlers.Transition(repo, auditEmitter, railsIssuer))
 		log.Printf("%s product routes enabled (db=%s)", serviceName, redactDSN(dbURL))
 		subRepo := subscriptions.New(p)
 		mux.HandleFunc("POST /v1/subscriptions", handlers.CreateSubscription(subRepo))

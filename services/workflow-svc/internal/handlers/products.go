@@ -22,10 +22,37 @@ type AuditEmitter interface {
 	EmitProductTransitioned(ctx context.Context, tenantID, productID, from, to string) error
 }
 
+// RailsIssuer is the small hydrax-adapter surface the Transition handler
+// needs. The real implementation lives in internal/railsclient; tests
+// inject a recording fake. Issuance is invoked only on pending->approved
+// transitions; failures are best-effort — they log and the handler still
+// returns 2xx, leaving rails_product_id null for a future reconciliation
+// slice to backfill. A nil issuer is the no-op default used in local dev
+// when HYDRAX_ADAPTER_URL is unset.
+type RailsIssuer interface {
+	IssueProduct(ctx context.Context, tenantID, productCode string) (railsProductID string, err error)
+}
+
+// RailsIssuerFunc adapts a plain function to RailsIssuer (mirrors
+// http.HandlerFunc). Lets main.go wrap *railsclient.Client without
+// pulling railsclient into this package.
+type RailsIssuerFunc func(ctx context.Context, tenantID, productCode string) (string, error)
+
+// IssueProduct satisfies RailsIssuer.
+func (f RailsIssuerFunc) IssueProduct(ctx context.Context, tenantID, productCode string) (string, error) {
+	return f(ctx, tenantID, productCode)
+}
+
 // auditEmitTimeout caps the inline audit POST budget. Derived from
 // context.Background(), not r.Context(), so it survives the response
 // writer closing.
 const auditEmitTimeout = 2 * time.Second
+
+// railsIssueTimeout caps the hydrax-adapter call budget. Larger than
+// auditEmitTimeout because issuance crosses into rails — eventual real
+// HydraX integration may include ledger commits — but still small enough
+// that a stuck adapter does not pin the workflow-svc response.
+const railsIssueTimeout = 5 * time.Second
 
 type createBody struct {
 	TenantID    string `json:"tenant_id"`
@@ -270,6 +297,15 @@ type transitionBody struct {
 // so it survives the response writer closing. A nil emitter is the
 // no-op default — used during local dev when AUDIT_SVC_URL is unset.
 //
+// On pending->approved specifically, the handler also calls
+// issuer.IssueProduct against hydrax-adapter to mint the underlying
+// tokenization id, then stamps it onto the row via SetRailsProductID.
+// Issuance is best-effort with the same shape as audit emission —
+// failure logs and the originating caller still sees 2xx; rails_product_id
+// stays null for a reconciliation slice to backfill. Other transitions
+// (approved->active, active->matured, etc.) do NOT call rails. A nil
+// issuer is the no-op default used when HYDRAX_ADAPTER_URL is unset.
+//
 // Returns:
 //
 //	200 with updated product on success
@@ -278,7 +314,7 @@ type transitionBody struct {
 //	409 when status drifted between GetByID and UpdateStatus (race) or id is unknown by the time UpdateStatus runs
 //	422 when (current_status, body.to) is not a legal lifecycle edge
 //	500 on other errors
-func Transition(repo *products.Products, emitter AuditEmitter) http.HandlerFunc {
+func Transition(repo *products.Products, emitter AuditEmitter, issuer RailsIssuer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "POST only")
@@ -328,6 +364,30 @@ func Transition(repo *products.Products, emitter AuditEmitter) http.HandlerFunc 
 			log.Printf("workflow-svc: products.Transition UpdateStatus(%q): %v", id, err)
 			errorJSON(w, http.StatusInternalServerError, "internal", "an internal error occurred")
 			return
+		}
+
+		// Rails issuance fires only on pending->approved and only if an
+		// issuer was wired. Inline (not deferred) so the response body
+		// can carry the freshly stamped rails_product_id when the round
+		// trip succeeds. Failures fall through to the 200 below — the
+		// transition itself is committed and rails_product_id stays
+		// null for a future reconciliation slice to backfill.
+		if issuer != nil && current.Status == string(lifecycle.StatePending) && body.To == string(lifecycle.StateApproved) {
+			issueCtx, issueCancel := context.WithTimeout(context.Background(), railsIssueTimeout)
+			railsProductID, issueErr := issuer.IssueProduct(issueCtx, current.TenantID, current.Code)
+			issueCancel()
+			if issueErr != nil {
+				log.Printf("workflow-svc: rails issuance failed for product=%s code=%s tenant=%s: %v",
+					id, current.Code, current.TenantID, issueErr)
+			} else {
+				stamped, stampErr := repo.SetRailsProductID(r.Context(), id, railsProductID)
+				if stampErr != nil {
+					log.Printf("workflow-svc: rails_product_id stamp failed for product=%s rails_id=%s: %v",
+						id, railsProductID, stampErr)
+				} else {
+					updated = stamped
+				}
+			}
 		}
 
 		w.Header().Set("Content-Type", "application/json")

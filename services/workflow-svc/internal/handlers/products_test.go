@@ -57,6 +57,43 @@ func (r *recordingEmitter) snapshot() []emitCall {
 // emitter fails.
 var errAuditTestFailure = errors.New("audit emission rejected (test fixture)")
 
+// recordingIssuer is the test double for RailsIssuer. Mirrors the
+// shape of recordingEmitter — buffers calls, lets the test pin the
+// returned rails id and choose whether to fail the round trip.
+type recordingIssuer struct {
+	mu       sync.Mutex
+	calls    []issueCall
+	railsID  string
+	issueErr error
+}
+
+type issueCall struct {
+	tenantID    string
+	productCode string
+}
+
+func (r *recordingIssuer) IssueProduct(_ context.Context, tenantID, productCode string) (string, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.calls = append(r.calls, issueCall{tenantID, productCode})
+	if r.issueErr != nil {
+		return "", r.issueErr
+	}
+	return r.railsID, nil
+}
+
+func (r *recordingIssuer) snapshot() []issueCall {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := make([]issueCall, len(r.calls))
+	copy(out, r.calls)
+	return out
+}
+
+// errRailsTestFailure is the canned error the recordingIssuer returns
+// when a test wants to simulate hydrax-adapter rejecting the issuance.
+var errRailsTestFailure = errors.New("rails issuance rejected (test fixture)")
+
 // tenantIDForProduct reads the tenant_id of an already-inserted product
 // out of the same Tx the repo is bound to. Lets the emit-asserting
 // tests verify the AuditEmitter saw the right tenant scope.
@@ -212,7 +249,7 @@ func TestTransitionPendingToApprovedReturns200WithUpdatedProduct(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo, emitter)(rr, req)
+	Transition(repo, emitter, nil)(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
@@ -250,7 +287,7 @@ func TestTransitionPendingToActiveReturns422(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo, emitter)(rr, req)
+	Transition(repo, emitter, nil)(rr, req)
 
 	if rr.Code != http.StatusUnprocessableEntity {
 		t.Fatalf("status: got %d want 422; body=%s", rr.Code, rr.Body.String())
@@ -278,7 +315,7 @@ func TestTransitionUnknownIDReturns404(t *testing.T) {
 	req.SetPathValue("id", bogus)
 	rr := httptest.NewRecorder()
 
-	Transition(repo, emitter)(rr, req)
+	Transition(repo, emitter, nil)(rr, req)
 
 	if rr.Code != http.StatusNotFound {
 		t.Errorf("status: got %d want 404; body=%s", rr.Code, rr.Body.String())
@@ -299,7 +336,7 @@ func TestTransitionMissingToFieldReturns400(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo, emitter)(rr, req)
+	Transition(repo, emitter, nil)(rr, req)
 
 	if rr.Code != http.StatusBadRequest {
 		t.Errorf("status: got %d want 400; body=%s", rr.Code, rr.Body.String())
@@ -324,7 +361,7 @@ func TestTransitionEmitFailureStill200(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo, emitter)(rr, req)
+	Transition(repo, emitter, nil)(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Fatalf("status: got %d want 200 (emit failure must not block transition); body=%s",
@@ -348,7 +385,7 @@ func TestTransitionNilEmitterStill200(t *testing.T) {
 	req.SetPathValue("id", id)
 	rr := httptest.NewRecorder()
 
-	Transition(repo, nil)(rr, req)
+	Transition(repo, nil, nil)(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
@@ -375,6 +412,172 @@ func TestGetProductIncludesAllowedNext(t *testing.T) {
 	want := []string{"approved", "cancelled"} // pending product
 	if !equalStringSets(got.AllowedNext, want) {
 		t.Errorf("allowed_next = %v, want %v", got.AllowedNext, want)
+	}
+}
+
+// productCodeFor reads the code of an already-inserted product out of
+// the same Tx the repo is bound to. Lets the rails-asserting tests
+// verify the issuer saw the right (tenant_id, product_code) tuple
+// without having to thread the code through seedPendingProduct.
+func productCodeFor(t *testing.T, repo *products.Products, productID string) string {
+	t.Helper()
+	var code string
+	if err := repo.Tx().QueryRowContext(context.Background(),
+		`SELECT code FROM products WHERE id = $1`, productID,
+	).Scan(&code); err != nil {
+		t.Fatalf("productCodeFor(%s): %v", productID, err)
+	}
+	return code
+}
+
+// railsProductIDFor reads the rails_product_id column for a row,
+// returning ("", false) when the column is null. Used by tests that
+// must distinguish "stamped" from "not stamped" in the underlying row
+// (the JSON response only carries the value via omitempty pointer).
+func railsProductIDFor(t *testing.T, repo *products.Products, productID string) (string, bool) {
+	t.Helper()
+	var id sql.NullString
+	if err := repo.Tx().QueryRowContext(context.Background(),
+		`SELECT rails_product_id FROM products WHERE id = $1`, productID,
+	).Scan(&id); err != nil {
+		t.Fatalf("railsProductIDFor(%s): %v", productID, err)
+	}
+	if !id.Valid {
+		return "", false
+	}
+	return id.String, true
+}
+
+func TestTransitionPendingToApprovedCallsRailsAndStamps(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "trails1", "TRAILS-001")
+	tenantID := tenantIDForProduct(t, repo, id)
+	productCode := productCodeFor(t, repo, id)
+	emitter := &recordingEmitter{}
+	issuer := &recordingIssuer{railsID: "rails-prod-12345"}
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"approved"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo, emitter, issuer)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+
+	calls := issuer.snapshot()
+	if len(calls) != 1 {
+		t.Fatalf("issuer calls: got %d, want 1; calls=%+v", len(calls), calls)
+	}
+	want := issueCall{tenantID: tenantID, productCode: productCode}
+	if calls[0] != want {
+		t.Errorf("issuer call: got %+v, want %+v", calls[0], want)
+	}
+
+	var got productResponse
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got.RailsProductID == nil || *got.RailsProductID != "rails-prod-12345" {
+		t.Errorf("response rails_product_id: got %v want rails-prod-12345", got.RailsProductID)
+	}
+
+	stamped, ok := railsProductIDFor(t, repo, id)
+	if !ok || stamped != "rails-prod-12345" {
+		t.Errorf("db rails_product_id: got (%q,%v) want (rails-prod-12345,true)", stamped, ok)
+	}
+}
+
+func TestTransitionApprovedToActiveDoesNotCallRails(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "trails2", "TRAILS-002")
+	// Walk row from pending -> approved without going through the handler
+	// so the test exercises only the approved->active edge.
+	if _, err := repo.UpdateStatus(context.Background(), id, "pending", "approved"); err != nil {
+		t.Fatalf("seed approved: %v", err)
+	}
+	emitter := &recordingEmitter{}
+	issuer := &recordingIssuer{railsID: "should-not-be-stamped"}
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"active"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo, emitter, issuer)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	if calls := issuer.snapshot(); len(calls) != 0 {
+		t.Errorf("approved->active path must not call rails issuer; got %d call(s): %+v", len(calls), calls)
+	}
+	if _, ok := railsProductIDFor(t, repo, id); ok {
+		t.Errorf("approved->active path must not stamp rails_product_id")
+	}
+}
+
+func TestTransitionRailsFailureStill200WithNullRailsID(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "trails3", "TRAILS-003")
+	emitter := &recordingEmitter{}
+	issuer := &recordingIssuer{issueErr: errRailsTestFailure}
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"approved"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo, emitter, issuer)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200 (rails failure must not block transition); body=%s",
+			rr.Code, rr.Body.String())
+	}
+	if calls := issuer.snapshot(); len(calls) != 1 {
+		t.Errorf("issuer must still be invoked exactly once on the 2xx path; got %d", len(calls))
+	}
+	var got productResponse
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got.RailsProductID != nil {
+		t.Errorf("rails failure must leave rails_product_id null; got %v", *got.RailsProductID)
+	}
+	// And the row in the DB must also remain null (not partially stamped).
+	if stamped, ok := railsProductIDFor(t, repo, id); ok {
+		t.Errorf("rails failure must leave db rails_product_id null; got %q", stamped)
+	}
+	// Status must still have advanced — the rails best-effort policy
+	// commits the transition even when issuance fails.
+	if got.Status != "approved" {
+		t.Errorf("status must advance to approved despite rails failure; got %q", got.Status)
+	}
+}
+
+func TestTransitionNilRailsStill200OnPendingToApproved(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "trails4", "TRAILS-004")
+	emitter := &recordingEmitter{}
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"approved"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo, emitter, nil)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	if _, ok := railsProductIDFor(t, repo, id); ok {
+		t.Errorf("nil issuer must not stamp rails_product_id")
 	}
 }
 

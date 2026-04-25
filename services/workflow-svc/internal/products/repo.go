@@ -141,6 +141,33 @@ func (p *Products) List(ctx context.Context, tenantID string, limit, offset int)
 	return out, nil
 }
 
+// SetRailsProductID stamps the upstream tokenization id returned by
+// hydrax-adapter onto an existing product row. Called best-effort by the
+// Transition handler after a successful pending->approved edge. Returns
+// errNotFound (via IsNotFound) when the id is unknown so the handler can
+// log without surfacing a 500 to the client. Idempotent — calling twice
+// with the same value is a no-op beyond bumping updated_at.
+func (p *Products) SetRailsProductID(ctx context.Context, id, railsProductID string) (*Product, error) {
+	const q = `
+		UPDATE products
+		SET rails_product_id = $2, updated_at = NOW()
+		WHERE id = $1
+		RETURNING id, tenant_id, code, name, product_type, status, rails_product_id, created_at, updated_at
+	`
+	var got Product
+	err := p.tx.QueryRowContext(ctx, q, id, railsProductID).Scan(
+		&got.ID, &got.TenantID, &got.Code, &got.Name, &got.ProductType,
+		&got.Status, &got.RailsProductID, &got.CreatedAt, &got.UpdatedAt,
+	)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("products.SetRailsProductID(%q): %w", id, errNotFound)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("products.SetRailsProductID(%q): %w", id, err)
+	}
+	return &got, nil
+}
+
 // GetByID returns the product with the given id, or an error for which
 // IsNotFound returns true if no such row exists.
 func (p *Products) GetByID(ctx context.Context, id string) (*Product, error) {

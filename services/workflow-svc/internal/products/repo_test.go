@@ -177,6 +177,42 @@ func TestUpdateStatusUnknownIDReturnsStale(t *testing.T) {
 	}
 }
 
+func TestSetRailsProductIDStampsValue(t *testing.T) {
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
+	created, err := repo.Insert(ctx, ProductInput{
+		TenantID:    tenantID,
+		Code:        "T1-RAILS",
+		Name:        "Rails id stamp",
+		ProductType: "short_duration_credit",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+	if created.RailsProductID != nil {
+		t.Fatalf("freshly inserted product must not have rails_product_id set; got %v", *created.RailsProductID)
+	}
+
+	got, err := repo.SetRailsProductID(ctx, created.ID, "rails-prod-abc")
+	if err != nil {
+		t.Fatalf("SetRailsProductID: %v", err)
+	}
+	if got.RailsProductID == nil || *got.RailsProductID != "rails-prod-abc" {
+		t.Errorf("rails_product_id mismatch: got %v want rails-prod-abc", got.RailsProductID)
+	}
+}
+
+func TestSetRailsProductIDUnknownIDReturnsNotFound(t *testing.T) {
+	ctx, repo, _ := withTx(t)
+	_, err := repo.SetRailsProductID(ctx, "00000000-0000-0000-0000-000000000000", "rails-prod-xyz")
+	if err == nil {
+		t.Fatal("SetRailsProductID on missing id should fail, got nil")
+	}
+	if !IsNotFound(err) {
+		t.Errorf("expected IsNotFound(err)==true, got %v", err)
+	}
+}
+
 func TestInsertRejectsDuplicateTenantCode(t *testing.T) {
 	ctx, repo, tx := withTx(t)
 	tenantID := seedTenant(t, ctx, tx)
