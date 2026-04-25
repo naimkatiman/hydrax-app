@@ -1,9 +1,13 @@
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 
+import { loadUpstreamConfig, type UpstreamConfig } from "./bff/bff.js";
+import { aggregateHealth } from "./healthz/aggregate.js";
+
 export interface StartOptions {
   port: number;
   service: string;
+  upstreamConfig?: UpstreamConfig;
 }
 
 export interface StartResult {
@@ -12,14 +16,35 @@ export interface StartResult {
 }
 
 export function startServer(opts: StartOptions): Promise<StartResult> {
-  const server = http.createServer((req, res) => {
-    if (req.url === "/healthz" && req.method === "GET") {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ service: opts.service, status: "ok" }));
+  const upstreamConfig = opts.upstreamConfig ?? loadUpstreamConfig(process.env);
+
+  const server = http.createServer(async (req, res) => {
+    if (req.method !== "GET") {
+      respondJson(res, 405, { error: "method_not_allowed" });
       return;
     }
-    res.writeHead(404, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "not found" }));
+
+    if (req.url === "/healthz") {
+      respondJson(res, 200, { service: opts.service, status: "ok" });
+      return;
+    }
+
+    if (req.url === "/healthz/composite") {
+      try {
+        const composite = await aggregateHealth(upstreamConfig);
+        const httpStatus =
+          composite.status === "ok" ? 200 : composite.status === "degraded" ? 207 : 503;
+        respondJson(res, httpStatus, composite);
+      } catch (err: unknown) {
+        respondJson(res, 500, {
+          error: "aggregate_failed",
+          message: err instanceof Error ? err.message : "unknown",
+        });
+      }
+      return;
+    }
+
+    respondJson(res, 404, { error: "not_found" });
   });
 
   return new Promise((resolve) => {
@@ -30,10 +55,15 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
   });
 }
 
+function respondJson(res: http.ServerResponse, status: number, body: unknown): void {
+  res.writeHead(status, { "Content-Type": "application/json" });
+  res.end(JSON.stringify(body));
+}
+
 const isMain = import.meta.url === `file://${process.argv[1]}`;
 if (isMain) {
   const port = Number(process.env.PORT ?? 7103);
   startServer({ port, service: "bff" }).then(({ baseUrl }) => {
-    console.log(`bff listening on ${baseUrl}`);
+    process.stdout.write(`bff listening on ${baseUrl}\n`);
   });
 }
