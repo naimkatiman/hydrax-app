@@ -63,6 +63,17 @@ fast at boot rather than at first query.
 - **Railway:** the Postgres addon injects `DATABASE_URL` automatically once provisioned.
   See "Railway provisioning runbook" in `docs/plans/2026-04-25-persistence-foundation.md`.
 
+### Auth Foundation (Slice 1)
+
+| Var | Service | Default | Purpose |
+|---|---|---|---|
+| `INTEGRATION_SVC_DATABASE_URL` | integration-svc | falls back to `DATABASE_URL` | Postgres DSN for the auth Sessions repo |
+| `AUTH_DEV_LOGIN` | integration-svc | unset (off) | Set to `1` to enable `POST /v1/auth/dev/login`. Returns 404 when unset. **Never set in prod.** |
+| `SESSION_TTL_SECONDS` | integration-svc | `43200` (12h) | TTL for sessions issued via dev/login |
+| `INTEGRATION_SVC_URL` | bff | `http://localhost:7102` | Upstream URL for auth proxy + composite healthz (already listed in bff upstream URLs table above) |
+
+Slice 2 (passkeys or OIDC) will add: `WEBAUTHN_RP_ID`, `WEBAUTHN_ORIGIN`, magic-link email creds (passkeys path) OR `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` (OIDC path).
+
 ### Deferred
 
 `MONGODB_URI`, KYC/SSO/CRM provider credentials, HydraX rails credentials — all deferred until the corresponding domain logic lands. Document each here at the same commit that introduces the dependency.
