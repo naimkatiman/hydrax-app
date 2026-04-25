@@ -3,6 +3,7 @@ import {
   fetchProduct,
   createProduct,
   transitionProduct,
+  listProducts,
   ProductsUpstreamError,
   type TransitionProductInput,
 } from "./proxy.js";
@@ -116,5 +117,83 @@ describe("transitionProduct", () => {
     }).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(ProductsUpstreamError);
     expect((err as ProductsUpstreamError).httpStatus).toBeUndefined();
+  });
+});
+
+describe("listProducts", () => {
+  it("returns the body and forwards tenant_id, limit, offset", async () => {
+    let captured = "";
+    const fetchImpl = ((async (input: string | URL | Request) => {
+      captured = typeof input === "string" ? input : input.toString();
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          products: [
+            {
+              id: "p-1",
+              tenant_id: "t-1",
+              code: "C-1",
+              name: "N",
+              product_type: "credit-note",
+              status: "pending",
+              created_at: "2026-04-26T00:00:00.000000Z",
+              updated_at: "2026-04-26T00:00:00.000000Z",
+            },
+          ],
+          next_offset: null,
+        }),
+      } as Response;
+    }) as unknown) as typeof fetch;
+
+    const got = await listProducts(
+      { tenantId: "t-1", limit: 25, offset: 10 },
+      { workflowSvcUrl: "http://wf", fetchImpl },
+    );
+    expect(got.products).toHaveLength(1);
+    expect(got.next_offset).toBeNull();
+    expect(captured).toContain("tenant_id=t-1");
+    expect(captured).toContain("limit=25");
+    expect(captured).toContain("offset=10");
+  });
+
+  it("wraps upstream 5xx in ProductsUpstreamError preserving status", async () => {
+    const fetchImpl = ((async () => ({
+      ok: false,
+      status: 503,
+      json: async () => ({}),
+    } as Response)) as unknown) as typeof fetch;
+    const err = await listProducts(
+      { tenantId: "t-1" },
+      { workflowSvcUrl: "http://wf", fetchImpl },
+    ).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ProductsUpstreamError);
+    expect((err as ProductsUpstreamError).httpStatus).toBe(503);
+  });
+
+  it("converts a transport error into ProductsUpstreamError without httpStatus", async () => {
+    const fetchImpl = (async () => {
+      throw new TypeError("network down");
+    }) as unknown as typeof fetch;
+    const err = await listProducts(
+      { tenantId: "t-1" },
+      { workflowSvcUrl: "http://wf", fetchImpl },
+    ).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ProductsUpstreamError);
+    expect((err as ProductsUpstreamError).httpStatus).toBeUndefined();
+  });
+
+  it("rejects malformed upstream body that lacks products array", async () => {
+    const fetchImpl = ((async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ not_what_we_expected: true }),
+    } as Response)) as unknown) as typeof fetch;
+    const err = await listProducts(
+      { tenantId: "t-1" },
+      { workflowSvcUrl: "http://wf", fetchImpl },
+    ).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ProductsUpstreamError);
+    expect((err as ProductsUpstreamError).message).toMatch(/malformed/i);
   });
 });

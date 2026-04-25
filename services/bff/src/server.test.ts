@@ -459,3 +459,48 @@ describe("bff /v1/products/{id}/transition POST", () => {
     }
   });
 });
+
+describe("bff /v1/products GET (list)", () => {
+  it("returns 200 with the list and forwards session.tenant_id to workflow-svc", async () => {
+    const upstream = await startMockWorkflowSvc({
+      "GET /v1/products": {
+        status: 200,
+        body: {
+          products: [
+            {
+              id: "p-1",
+              tenant_id: "ten-1",
+              code: "C-1",
+              name: "Prime",
+              product_type: "credit-note",
+              status: "pending",
+              created_at: "2026-04-26T00:00:00.000000Z",
+              updated_at: "2026-04-26T00:00:00.000000Z",
+            },
+          ],
+          next_offset: null,
+        },
+      },
+    });
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/products`, {
+        headers: { "Authorization": `Bearer ${TEST_TOKEN}` },
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { products: Array<{ id: string }>; next_offset: number | null };
+      expect(body.products).toHaveLength(1);
+      expect(body.products[0]?.id).toBe("p-1");
+      expect(body.next_offset).toBeNull();
+      // BFF forwards session.tenant_id (ten-1) as ?tenant_id= even though
+      // the original GET had no query string — single source of truth.
+      const upstreamCall = upstream.received[0]?.url ?? "";
+      expect(upstreamCall).toContain("tenant_id=ten-1");
+    } finally {
+      await bff.close();
+      await upstream.close();
+      await integrationSvc.close();
+    }
+  });
+});

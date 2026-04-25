@@ -8,6 +8,7 @@ import {
   fetchProduct,
   createProduct,
   transitionProduct,
+  listProducts,
   ProductsUpstreamError,
 } from "./products/proxy.js";
 import { fetchSubscription, createSubscription, SubscriptionsUpstreamError } from "./subscriptions/proxy.js";
@@ -165,6 +166,61 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           respondJson(res, status, { error: "products_upstream", message: err.message });
         } else {
           console.error("bff: /v1/products/{id}/transition handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    // Bare GET /v1/products (with optional ?tenant_id=&limit=&offset=) —
+    // matched BEFORE the /v1/products/{id} prefix branch below. The
+    // prefix branch only matches paths with a trailing slash so this
+    // does not collide, but keeping it adjacent makes the routing
+    // intent obvious.
+    if (req.url?.match(/^\/v1\/products(\?.*)?$/) && req.method === "GET") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
+      const url = new URL(req.url, "http://_");
+      // BFF derives tenant from session; the query param (if present
+      // from a caller that knows what they're doing) is ignored to
+      // keep tenant scoping single-source.
+      const tenantId = session.tenant_id;
+      if (!tenantId) {
+        respondJson(res, 400, { error: "missing_tenant", message: "session has no tenant_id" });
+        return;
+      }
+      const limitRaw = url.searchParams.get("limit");
+      const offsetRaw = url.searchParams.get("offset");
+      let limit: number | undefined;
+      let offset: number | undefined;
+      if (limitRaw !== null) {
+        const n = Number(limitRaw);
+        if (!Number.isFinite(n) || n <= 0) {
+          respondJson(res, 400, { error: "bad_query", message: "limit must be a positive integer" });
+          return;
+        }
+        limit = n;
+      }
+      if (offsetRaw !== null) {
+        const n = Number(offsetRaw);
+        if (!Number.isFinite(n) || n < 0) {
+          respondJson(res, 400, { error: "bad_query", message: "offset must be a non-negative integer" });
+          return;
+        }
+        offset = n;
+      }
+      try {
+        const list = await listProducts(
+          { tenantId, limit, offset },
+          { workflowSvcUrl: upstreamConfig.workflowSvcUrl },
+        );
+        respondJson(res, 200, list);
+      } catch (err: unknown) {
+        if (err instanceof ProductsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "products_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/products GET handler:", err);
           respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }

@@ -18,6 +18,17 @@ export interface CreateProductInput {
   readonly product_type: string;
 }
 
+export interface ListProductsArgs {
+  readonly tenantId: string;
+  readonly limit?: number;
+  readonly offset?: number;
+}
+
+export interface ListProductsResponse {
+  readonly products: ReadonlyArray<Product>;
+  readonly next_offset: number | null;
+}
+
 export interface TransitionProductInput {
   readonly to: string;
 }
@@ -45,6 +56,45 @@ async function withTimeout<T>(timeoutMs: number, fn: (signal: AbortSignal) => Pr
   } finally {
     clearTimeout(timer);
   }
+}
+
+export async function listProducts(
+  args: Readonly<ListProductsArgs>,
+  opts: Readonly<ProxyOptions>,
+): Promise<ListProductsResponse> {
+  const fetchImpl = opts.fetchImpl ?? fetch;
+  const timeoutMs = opts.timeoutMs ?? 1500;
+  const params = new URLSearchParams({ tenant_id: args.tenantId });
+  if (args.limit !== undefined) params.set("limit", String(args.limit));
+  if (args.offset !== undefined) params.set("offset", String(args.offset));
+  return withTimeout(timeoutMs, async (signal) => {
+    let res: Response;
+    try {
+      res = await fetchImpl(`${opts.workflowSvcUrl}/v1/products?${params.toString()}`, { signal });
+    } catch (err: unknown) {
+      throw new ProductsUpstreamError(err instanceof Error ? err.message : "transport error");
+    }
+    if (!res.ok) {
+      throw new ProductsUpstreamError(`workflow-svc returned ${res.status}`, res.status);
+    }
+    let body: unknown;
+    try {
+      body = await res.json();
+    } catch (err: unknown) {
+      throw new ProductsUpstreamError(
+        err instanceof Error ? `malformed body: ${err.message}` : "malformed body",
+        res.status,
+      );
+    }
+    if (
+      typeof body !== "object" ||
+      body === null ||
+      !Array.isArray((body as { products?: unknown }).products)
+    ) {
+      throw new ProductsUpstreamError("malformed body: missing products array", res.status);
+    }
+    return body as ListProductsResponse;
+  });
 }
 
 export async function fetchProduct(id: string, opts: Readonly<ProxyOptions>): Promise<Product> {
