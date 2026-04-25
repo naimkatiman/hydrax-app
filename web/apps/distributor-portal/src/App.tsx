@@ -1,21 +1,31 @@
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Network, Home as HomeIcon } from "lucide-react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
-import { AppShell, Card, Icon } from "@hydrax/ui";
+import { AppShell } from "@hydrax/ui";
+import { DistributorSidebar, DistributorBrand } from "./components/DistributorSidebar";
+import { DistributorTopBar } from "./components/DistributorTopBar";
+import { HomeRoute } from "./routes/HomeRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
   middleware: (getDefault) => getDefault().concat(hydraxApi.middleware),
 });
 
-function HomeRoute() {
+function ShellContents() {
+  const location = useLocation();
   return (
-    <Card title={<h1 style={{ margin: 0, fontSize: 20 }}>Home</h1>}>
-      <p>Distributor Portal scaffold. Real home content lands in a follow-up plan.</p>
-    </Card>
+    <AppShell
+      appName="distributor-portal"
+      brand={<DistributorBrand />}
+      sidebar={<DistributorSidebar currentPath={location.pathname} />}
+      topbar={<DistributorTopBar userName="Distributor Operator" />}
+    >
+      <Routes>
+        <Route path="/" element={<HomeRoute />} />
+      </Routes>
+    </AppShell>
   );
 }
 
@@ -24,27 +34,7 @@ export function App() {
     <Provider store={store}>
       <ThemeProvider theme={DEFAULT_TENANT_THEME}>
         <BrowserRouter>
-          <AppShell
-            appName="distributor-portal"
-            topbar={
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <Icon icon={Network} label="Distributor Portal logo" size={18} />
-                Distributor Portal
-              </span>
-            }
-            sidebar={
-              <nav>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  <Icon icon={HomeIcon} label="Home" size={16} />
-                  Home
-                </span>
-              </nav>
-            }
-          >
-            <Routes>
-              <Route path="/" element={<HomeRoute />} />
-            </Routes>
-          </AppShell>
+          <ShellContents />
         </BrowserRouter>
       </ThemeProvider>
     </Provider>
