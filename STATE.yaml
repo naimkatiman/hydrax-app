@@ -1,25 +1,22 @@
 project: hydrax-app
-updated: 2026-04-25T01:35:00+08:00
+updated: 2026-04-25T08:00:00+08:00
 status: in_progress
-summary: Clickable breadcrumb segments — panel and item crumbs become interactive (role=button, tabindex=0) whenever a drill-down is active; click or Enter/Space on either triggers deselectActivePanel() which toggles the current select*() to clear the selection.
+summary: Decisions section added to CLAUDE.md — market data source for prototype + v1 = Binance public + market-data-hub; PRD-v2 §14 Q1 (HydraX rails) marked deferred-not-resolved with mocked hydrax-adapter approach for v1.
 current_focus:
-  - Toolbar eyebrow is now a <nav id="breadcrumbTrail"> breadcrumb instead of the static "Dashboard view" label
-  - renderBreadcrumb() always renders "Dashboard view > <Panel name>" and appends "> <Selected item>" when a drill-down is active
-  - Panel and item crumbs toggle is-interactive (with role=button, tabindex=0, aria-label) whenever a selection exists
-  - breadcrumbTrail has click + keydown (Enter/Space) event delegation calling deselectActivePanel()
-  - deselectActivePanel() toggles the current select*() for the active panel, clearing the selection and returning focus to the lane
-  - CSS .is-interactive adds cursor, accent-soft hover/focus background, and focus-visible outline for keyboard a11y
-  - Twenty-one workbench features now fully interactive: ... , Contextual breadcrumb trail, Clickable breadcrumb segments
+  - CLAUDE.md gained "Decisions (Recent)" section above Open Questions, recording market data source choice and Q1 deferral rationale
+  - Open Questions section header corrected from "(PRD §22)" to "(PRD-v2 §14)" to match roadmap_alignment.v1_build_dependencies citations
+  - Q1 entry annotated inline with deferred-not-resolved status pointing to Decisions section
+  - market-data-hub Railway service confirmed reachable (https://affectionate-consideration-production-f0be.up.railway.app returns 200)
+  - Railway CLI access confirmed (Muhammad Naim, market-data-hub project visible in railway list); link to market-data-hub skipped (README + workspace CLAUDE.md = ground truth)
 recently_verified:
-  - node --check app.js passes
-  - deselectActivePanel referenced 3x in app.js (1 definition + click + keydown handlers)
-  - is-interactive referenced 4x in app.js (renderBreadcrumb output) and 6x in styles.css (3 rule blocks x 2 selectors)
-  - serve check: python3 http.server; /app.js contains "deselectActivePanel"; /styles.css contains "is-interactive"
-  - wc -l index.html=617 app.js=1961 styles.css=2036
-  - git diff --stat will confirm 2 code files + STATE.yaml changed
+  - CLAUDE.md edit: grep "Decisions (Recent)" returns 1 hit at the new section header; updated Open Questions header reads "(PRD-v2 §14)"
+  - market-data-hub README confirms dual-source pattern (TradeClaw web fetches crypto from Binance directly; hub serves 18 forex + XAU/USD + XAG/USD via Twelve Data; all crypto disabled on hub)
+  - python3 -c "import yaml; yaml.safe_load(open('STATE.yaml'))" passes for STATE.yaml after this edit
+  - CLAUDE.md wc -l within 300-line global budget after edit
 next_actions:
-  - Deferred to v1 build: authenticated navigation shell, services/ scaffolding, web/apps/ shells
-next_recommended_slice: Pending user direction — candidates: (a) keyboard shortcut to deselect (Esc), (b) breadcrumb history trail (previous 2-3 drill-downs, like a mini back stack), (c) different slice entirely.
+  - Item D next in this /proceed pass — write docs/plans/2026-04-25-market-data-adapter.md
+  - STOP at Item C — v1 backend scaffolding (services/, web/apps/, Postgres+Mongo, mock hydrax-adapter) requires explicit user approval before any execution
+next_recommended_slice: After D ships, pending user approval on Item C (v1 scaffolding). Prototype continuation alternatives remain available (Esc-to-deselect, breadcrumb history, alternative slice).
 roadmap_alignment:
   prototype_sequence:
     - done — static landing + command-surface preview
@@ -47,15 +44,16 @@ roadmap_alignment:
     - done — Shared drill-down primitive with close button (2026-04-24)
     - done — Contextual breadcrumb trail (2026-04-25)
     - done — Clickable breadcrumb segments (2026-04-25)
-    - next — user to pick (Esc-to-deselect, breadcrumb history, or alternative slice)
+    - paused — prototype slices on hold while market data source decision is recorded and adapter plan is written (2026-04-25)
+    - next — pending Item C (v1 scaffolding) approval OR user-picked prototype slice (Esc-to-deselect, breadcrumb history, alternative)
   v1_build_dependencies:
-    - prd-v2 §14 Q1 — HydraX API surface
+    - prd-v2 §14 Q1 — HydraX API surface (deferred-not-resolved for v1; mocked behind services/hydrax-adapter interface — see CLAUDE.md Decisions (Recent))
     - prd-v2 §14 Q3 — first product template (MMF vs short-duration credit vs treasury-equivalent)
     - prd-v2 §14 Q4 — first tenant design partner
     - prd-v2 §14 Q7 — pricing commitment
   post_v1: see prd-v2 §12 (v2 extends the wedge; v3 platform expansion)
 blockers:
-  - v1 build cannot start until the 4 gating questions in prd-v2 §14 are resolved — prototype slices continue in parallel and do not unblock v1
+  - v1 build still gated by prd-v2 §14 Q3, Q4, Q7. Q1 (HydraX rails) is now scoped-around via mock services/hydrax-adapter interface (see CLAUDE.md Decisions (Recent)), no longer a hard blocker. Prototype slices continue in parallel.
 verification_log:
   - 2026-04-23 — manual cross-check of HTML ids vs JS getElementById (all hit)
   - 2026-04-23 — node --check app.js passes
@@ -90,3 +88,4 @@ verification_log:
   - 2026-04-25 — breadcrumb trail: node --check app.js passes; breadcrumbTrail id in HTML (index.html:254) matched by getElementById in JS; renderBreadcrumb defined at app.js:514 and called at app.js:672 (selectOrder), 963 (selectVenue), 1144 (selectRisk), 1155 (resolveRisk), 1325 (selectPosition), 1459 (setActivePanel); 5 new CSS classes declared (breadcrumb-trail, crumb-root, crumb-sep, crumb-panel, crumb-item) reusing existing eyebrow treatment; python3 http.server serves /, /app.js, /styles.css as HTTP 200 with expected markers; wc -l index.html=617 app.js=1936 styles.css=2016; visual browser walk-through deferred to user; git diff --stat confirms 3 code files + STATE.yaml changed
   - 2026-04-25 — clickable breadcrumb segments: node --check app.js passes; renderBreadcrumb emits is-interactive + role=button + tabindex=0 + aria-label on crumb-panel and crumb-item whenever a drill-down is active; deselectActivePanel() dispatches to the correct select*() for the active panel; click + keydown (Enter/Space) handlers on breadcrumbTrail with .is-interactive target filter; CSS adds cursor/focus-visible/accent-soft hover state via 3 new rule blocks; serve check confirms deselectActivePanel in /app.js and is-interactive in /styles.css; wc -l index.html=617 app.js=1961 styles.css=2036; visual browser click-through deferred to user; git diff --stat confirms 2 code files + STATE.yaml changed
   - 2026-04-25 — hydrax-governance Daml spike (orthogonal to prototype work): Daml SDK 2.9.5 + Temurin JRE 17.0.19 installed user-local (~/.daml, ~/.java); new throwaway package at services/canton-adapter/daml/hydrax-governance/ with GovernanceProposal template (proposer signatory, approvers+observers disclosure, ensure requiredApprovals in (0, len approvers] + unique approvers), Approve/Execute/Reject choices with controller-gated authz, Proposal interface + ProposalView for upgrade seam; daml build exits 0; 5 Daml Scripts (testHappyPath, testUnauthorizedApprover, testDoubleApproval, testRejectBlocksExecute, testInterfaceView) all exit 0 on --ide-ledger; wc -l daml.yaml=8 Governance.daml=83 GovernanceScript.daml=109 README.md=86 docs/env.md=17; 6 commits on main (64fc029..3567836) plus plan bd645b8; Canton reassignment documented as deferred per PRD §15 (single-synchronizer); does NOT change prototype slice roadmap
+  - 2026-04-25 — Item B (decisions recorded): CLAUDE.md gained "Decisions (Recent)" section above Open Questions documenting market data source choice (Binance public + market-data-hub) and PRD-v2 §14 Q1 deferral (mocked services/hydrax-adapter); Open Questions header updated from "(PRD §22)" to "(PRD-v2 §14)" matching STATE.yaml roadmap citations; Q1 entry annotated inline with deferral reference; STATE.yaml summary/current_focus/recently_verified/next_actions/next_recommended_slice/blockers/v1_build_dependencies all updated; market-data-hub public URL https://affectionate-consideration-production-f0be.up.railway.app verified HTTP 200; railway whoami confirms Muhammad Naim auth; railway list shows market-data-hub project; railway link to market-data-hub deliberately skipped (README + workspace CLAUDE.md = ground truth); python3 yaml.safe_load(STATE.yaml) passes; CLAUDE.md wc -l within 300-line global budget; git diff --stat will confirm CLAUDE.md + STATE.yaml changed

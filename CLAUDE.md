@@ -171,9 +171,14 @@ Installed at user-level from `naimkatiman/continuous-improvement`. Optional — 
 - `/ralph` — autonomous multi-iteration loop for PRD-sized work. Requires explicit authorization; incompatible with small reversible slices.
 - `/superpowers` — framework companion. Prefer the namespaced `superpowers:*` plugin skills (writing-plans, brainstorming, verification) for specific workflow stages.
 
-## Open Questions — Resolve Before Design (PRD §22)
+## Decisions (Recent)
 
-1. HydraX API surface available for workflow-layer integration?
+- **2026-04-25 — Market data source for prototype + v1.** Binance public REST/WS for crypto, and the existing `market-data-hub` Railway service (Twelve Data via Redis) for forex + commodities. Mirrors the dual-source pattern already proven in TradeClaw `web`. Plan: [docs/plans/2026-04-25-market-data-adapter.md](docs/plans/2026-04-25-market-data-adapter.md). Hydrax-app consumes the hub via `MARKET_DATA_HUB_URL`; Binance public market endpoints require no key (optional `BINANCE_API_KEY` only for higher rate limits).
+- **2026-04-25 — PRD-v2 §14 Q1 (HydraX rails) deferred-not-resolved for v1.** Real workflow-layer integration with HydraX tokenisation, custody, and trading rails waits on HydraX engagement providing the API surface. v1 stands up `services/hydrax-adapter` (Go) as a mock behind a stable interface so the workflow stack ships without blocking on Q1. Q1 is scoped around, not closed.
+
+## Open Questions — Resolve Before Design (PRD-v2 §14)
+
+1. HydraX API surface available for workflow-layer integration? *(v1: deferred-not-resolved — see Decisions (Recent); `services/hydrax-adapter` mocked behind interface.)*
 2. Which workflow objects live as Daml contracts vs off-ledger read models?
 3. First target product type: fund, structured product, private credit, treasury, or equity-linked?
 4. First tenant persona: issuer, distributor, or market operator?
