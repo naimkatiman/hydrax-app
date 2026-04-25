@@ -19,6 +19,8 @@ import {
   decideApproval,
   ApprovalsUpstreamError,
 } from "./approvals/proxy.js";
+import { proxyDevLogin, proxyLogout, AuthUpstreamError } from "./auth/proxy.js";
+import { requireSession } from "./auth/middleware.js";
 
 export interface StartOptions {
   port: number;
@@ -35,7 +37,60 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
   const upstreamConfig = opts.upstreamConfig ?? loadUpstreamConfig(process.env);
 
   const server = http.createServer(async (req, res) => {
+    // ── Auth routes (unprotected) ───────────────────────────────────────────
+    if (req.url === "/v1/auth/dev/login" && req.method === "POST") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) { respondJson(res, 413, { error: "payload_too_large" }); return; }
+      let body: unknown;
+      try { body = JSON.parse(raw.toString("utf8")); } catch { respondJson(res, 400, { error: "bad_json" }); return; }
+      if (typeof body !== "object" || body === null) { respondJson(res, 400, { error: "bad_body" }); return; }
+      try {
+        const result = await proxyDevLogin(body as Parameters<typeof proxyDevLogin>[0], {
+          integrationSvcUrl: upstreamConfig.integrationSvcUrl,
+        });
+        respondJson(res, 200, result);
+      } catch (err: unknown) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/auth/dev/login handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url === "/v1/auth/whoami" && req.method === "GET") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
+      respondJson(res, 200, session);
+      return;
+    }
+
+    if (req.url === "/v1/auth/logout" && req.method === "POST") {
+      const authHeader = req.headers["authorization"];
+      const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : "";
+      try {
+        await proxyLogout(token, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+        respondJson(res, 204, {});
+      } catch (err: unknown) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/auth/logout handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
     if (req.url === "/v1/products" && req.method === "POST") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const chunks: Buffer[] = [];
       for await (const chunk of req) chunks.push(chunk as Buffer);
       const raw = Buffer.concat(chunks);
@@ -74,6 +129,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     // /v1/products/{id}/transition POST — must be matched BEFORE the bare
     // /v1/products/{id} GET below.
     if (req.url?.match(/^\/v1\/products\/[^/]+\/transition$/) && req.method === "POST") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const segments = req.url.split("/");
       const id = decodeURIComponent(segments[3] ?? "");
       const chunks: Buffer[] = [];
@@ -116,6 +173,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url?.startsWith("/v1/products/") && req.method === "GET") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const id = decodeURIComponent(req.url.slice("/v1/products/".length));
       try {
         const product = await fetchProduct(id, { workflowSvcUrl: upstreamConfig.workflowSvcUrl });
@@ -133,6 +192,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url === "/v1/subscriptions" && req.method === "POST") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const chunks: Buffer[] = [];
       for await (const chunk of req) chunks.push(chunk as Buffer);
       const raw = Buffer.concat(chunks);
@@ -169,6 +230,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url?.startsWith("/v1/subscriptions/") && req.method === "GET") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const id = decodeURIComponent(req.url.slice("/v1/subscriptions/".length));
       try {
         const subscription = await fetchSubscription(id, { workflowSvcUrl: upstreamConfig.workflowSvcUrl });
@@ -186,6 +249,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url === "/v1/audit/events" && req.method === "POST") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const chunks: Buffer[] = [];
       for await (const chunk of req) chunks.push(chunk as Buffer);
       const raw = Buffer.concat(chunks);
@@ -222,6 +287,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url === "/v1/approvals" && req.method === "POST") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const chunks: Buffer[] = [];
       for await (const chunk of req) chunks.push(chunk as Buffer);
       const raw = Buffer.concat(chunks);
@@ -259,6 +326,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
 
     // /v1/approvals/{id}/decide POST — must be matched BEFORE the bare /{id} GET below
     if (req.url?.match(/^\/v1\/approvals\/[^/]+\/decide$/) && req.method === "POST") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const segments = req.url.split("/");
       const id = decodeURIComponent(segments[3] ?? "");
       const chunks: Buffer[] = [];
@@ -302,6 +371,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url?.startsWith("/v1/audit/events") && req.method === "GET") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const url = new URL(req.url, "http://_");
       const q: ListEventsQuery = {
         tenant_id: url.searchParams.get("tenant_id") ?? "",
@@ -331,6 +402,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url === "/v1/approvals" && req.method === "GET") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       try {
         const list = await listPendingApprovals({ approvalSvcUrl: upstreamConfig.approvalSvcUrl });
         respondJson(res, 200, list);
@@ -347,6 +420,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url?.startsWith("/v1/approvals/") && req.method === "GET") {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const id = decodeURIComponent(req.url.slice("/v1/approvals/".length));
       try {
         const approval = await fetchApproval(id, { approvalSvcUrl: upstreamConfig.approvalSvcUrl });
@@ -384,6 +459,8 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url?.startsWith("/v1/market-data/quotes/")) {
+      const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+      if (!session) return;
       const symbol = decodeURIComponent(req.url.slice("/v1/market-data/quotes/".length));
       try {
         const quote = await fetchQuote(symbol, {

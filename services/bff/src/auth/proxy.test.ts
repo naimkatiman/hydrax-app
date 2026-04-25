@@ -1,0 +1,226 @@
+import { describe, it, expect, afterEach } from "vitest";
+import http, { type IncomingMessage, type ServerResponse } from "node:http";
+import type { AddressInfo } from "node:net";
+import { proxyDevLogin, proxyWhoami, proxyLogout, AuthUpstreamError } from "./proxy.js";
+
+interface ControlledServer {
+  url: string;
+  lastReq: { method: string; url: string; headers: http.IncomingHttpHeaders; body: string } | null;
+  respond: (status: number, body: unknown) => void;
+  close(): Promise<void>;
+}
+
+async function startControlledServer(): Promise<ControlledServer> {
+  let lastReq: ControlledServer["lastReq"] = null;
+  let respondFn: ((status: number, body: unknown) => void) | null = null;
+
+  const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    const body = Buffer.concat(chunks).toString("utf8");
+    lastReq = { method: req.method ?? "", url: req.url ?? "", headers: req.headers, body };
+
+    await new Promise<void>((resolve) => {
+      const check = () => {
+        if (respondFn) {
+          resolve();
+        } else {
+          setImmediate(check);
+        }
+      };
+      check();
+    });
+
+    const fn = respondFn!;
+    respondFn = null;
+    fn(0, null); // this won't be called — respond sets it up per test
+  });
+
+  // Different approach: capture pending response and let test control it
+  const pending: Array<{ req: { method: string; url: string; headers: http.IncomingHttpHeaders; body: string }; res: ServerResponse }> = [];
+
+  const server2 = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    const body = Buffer.concat(chunks).toString("utf8");
+    lastReq = { method: req.method ?? "", url: req.url ?? "", headers: req.headers, body };
+    pending.push({ req: lastReq, res });
+  });
+
+  await new Promise<void>((resolve) => server2.listen(0, resolve));
+  const addr = server2.address() as AddressInfo;
+
+  const ctrl: ControlledServer = {
+    url: `http://127.0.0.1:${addr.port}`,
+    get lastReq() { return lastReq; },
+    respond(status: number, body: unknown) {
+      // poll for a pending request
+      const flush = () => {
+        const item = pending.shift();
+        if (!item) {
+          setImmediate(flush);
+          return;
+        }
+        item.res.writeHead(status, { "Content-Type": "application/json" });
+        item.res.end(JSON.stringify(body));
+      };
+      flush();
+    },
+    close: () =>
+      new Promise<void>((resolve, reject) =>
+        server2.close((err) => (err ? reject(err) : resolve())),
+      ),
+  };
+
+  // close the unused first server
+  server.close();
+
+  return ctrl;
+}
+
+// Simpler approach: use a routes map similar to workflow-svc mock
+interface MockSpec {
+  status: number;
+  body: unknown;
+}
+
+interface SimpleMock {
+  url: string;
+  setNext(spec: MockSpec): void;
+  lastReq: { method: string; url: string; headers: http.IncomingHttpHeaders; body: string } | null;
+  close(): Promise<void>;
+}
+
+async function startMockIntegrationSvc(): Promise<SimpleMock> {
+  let nextSpec: MockSpec = { status: 200, body: {} };
+  let lastReq: SimpleMock["lastReq"] = null;
+
+  const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    const body = Buffer.concat(chunks).toString("utf8");
+    lastReq = { method: req.method ?? "", url: req.url ?? "", headers: req.headers, body };
+    const spec = nextSpec;
+    res.writeHead(spec.status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(spec.body));
+  });
+
+  await new Promise<void>((resolve) => server.listen(0, resolve));
+  const addr = server.address() as AddressInfo;
+
+  return {
+    url: `http://127.0.0.1:${addr.port}`,
+    get lastReq() { return lastReq; },
+    setNext(spec: MockSpec) { nextSpec = spec; },
+    close: () =>
+      new Promise<void>((resolve, reject) =>
+        server.close((err) => (err ? reject(err) : resolve())),
+      ),
+  };
+}
+
+describe("proxyDevLogin", () => {
+  it("POSTs credentials and returns DevLoginResult on 200", async () => {
+    const mock = await startMockIntegrationSvc();
+    const expected = {
+      token: "tok_abc123",
+      session: {
+        id: "sess-1",
+        user_id: "user-1",
+        tenant_id: "tenant-1",
+        role: "investor",
+        expires_at: "2026-05-01T00:00:00.000Z",
+      },
+    };
+    mock.setNext({ status: 200, body: expected });
+    try {
+      const result = await proxyDevLogin(
+        { tenant_slug: "acme", email: "alice@example.com" },
+        { integrationSvcUrl: mock.url },
+      );
+      expect(result.token).toBe("tok_abc123");
+      expect(result.session.id).toBe("sess-1");
+      expect(result.session.role).toBe("investor");
+      expect(mock.lastReq?.method).toBe("POST");
+      expect(mock.lastReq?.url).toBe("/v1/auth/dev/login");
+      const parsed = JSON.parse(mock.lastReq?.body ?? "{}") as unknown;
+      expect((parsed as { tenant_slug: string }).tenant_slug).toBe("acme");
+    } finally {
+      await mock.close();
+    }
+  });
+
+  it("throws AuthUpstreamError with httpStatus 401 when upstream returns 401", async () => {
+    const mock = await startMockIntegrationSvc();
+    mock.setNext({ status: 401, body: { error: "dev_login_disabled" } });
+    try {
+      await expect(
+        proxyDevLogin(
+          { tenant_slug: "acme", email: "x@example.com" },
+          { integrationSvcUrl: mock.url },
+        ),
+      ).rejects.toSatisfy(
+        (err: unknown) =>
+          err instanceof AuthUpstreamError && err.httpStatus === 401,
+      );
+    } finally {
+      await mock.close();
+    }
+  });
+});
+
+describe("proxyWhoami", () => {
+  it("forwards bearer token and returns WhoamiResult on 200", async () => {
+    const mock = await startMockIntegrationSvc();
+    const expected = {
+      session_id: "sess-1",
+      user_id: "user-1",
+      tenant_id: "tenant-1",
+      tenant_slug: "acme",
+      email: "alice@example.com",
+      role: "investor",
+      expires_at: "2026-05-01T00:00:00.000Z",
+    };
+    mock.setNext({ status: 200, body: expected });
+    try {
+      const result = await proxyWhoami("test-token-abc", { integrationSvcUrl: mock.url });
+      expect(result.session_id).toBe("sess-1");
+      expect(result.email).toBe("alice@example.com");
+      expect(mock.lastReq?.headers.authorization).toBe("Bearer test-token-abc");
+    } finally {
+      await mock.close();
+    }
+  });
+
+  it("throws AuthUpstreamError with httpStatus 401 when upstream returns 401", async () => {
+    const mock = await startMockIntegrationSvc();
+    mock.setNext({ status: 401, body: { error: "invalid_token" } });
+    try {
+      await expect(
+        proxyWhoami("bad-token", { integrationSvcUrl: mock.url }),
+      ).rejects.toSatisfy(
+        (err: unknown) =>
+          err instanceof AuthUpstreamError && err.httpStatus === 401,
+      );
+    } finally {
+      await mock.close();
+    }
+  });
+});
+
+describe("proxyLogout", () => {
+  it("POSTs to /v1/auth/logout with bearer and resolves void on 204", async () => {
+    const mock = await startMockIntegrationSvc();
+    mock.setNext({ status: 204, body: null });
+    try {
+      await expect(
+        proxyLogout("test-token-abc", { integrationSvcUrl: mock.url }),
+      ).resolves.toBeUndefined();
+      expect(mock.lastReq?.method).toBe("POST");
+      expect(mock.lastReq?.url).toBe("/v1/auth/logout");
+      expect(mock.lastReq?.headers.authorization).toBe("Bearer test-token-abc");
+    } finally {
+      await mock.close();
+    }
+  });
+});

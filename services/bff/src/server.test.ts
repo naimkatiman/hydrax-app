@@ -3,6 +3,7 @@ import http, { type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { startServer } from "./server.js";
 import { loadUpstreamConfig } from "./bff/bff.js";
+import type { WhoamiResult } from "./auth/proxy.js";
 
 let server: Server;
 let baseUrl: string;
@@ -16,6 +17,129 @@ afterAll(async () => {
     server.close((err) => (err ? reject(err) : resolve())),
   );
 });
+
+// ── Mock helpers ──────────────────────────────────────────────────────────────
+
+const TEST_TOKEN = "test-token";
+
+const mockSession: WhoamiResult = {
+  session_id: "sess-1",
+  user_id: "usr-1",
+  tenant_id: "ten-1",
+  tenant_slug: "acme",
+  email: "alice@acme.com",
+  role: "issuer",
+  expires_at: "2099-01-01T00:00:00Z",
+};
+
+interface MockHandlerSpec {
+  readonly status: number;
+  readonly body: unknown;
+  readonly transportError?: boolean;
+}
+
+interface MockUpstream {
+  readonly url: string;
+  close(): Promise<void>;
+  readonly received: Array<{ method: string; url: string; body: string }>;
+}
+
+async function startMockIntegrationSvc(): Promise<MockUpstream> {
+  const received: Array<{ method: string; url: string; body: string }> = [];
+  const server = http.createServer(async (req, res) => {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    const body = Buffer.concat(chunks).toString("utf8");
+    received.push({ method: req.method ?? "", url: req.url ?? "", body });
+
+    if (req.url === "/v1/auth/whoami" && req.method === "GET") {
+      const auth = req.headers["authorization"];
+      if (!auth || !auth.startsWith("Bearer ")) {
+        res.writeHead(401, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "unauthorized" }));
+        return;
+      }
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(mockSession));
+      return;
+    }
+
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "mock_not_found" }));
+  });
+  await new Promise<void>((resolve) => server.listen(0, resolve));
+  const addr = server.address() as AddressInfo;
+  return {
+    url: `http://127.0.0.1:${addr.port}`,
+    received,
+    close: () =>
+      new Promise<void>((resolve, reject) =>
+        server.close((err) => (err ? reject(err) : resolve())),
+      ),
+  };
+}
+
+async function startMockWorkflowSvc(routes: Record<string, MockHandlerSpec>): Promise<MockUpstream> {
+  const received: Array<{ method: string; url: string; body: string }> = [];
+  const server = http.createServer(async (req, res) => {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    const body = Buffer.concat(chunks).toString("utf8");
+    received.push({ method: req.method ?? "", url: req.url ?? "", body });
+    const key = `${req.method} ${req.url}`;
+    const matchKey =
+      Object.keys(routes).find((k) => k === key) ??
+      Object.keys(routes).find((k) => {
+        const [m, u] = k.split(" ");
+        return m === req.method && u && req.url?.startsWith(u);
+      });
+    if (!matchKey) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "mock_not_found" }));
+      return;
+    }
+    const spec = routes[matchKey];
+    if (!spec) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "mock_misconfigured" }));
+      return;
+    }
+    if (spec.transportError) {
+      // Forcibly close the socket to provoke a transport error in the bff.
+      req.socket.destroy();
+      return;
+    }
+    res.writeHead(spec.status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(spec.body));
+  });
+  await new Promise<void>((resolve) => server.listen(0, resolve));
+  const addr = server.address() as AddressInfo;
+  return {
+    url: `http://127.0.0.1:${addr.port}`,
+    received,
+    close: () =>
+      new Promise<void>((resolve, reject) =>
+        server.close((err) => (err ? reject(err) : resolve())),
+      ),
+  };
+}
+
+async function startBffWithUpstream(
+  workflowSvcUrl: string,
+  integrationSvcUrl: string,
+): Promise<{ baseUrl: string; close(): Promise<void> }> {
+  const upstreamConfig = { ...loadUpstreamConfig(process.env), workflowSvcUrl, integrationSvcUrl };
+  const { server: s, baseUrl: u } = await startServer({ port: 0, service: "bff", upstreamConfig });
+  return {
+    baseUrl: u,
+    close: () =>
+      new Promise<void>((resolve, reject) =>
+        s.close((err) => (err ? reject(err) : resolve())),
+      ),
+  };
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe("bff /healthz", () => {
   it("returns 200 with service identity", async () => {
@@ -65,74 +189,21 @@ describe("bff /v1/products/{id} method guard", () => {
   });
 });
 
-interface MockHandlerSpec {
-  readonly status: number;
-  readonly body: unknown;
-  readonly transportError?: boolean;
-}
-
-interface MockUpstream {
-  readonly url: string;
-  close(): Promise<void>;
-  readonly received: Array<{ method: string; url: string; body: string }>;
-}
-
-async function startMockWorkflowSvc(routes: Record<string, MockHandlerSpec>): Promise<MockUpstream> {
-  const received: Array<{ method: string; url: string; body: string }> = [];
-  const server = http.createServer(async (req, res) => {
-    const chunks: Buffer[] = [];
-    for await (const chunk of req) chunks.push(chunk as Buffer);
-    const body = Buffer.concat(chunks).toString("utf8");
-    received.push({ method: req.method ?? "", url: req.url ?? "", body });
-    const key = `${req.method} ${req.url}`;
-    const matchKey =
-      Object.keys(routes).find((k) => k === key) ??
-      Object.keys(routes).find((k) => {
-        const [m, u] = k.split(" ");
-        return m === req.method && u && req.url?.startsWith(u);
-      });
-    if (!matchKey) {
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "mock_not_found" }));
-      return;
+describe("bff auth: requireSession enforcement", () => {
+  it("returns 401 when Authorization header is missing on a protected route", async () => {
+    const integrationSvc = await startMockIntegrationSvc();
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/products/abc`, { method: "GET" });
+      expect(res.status).toBe(401);
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
     }
-    const spec = routes[matchKey];
-    if (!spec) {
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "mock_misconfigured" }));
-      return;
-    }
-    if (spec.transportError) {
-      // Forcibly close the socket to provoke a transport error in the bff.
-      req.socket.destroy();
-      return;
-    }
-    res.writeHead(spec.status, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(spec.body));
   });
-  await new Promise<void>((resolve) => server.listen(0, resolve));
-  const addr = server.address() as AddressInfo;
-  return {
-    url: `http://127.0.0.1:${addr.port}`,
-    received,
-    close: () =>
-      new Promise<void>((resolve, reject) =>
-        server.close((err) => (err ? reject(err) : resolve())),
-      ),
-  };
-}
-
-async function startBffWithUpstream(workflowSvcUrl: string): Promise<{ baseUrl: string; close(): Promise<void> }> {
-  const upstreamConfig = { ...loadUpstreamConfig(process.env), workflowSvcUrl };
-  const { server: s, baseUrl: u } = await startServer({ port: 0, service: "bff", upstreamConfig });
-  return {
-    baseUrl: u,
-    close: () =>
-      new Promise<void>((resolve, reject) =>
-        s.close((err) => (err ? reject(err) : resolve())),
-      ),
-  };
-}
+});
 
 describe("bff /v1/subscriptions POST", () => {
   it("returns 201 with the subscription on upstream success", async () => {
@@ -151,11 +222,12 @@ describe("bff /v1/subscriptions POST", () => {
         },
       },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
       const res = await fetch(`${bff.baseUrl}/v1/subscriptions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TEST_TOKEN}` },
         body: JSON.stringify({
           product_id: "prod-1",
           investor_user_id: "user-1",
@@ -172,6 +244,7 @@ describe("bff /v1/subscriptions POST", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 
@@ -182,11 +255,12 @@ describe("bff /v1/subscriptions POST", () => {
         body: { error: "missing_fields", message: "product_id required" },
       },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
       const res = await fetch(`${bff.baseUrl}/v1/subscriptions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TEST_TOKEN}` },
         body: JSON.stringify({ currency: "USD" }),
       });
       expect(res.status).toBe(400);
@@ -195,6 +269,7 @@ describe("bff /v1/subscriptions POST", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 
@@ -202,11 +277,12 @@ describe("bff /v1/subscriptions POST", () => {
     const upstream = await startMockWorkflowSvc({
       "POST /v1/subscriptions": { status: 0, body: null, transportError: true },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
       const res = await fetch(`${bff.baseUrl}/v1/subscriptions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TEST_TOKEN}` },
         body: JSON.stringify({
           product_id: "prod-1",
           investor_user_id: "user-1",
@@ -220,6 +296,7 @@ describe("bff /v1/subscriptions POST", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 
@@ -253,9 +330,12 @@ describe("bff /v1/subscriptions/{id} GET", () => {
         },
       },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
-      const res = await fetch(`${bff.baseUrl}/v1/subscriptions/sub-2`);
+      const res = await fetch(`${bff.baseUrl}/v1/subscriptions/sub-2`, {
+        headers: { "Authorization": `Bearer ${TEST_TOKEN}` },
+      });
       expect(res.status).toBe(200);
       const body = (await res.json()) as { id: string };
       expect(body.id).toBe("sub-2");
@@ -263,6 +343,7 @@ describe("bff /v1/subscriptions/{id} GET", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 
@@ -273,15 +354,19 @@ describe("bff /v1/subscriptions/{id} GET", () => {
         body: { error: "not_found", message: "no subscription with that id" },
       },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
-      const res = await fetch(`${bff.baseUrl}/v1/subscriptions/missing`);
+      const res = await fetch(`${bff.baseUrl}/v1/subscriptions/missing`, {
+        headers: { "Authorization": `Bearer ${TEST_TOKEN}` },
+      });
       expect(res.status).toBe(404);
       const body = (await res.json()) as { error: string };
       expect(body.error).toBe("subscriptions_upstream");
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 });
@@ -304,11 +389,12 @@ describe("bff /v1/products/{id}/transition POST", () => {
         },
       },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
       const res = await fetch(`${bff.baseUrl}/v1/products/abc/transition`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TEST_TOKEN}` },
         body: JSON.stringify({ to: "approved" }),
       });
       expect(res.status).toBe(200);
@@ -322,6 +408,7 @@ describe("bff /v1/products/{id}/transition POST", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 
@@ -332,11 +419,12 @@ describe("bff /v1/products/{id}/transition POST", () => {
         body: { error: "invalid_transition", message: "pending->matured not allowed" },
       },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
       const res = await fetch(`${bff.baseUrl}/v1/products/abc/transition`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TEST_TOKEN}` },
         body: JSON.stringify({ to: "matured" }),
       });
       expect(res.status).toBe(422);
@@ -345,6 +433,7 @@ describe("bff /v1/products/{id}/transition POST", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 
@@ -352,11 +441,12 @@ describe("bff /v1/products/{id}/transition POST", () => {
     const upstream = await startMockWorkflowSvc({
       "POST /v1/products/abc/transition": { status: 0, body: null, transportError: true },
     });
-    const bff = await startBffWithUpstream(upstream.url);
+    const integrationSvc = await startMockIntegrationSvc();
+    const bff = await startBffWithUpstream(upstream.url, integrationSvc.url);
     try {
       const res = await fetch(`${bff.baseUrl}/v1/products/abc/transition`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TEST_TOKEN}` },
         body: JSON.stringify({ to: "approved" }),
       });
       expect(res.status).toBe(502);
@@ -365,6 +455,7 @@ describe("bff /v1/products/{id}/transition POST", () => {
     } finally {
       await bff.close();
       await upstream.close();
+      await integrationSvc.close();
     }
   });
 });
