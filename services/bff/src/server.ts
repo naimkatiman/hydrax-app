@@ -20,7 +20,7 @@ import {
   ApprovalsUpstreamError,
 } from "./approvals/proxy.js";
 import { proxyDevLogin, proxyLogout, AuthUpstreamError } from "./auth/proxy.js";
-import { requireSession } from "./auth/middleware.js";
+import { extractBearer, requireSession } from "./auth/middleware.js";
 
 export interface StartOptions {
   port: number;
@@ -71,8 +71,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
 
     if (req.url === "/v1/auth/logout" && req.method === "POST") {
-      const authHeader = req.headers["authorization"];
-      const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : "";
+      const token = extractBearer(req) ?? "";
       try {
         await proxyLogout(token, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
         respondJson(res, 204, {});

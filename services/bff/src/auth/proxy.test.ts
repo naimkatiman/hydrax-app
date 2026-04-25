@@ -1,98 +1,17 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import { proxyDevLogin, proxyWhoami, proxyLogout, AuthUpstreamError } from "./proxy.js";
 
-interface ControlledServer {
-  url: string;
-  lastReq: { method: string; url: string; headers: http.IncomingHttpHeaders; body: string } | null;
-  respond: (status: number, body: unknown) => void;
-  close(): Promise<void>;
-}
-
-async function startControlledServer(): Promise<ControlledServer> {
-  let lastReq: ControlledServer["lastReq"] = null;
-  let respondFn: ((status: number, body: unknown) => void) | null = null;
-
-  const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
-    const chunks: Buffer[] = [];
-    for await (const chunk of req) chunks.push(chunk as Buffer);
-    const body = Buffer.concat(chunks).toString("utf8");
-    lastReq = { method: req.method ?? "", url: req.url ?? "", headers: req.headers, body };
-
-    await new Promise<void>((resolve) => {
-      const check = () => {
-        if (respondFn) {
-          resolve();
-        } else {
-          setImmediate(check);
-        }
-      };
-      check();
-    });
-
-    const fn = respondFn!;
-    respondFn = null;
-    fn(0, null); // this won't be called — respond sets it up per test
-  });
-
-  // Different approach: capture pending response and let test control it
-  const pending: Array<{ req: { method: string; url: string; headers: http.IncomingHttpHeaders; body: string }; res: ServerResponse }> = [];
-
-  const server2 = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
-    const chunks: Buffer[] = [];
-    for await (const chunk of req) chunks.push(chunk as Buffer);
-    const body = Buffer.concat(chunks).toString("utf8");
-    lastReq = { method: req.method ?? "", url: req.url ?? "", headers: req.headers, body };
-    pending.push({ req: lastReq, res });
-  });
-
-  await new Promise<void>((resolve) => server2.listen(0, resolve));
-  const addr = server2.address() as AddressInfo;
-
-  const ctrl: ControlledServer = {
-    url: `http://127.0.0.1:${addr.port}`,
-    get lastReq() { return lastReq; },
-    respond(status: number, body: unknown) {
-      // poll for a pending request
-      const flush = () => {
-        const item = pending.shift();
-        if (!item) {
-          setImmediate(flush);
-          return;
-        }
-        item.res.writeHead(status, { "Content-Type": "application/json" });
-        item.res.end(JSON.stringify(body));
-      };
-      flush();
-    },
-    close: () =>
-      new Promise<void>((resolve, reject) =>
-        server2.close((err) => (err ? reject(err) : resolve())),
-      ),
-  };
-
-  // close the unused first server
-  server.close();
-
-  return ctrl;
-}
-
-// Simpler approach: use a routes map similar to workflow-svc mock
-interface MockSpec {
-  status: number;
-  body: unknown;
-}
-
 interface SimpleMock {
   url: string;
-  setNext(spec: MockSpec): void;
+  setNext(spec: { status: number; body: unknown }): void;
   lastReq: { method: string; url: string; headers: http.IncomingHttpHeaders; body: string } | null;
   close(): Promise<void>;
 }
 
 async function startMockIntegrationSvc(): Promise<SimpleMock> {
-  let nextSpec: MockSpec = { status: 200, body: {} };
+  let nextSpec: { status: number; body: unknown } = { status: 200, body: {} };
   let lastReq: SimpleMock["lastReq"] = null;
 
   const server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
@@ -111,7 +30,7 @@ async function startMockIntegrationSvc(): Promise<SimpleMock> {
   return {
     url: `http://127.0.0.1:${addr.port}`,
     get lastReq() { return lastReq; },
-    setNext(spec: MockSpec) { nextSpec = spec; },
+    setNext(spec: { status: number; body: unknown }) { nextSpec = spec; },
     close: () =>
       new Promise<void>((resolve, reject) =>
         server.close((err) => (err ? reject(err) : resolve())),

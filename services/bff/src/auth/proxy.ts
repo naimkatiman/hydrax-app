@@ -81,7 +81,7 @@ export async function proxyLogout(
     method: "POST",
     headers: { authorization: `Bearer ${token}` },
   });
-  if (!res.ok && res.status !== 204) {
+  if (!res.ok) {
     throw new AuthUpstreamError(`logout: upstream ${res.status}`, res.status);
   }
 }

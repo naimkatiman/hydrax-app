@@ -67,16 +67,11 @@ describe("requireSession", () => {
 
   it("writes 401 and returns null when Authorization header is missing", async () => {
     const req = { headers: {} } as unknown as http.IncomingMessage;
-    const chunks: Buffer[] = [];
-    const res = {
-      writeHead: () => {},
-      end: (chunk: string) => chunks.push(Buffer.from(chunk)),
-    } as unknown as http.ServerResponse;
-
     let writeHeadStatus = 0;
-    (res as unknown as { writeHead: (s: number) => void }).writeHead = (s: number) => {
-      writeHeadStatus = s;
-    };
+    const res = {
+      writeHead: (s: number) => { writeHeadStatus = s; },
+      end: () => {},
+    } as unknown as http.ServerResponse;
 
     const result = await requireSession(req, res, { integrationSvcUrl: "http://localhost:0" });
     expect(result).toBeNull();
@@ -91,11 +86,10 @@ describe("requireSession", () => {
     mockServers.push(server);
 
     const req = { headers: { authorization: "Bearer bad-token" } } as unknown as http.IncomingMessage;
-    const chunks: Buffer[] = [];
     let writeHeadStatus = 0;
     const res = {
       writeHead: (s: number) => { writeHeadStatus = s; },
-      end: (chunk: string) => chunks.push(Buffer.from(chunk)),
+      end: () => {},
     } as unknown as http.ServerResponse;
 
     const result = await requireSession(req, res, { integrationSvcUrl: url });
