@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"sort"
 	"testing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -142,4 +143,156 @@ func TestGetProduct404OnUnknown(t *testing.T) {
 	if rr.Code != http.StatusNotFound {
 		t.Fatalf("status: got %d want 404", rr.Code)
 	}
+}
+
+func TestTransitionPendingToApprovedReturns200WithUpdatedProduct(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "t1xa", "T1XA-CODE")
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"approved"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var got productResponse
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got.Status != "approved" {
+		t.Errorf("status = %q, want approved", got.Status)
+	}
+	wantNext := []string{"active", "cancelled"}
+	if !equalStringSets(got.AllowedNext, wantNext) {
+		t.Errorf("allowed_next = %v, want %v (any order)", got.AllowedNext, wantNext)
+	}
+}
+
+func TestTransitionPendingToActiveReturns422(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "t2xa", "T2XA-CODE")
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{"to":"active"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo)(rr, req)
+
+	if rr.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("status: got %d want 422; body=%s", rr.Code, rr.Body.String())
+	}
+	var errBody map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&errBody); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if errBody["error"] != "invalid_transition" {
+		t.Errorf("error code = %q, want invalid_transition", errBody["error"])
+	}
+}
+
+func TestTransitionUnknownIDReturns404(t *testing.T) {
+	repo := txProducts(t)
+	bogus := "00000000-0000-0000-0000-000000000000"
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+bogus+"/transition",
+		bytes.NewReader([]byte(`{"to":"approved"}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", bogus)
+	rr := httptest.NewRecorder()
+
+	Transition(repo)(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Errorf("status: got %d want 404; body=%s", rr.Code, rr.Body.String())
+	}
+}
+
+func TestTransitionMissingToFieldReturns400(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "t3xa", "T3XA-CODE")
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/products/"+id+"/transition",
+		bytes.NewReader([]byte(`{}`)))
+	req.Header.Set("Content-Type", "application/json")
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Transition(repo)(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("status: got %d want 400; body=%s", rr.Code, rr.Body.String())
+	}
+}
+
+func TestGetProductIncludesAllowedNext(t *testing.T) {
+	repo := txProducts(t)
+	id := seedPendingProduct(t, repo, "t4xa", "T4XA-CODE")
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/products/"+id, nil)
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+
+	Get(repo)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var got productResponse
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	want := []string{"approved", "cancelled"} // pending product
+	if !equalStringSets(got.AllowedNext, want) {
+		t.Errorf("allowed_next = %v, want %v", got.AllowedNext, want)
+	}
+}
+
+// helpers
+
+// equalStringSets returns true if a and b contain the same strings,
+// regardless of order. Used for AllowedNext assertions since
+// lifecycle.AllowedNext returns unordered slice and the handler sorts;
+// the test should not depend on the handler's sort behavior.
+func equalStringSets(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	ac := append([]string(nil), a...)
+	bc := append([]string(nil), b...)
+	sort.Strings(ac)
+	sort.Strings(bc)
+	for i := range ac {
+		if ac[i] != bc[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// seedPendingProduct seeds a tenant + a pending product, returning the
+// product id. Each call uses a unique tenant slug derived from `tag`.
+func seedPendingProduct(t *testing.T, repo *products.Products, tag, code string) string {
+	t.Helper()
+	var tenantID string
+	err := repo.Tx().QueryRowContext(context.Background(),
+		`INSERT INTO tenants (slug, name, persona) VALUES ($1, $2, 'issuer') RETURNING id`,
+		tag, "T-"+tag,
+	).Scan(&tenantID)
+	if err != nil {
+		t.Fatalf("seed tenant: %v", err)
+	}
+	p, err := repo.Insert(context.Background(), products.ProductInput{
+		TenantID: tenantID, Code: code, Name: "T-product", ProductType: "short_duration_credit",
+	})
+	if err != nil {
+		t.Fatalf("insert product: %v", err)
+	}
+	return p.ID
 }
