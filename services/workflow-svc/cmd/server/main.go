@@ -54,6 +54,7 @@ func main() {
 		pool = p
 		repo := products.New(p)
 		mux.HandleFunc("POST /v1/products", handlers.Create(repo))
+		mux.HandleFunc("GET /v1/products", handlers.List(repo))
 		mux.HandleFunc("GET /v1/products/{id}", handlers.Get(repo))
 		mux.HandleFunc("POST /v1/products/{id}/transition", handlers.Transition(repo))
 		log.Printf("%s product routes enabled (db=%s)", serviceName, redactDSN(dbURL))

@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"sort"
+	"strconv"
 	"testing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -274,6 +275,154 @@ func equalStringSets(a, b []string) bool {
 		}
 	}
 	return true
+}
+
+// seedTenant inserts a tenants row inside the bound Tx and returns its
+// id. Lets List tests seed multiple products under the same tenant
+// without depending on seedPendingProduct's one-tenant-per-call shape.
+func seedTenant(t *testing.T, repo *products.Products, tag string) string {
+	t.Helper()
+	var tenantID string
+	err := repo.Tx().QueryRowContext(context.Background(),
+		`INSERT INTO tenants (slug, name, persona) VALUES ($1, $2, 'issuer') RETURNING id`,
+		tag, "T-"+tag,
+	).Scan(&tenantID)
+	if err != nil {
+		t.Fatalf("seed tenant: %v", err)
+	}
+	return tenantID
+}
+
+func TestListProducts200WithRows(t *testing.T) {
+	repo := txProducts(t)
+	tenantID := seedTenant(t, repo, "tlist1")
+	for i := 0; i < 3; i++ {
+		if _, err := repo.Insert(context.Background(), products.ProductInput{
+			TenantID: tenantID, Code: "L1-" + strconv.Itoa(i), Name: "L1", ProductType: "short_duration_credit",
+		}); err != nil {
+			t.Fatalf("insert product %d: %v", i, err)
+		}
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/products?tenant_id="+tenantID, nil)
+	rr := httptest.NewRecorder()
+	List(repo)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var body listResponse
+	if err := json.NewDecoder(rr.Body).Decode(&body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if len(body.Products) != 3 {
+		t.Errorf("products: got %d want 3", len(body.Products))
+	}
+	if body.NextOffset != nil {
+		t.Errorf("next_offset: got %v want nil (page not full)", *body.NextOffset)
+	}
+}
+
+func TestListProducts200EmptyForUnknownTenant(t *testing.T) {
+	repo := txProducts(t)
+	tenantID := seedTenant(t, repo, "tlist2") // tenant exists but no products
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/products?tenant_id="+tenantID, nil)
+	rr := httptest.NewRecorder()
+	List(repo)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var body listResponse
+	if err := json.NewDecoder(rr.Body).Decode(&body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if len(body.Products) != 0 {
+		t.Errorf("products: got %d want 0", len(body.Products))
+	}
+	// JSON decoder gives []productResponse{} not nil; assertion is on length.
+	if body.NextOffset != nil {
+		t.Errorf("next_offset: got %v want nil (empty page)", *body.NextOffset)
+	}
+}
+
+func TestListProducts400MissingTenant(t *testing.T) {
+	repo := txProducts(t)
+	req := httptest.NewRequest(http.MethodGet, "/v1/products", nil)
+	rr := httptest.NewRecorder()
+	List(repo)(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("status: got %d want 400; body=%s", rr.Code, rr.Body.String())
+	}
+	var ebody map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&ebody); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if ebody["error"] != "missing_tenant" {
+		t.Errorf("error code: got %q want missing_tenant", ebody["error"])
+	}
+}
+
+func TestListProducts400BadLimit(t *testing.T) {
+	repo := txProducts(t)
+	req := httptest.NewRequest(http.MethodGet, "/v1/products?tenant_id=t&limit=zero", nil)
+	rr := httptest.NewRecorder()
+	List(repo)(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("status: got %d want 400; body=%s", rr.Code, rr.Body.String())
+	}
+	var ebody map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&ebody); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if ebody["error"] != "bad_query" {
+		t.Errorf("error code: got %q want bad_query", ebody["error"])
+	}
+}
+
+func TestListProducts405OnNonGET(t *testing.T) {
+	repo := txProducts(t)
+	req := httptest.NewRequest(http.MethodPost, "/v1/products?tenant_id=t", nil)
+	rr := httptest.NewRecorder()
+	List(repo)(rr, req)
+
+	if rr.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("status: got %d want 405; body=%s", rr.Code, rr.Body.String())
+	}
+}
+
+func TestListProducts200NextOffsetSetWhenPageFull(t *testing.T) {
+	repo := txProducts(t)
+	tenantID := seedTenant(t, repo, "tlist3")
+	for i := 0; i < 3; i++ {
+		if _, err := repo.Insert(context.Background(), products.ProductInput{
+			TenantID: tenantID, Code: "L3-" + strconv.Itoa(i), Name: "L3", ProductType: "short_duration_credit",
+		}); err != nil {
+			t.Fatalf("insert product %d: %v", i, err)
+		}
+	}
+
+	// Page size 2 with 3 products: first page should be full → next_offset=2.
+	req := httptest.NewRequest(http.MethodGet, "/v1/products?tenant_id="+tenantID+"&limit=2", nil)
+	rr := httptest.NewRecorder()
+	List(repo)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var body listResponse
+	if err := json.NewDecoder(rr.Body).Decode(&body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if len(body.Products) != 2 {
+		t.Errorf("products: got %d want 2", len(body.Products))
+	}
+	if body.NextOffset == nil || *body.NextOffset != 2 {
+		t.Errorf("next_offset: got %v want 2", body.NextOffset)
+	}
 }
 
 // seedPendingProduct seeds a tenant + a pending product, returning the

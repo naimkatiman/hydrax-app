@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"sort"
+	"strconv"
 
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/lifecycle"
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/products"
@@ -118,6 +119,90 @@ func isUniqueViolation(err error) bool {
 		return true
 	}
 	return false
+}
+
+// listResponse is the JSON shape returned by GET /v1/products. NextOffset
+// is a cheap "probably more rows" hint: set to offset+len(products) when
+// the response is full (len == limit), nil otherwise. No total count to
+// keep the query cheap.
+type listResponse struct {
+	Products   []productResponse `json:"products"`
+	NextOffset *int              `json:"next_offset"`
+}
+
+const (
+	listDefaultLimit = 50
+	listMaxLimit     = 100
+)
+
+// List handles GET /v1/products?tenant_id=&limit=&offset=. Returns
+//
+//	200 with {"products":[...], "next_offset": <int|null>} on success
+//	400 on missing tenant_id or unparseable limit/offset
+//	405 on non-GET
+//	500 on db failure
+//
+// Tenant scoping is mandatory — the caller (BFF) is responsible for
+// supplying the tenant_id derived from the session. workflow-svc trusts
+// that caller in this slice; future slice replaces the query param with
+// a header propagated by auth middleware.
+func List(repo *products.Products) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "GET only")
+			return
+		}
+		q := r.URL.Query()
+		tenantID := q.Get("tenant_id")
+		if tenantID == "" {
+			errorJSON(w, http.StatusBadRequest, "missing_tenant", "tenant_id query param required")
+			return
+		}
+
+		limit := listDefaultLimit
+		if raw := q.Get("limit"); raw != "" {
+			n, err := strconv.Atoi(raw)
+			if err != nil || n <= 0 {
+				errorJSON(w, http.StatusBadRequest, "bad_query", "limit must be a positive integer")
+				return
+			}
+			limit = n
+			if limit > listMaxLimit {
+				limit = listMaxLimit
+			}
+		}
+
+		offset := 0
+		if raw := q.Get("offset"); raw != "" {
+			n, err := strconv.Atoi(raw)
+			if err != nil || n < 0 {
+				errorJSON(w, http.StatusBadRequest, "bad_query", "offset must be a non-negative integer")
+				return
+			}
+			offset = n
+		}
+
+		got, err := repo.List(r.Context(), tenantID, limit, offset)
+		if err != nil {
+			log.Printf("workflow-svc: products.List(%q, limit=%d, offset=%d): %v", tenantID, limit, offset, err)
+			errorJSON(w, http.StatusInternalServerError, "internal", "an internal error occurred")
+			return
+		}
+
+		out := make([]productResponse, 0, len(got))
+		for _, p := range got {
+			out = append(out, toResponse(p))
+		}
+		var next *int
+		if len(out) == limit {
+			n := offset + len(out)
+			next = &n
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(listResponse{Products: out, NextOffset: next})
+	}
 }
 
 // Get handles GET /v1/products/{id}. Returns 200 with the row, 404 if

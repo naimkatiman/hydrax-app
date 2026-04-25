@@ -33,6 +33,7 @@ func IsStaleStatus(err error) bool {
 // Lets callers (and tests) bind the repo to a Tx for rollback semantics.
 type querier interface {
 	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 }
 
 // Products is the product-table repository. Caller owns lifetime of the
@@ -103,6 +104,41 @@ func (p *Products) UpdateStatus(ctx context.Context, id, fromStatus, toStatus st
 		return nil, fmt.Errorf("products.UpdateStatus(%q, %q->%q): %w", id, fromStatus, toStatus, err)
 	}
 	return &got, nil
+}
+
+// List returns up to limit products for the given tenant, ordered by
+// created_at DESC, skipping the first offset rows. Limit must be > 0;
+// callers should clamp at the handler level (the repo trusts its
+// inputs). Returns an empty slice (never nil) when no rows match.
+func (p *Products) List(ctx context.Context, tenantID string, limit, offset int) ([]*Product, error) {
+	const q = `
+		SELECT id, tenant_id, code, name, product_type, status, rails_product_id, created_at, updated_at
+		FROM products
+		WHERE tenant_id = $1
+		ORDER BY created_at DESC
+		LIMIT $2 OFFSET $3
+	`
+	rows, err := p.tx.QueryContext(ctx, q, tenantID, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("products.List(%q): %w", tenantID, err)
+	}
+	defer rows.Close()
+
+	out := make([]*Product, 0, limit)
+	for rows.Next() {
+		var got Product
+		if err := rows.Scan(
+			&got.ID, &got.TenantID, &got.Code, &got.Name, &got.ProductType,
+			&got.Status, &got.RailsProductID, &got.CreatedAt, &got.UpdatedAt,
+		); err != nil {
+			return nil, fmt.Errorf("products.List(%q): scan: %w", tenantID, err)
+		}
+		out = append(out, &got)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("products.List(%q): rows: %w", tenantID, err)
+	}
+	return out, nil
 }
 
 // GetByID returns the product with the given id, or an error for which
