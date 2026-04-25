@@ -25,9 +25,9 @@ func openTestDB(t *testing.T) *sql.DB {
 	return db
 }
 
-// withTx wraps a test in a Tx that always rolls back. Returns a *Products
-// bound to that Tx so all writes vanish on cleanup.
-func withTx(t *testing.T) (context.Context, *Products) {
+// withTx wraps a test in a Tx that always rolls back. Returns the context,
+// a *Products bound to that Tx, and the raw *sql.Tx for direct seed queries.
+func withTx(t *testing.T) (context.Context, *Products, *sql.Tx) {
 	t.Helper()
 	db := openTestDB(t)
 	tx, err := db.BeginTx(context.Background(), nil)
@@ -35,15 +35,16 @@ func withTx(t *testing.T) (context.Context, *Products) {
 		t.Fatalf("BeginTx: %v", err)
 	}
 	t.Cleanup(func() { _ = tx.Rollback() })
-	return context.Background(), New(tx)
+	return context.Background(), New(tx), tx
 }
 
-// seedTenant inserts a throwaway tenant inside the same Tx and returns
-// its id. Rolls back with the test.
-func seedTenant(t *testing.T, ctx context.Context, repo *Products) string {
+// seedTenant inserts a throwaway tenant inside the given Tx and returns
+// its id. Rolls back with the test. Takes the *sql.Tx directly so this
+// helper does not couple to the unexported Products.tx field.
+func seedTenant(t *testing.T, ctx context.Context, tx *sql.Tx) string {
 	t.Helper()
 	var id string
-	err := repo.tx.QueryRowContext(ctx,
+	err := tx.QueryRowContext(ctx,
 		`INSERT INTO tenants (slug, name, persona) VALUES ($1, $2, 'issuer') RETURNING id`,
 		"acme-test", "Acme Test Issuer",
 	).Scan(&id)
@@ -54,8 +55,8 @@ func seedTenant(t *testing.T, ctx context.Context, repo *Products) string {
 }
 
 func TestInsertReturnsRowWithDefaults(t *testing.T) {
-	ctx, repo := withTx(t)
-	tenantID := seedTenant(t, ctx, repo)
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
 
 	got, err := repo.Insert(ctx, ProductInput{
 		TenantID:    tenantID,
@@ -78,8 +79,8 @@ func TestInsertReturnsRowWithDefaults(t *testing.T) {
 }
 
 func TestGetByIDReturnsInsertedRow(t *testing.T) {
-	ctx, repo := withTx(t)
-	tenantID := seedTenant(t, ctx, repo)
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
 
 	created, err := repo.Insert(ctx, ProductInput{
 		TenantID:    tenantID,
@@ -104,7 +105,7 @@ func TestGetByIDReturnsInsertedRow(t *testing.T) {
 }
 
 func TestGetByIDReturnsErrNotFoundForUnknown(t *testing.T) {
-	ctx, repo := withTx(t)
+	ctx, repo, _ := withTx(t)
 	_, err := repo.GetByID(ctx, "00000000-0000-0000-0000-000000000000")
 	if err == nil {
 		t.Fatal("expected error for unknown ID, got nil")
@@ -115,8 +116,8 @@ func TestGetByIDReturnsErrNotFoundForUnknown(t *testing.T) {
 }
 
 func TestInsertRejectsDuplicateTenantCode(t *testing.T) {
-	ctx, repo := withTx(t)
-	tenantID := seedTenant(t, ctx, repo)
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
 	input := ProductInput{
 		TenantID:    tenantID,
 		Code:        "DUPE-001",

@@ -11,9 +11,10 @@ import (
 var errNotFound = errors.New("products: not found")
 
 // IsNotFound reports whether err is a "row not found" error from this
-// package. Wraps sql.ErrNoRows-shaped misses.
+// package. GetByID wraps sql.ErrNoRows into errNotFound via %w before
+// returning, so callers should never need to inspect sql.ErrNoRows directly.
 func IsNotFound(err error) bool {
-	return errors.Is(err, errNotFound) || errors.Is(err, sql.ErrNoRows)
+	return errors.Is(err, errNotFound)
 }
 
 // querier is the subset of *sql.DB / *sql.Tx the repo actually uses.
