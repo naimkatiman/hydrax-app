@@ -36,7 +36,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     if (authOpts && mountAuthRoutes(req, res, authOpts)) return;
 
     res.writeHead(404, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "not found" }));
+    res.end(JSON.stringify({ error: "not_found" }));
   });
 
   return new Promise((resolve) => {
