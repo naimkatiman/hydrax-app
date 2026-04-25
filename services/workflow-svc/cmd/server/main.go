@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -86,27 +87,12 @@ func main() {
 }
 
 // redactDSN strips credentials from a Postgres URL for logging.
-// "postgres://user:pass@host:5432/db" → "postgres://***@host:5432/db".
+// Uses url.URL.Redacted (Go 1.15+) which masks the password while
+// preserving scheme, user, host, port, path, and query string.
 func redactDSN(dsn string) string {
-	at := -1
-	for i := len(dsn) - 1; i >= 0; i-- {
-		if dsn[i] == '@' {
-			at = i
-			break
-		}
+	u, err := url.Parse(dsn)
+	if err != nil {
+		return "<unparseable-dsn>"
 	}
-	if at < 0 {
-		return dsn
-	}
-	scheme := 0
-	for i := 0; i < at; i++ {
-		if i+2 < len(dsn) && dsn[i] == ':' && dsn[i+1] == '/' && dsn[i+2] == '/' {
-			scheme = i + 3
-			break
-		}
-	}
-	if scheme == 0 {
-		return "<redacted>"
-	}
-	return dsn[:scheme] + "***" + dsn[at:]
+	return u.Redacted()
 }
