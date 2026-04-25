@@ -1,0 +1,13 @@
+{
+  "issuer-empty-state.jpg": {
+    "generated": "2026-04-25",
+    "tool": "nano-banana (Gemini 3.1 flash image preview via OpenRouter)",
+    "subcommand": "generate",
+    "aspect": "4:3",
+    "dimensions": "1200x896",
+    "prompt_summary": "Minimalist abstract line-art empty institutional financial dashboard. Geometric clipboard / data grid / workspace shapes, no data populated. Thin clean strokes. Monochrome composition: single cyan accent (hsl(190, 90%, 55%)) on near-black background (hsl(220, 16%, 8%)). Centered ~35% of frame, generous negative space. No text, no logos, no photorealism, no gradients, no glow, no sci-fi or Web3 themes.",
+    "consumed_by": "web/apps/issuer-portal/src/routes/HomeRoute.tsx (empty-state for activity panel)",
+    "license": "Generated; treat as project-owned per nano-banana / OpenRouter terms",
+    "notes": "JPEG instead of PNG (Gemini's choice for this content). Replace if PRD §14 Q4 picks a tenant whose brand mandates different imagery. Keep monochrome line-art language consistent across any future hero assets — see CLAUDE.md 'Aesthetic Direction'."
+  }
+}
