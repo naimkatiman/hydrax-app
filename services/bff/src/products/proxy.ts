@@ -6,6 +6,7 @@ export interface Product {
   readonly product_type: string;
   readonly status: string;
   readonly rails_product_id?: string;
+  readonly allowed_next?: readonly string[];
   readonly created_at: string;
   readonly updated_at: string;
 }
@@ -15,6 +16,10 @@ export interface CreateProductInput {
   readonly code: string;
   readonly name: string;
   readonly product_type: string;
+}
+
+export interface TransitionProductInput {
+  readonly to: string;
 }
 
 export interface ProxyOptions {
@@ -71,6 +76,35 @@ export async function createProduct(input: Readonly<CreateProductInput>, opts: R
         body: JSON.stringify(input),
         signal,
       });
+    } catch (err: unknown) {
+      throw new ProductsUpstreamError(err instanceof Error ? err.message : "transport error");
+    }
+    if (!res.ok) {
+      throw new ProductsUpstreamError(`workflow-svc returned ${res.status}`, res.status);
+    }
+    return (await res.json()) as Product;
+  });
+}
+
+export async function transitionProduct(
+  id: string,
+  input: Readonly<TransitionProductInput>,
+  opts: Readonly<ProxyOptions>,
+): Promise<Product> {
+  const fetchImpl = opts.fetchImpl ?? fetch;
+  const timeoutMs = opts.timeoutMs ?? 1500;
+  return withTimeout(timeoutMs, async (signal) => {
+    let res: Response;
+    try {
+      res = await fetchImpl(
+        `${opts.workflowSvcUrl}/v1/products/${encodeURIComponent(id)}/transition`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+          signal,
+        },
+      );
     } catch (err: unknown) {
       throw new ProductsUpstreamError(err instanceof Error ? err.message : "transport error");
     }

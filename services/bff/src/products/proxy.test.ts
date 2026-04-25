@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { fetchProduct, createProduct, ProductsUpstreamError } from "./proxy.js";
+import {
+  fetchProduct,
+  createProduct,
+  transitionProduct,
+  ProductsUpstreamError,
+  type TransitionProductInput,
+} from "./proxy.js";
 
 function fakeFetch(handler: (url: string, init?: RequestInit) => { ok: boolean; status: number; body: unknown }): typeof fetch {
   return (async (input: string | URL | Request, init?: RequestInit) => {
@@ -53,5 +59,62 @@ describe("createProduct", () => {
     ).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(ProductsUpstreamError);
     expect((err as ProductsUpstreamError).httpStatus).toBe(409);
+  });
+});
+
+describe("transitionProduct", () => {
+  it("POSTs to /v1/products/{id}/transition and returns the updated product", async () => {
+    let captured: { url?: string; init?: RequestInit } = {};
+    const fetchImpl = fakeFetch((url, init) => {
+      captured = { url, init };
+      return {
+        ok: true,
+        status: 200,
+        body: {
+          id: "p-1",
+          tenant_id: "t-1",
+          code: "C1",
+          name: "N",
+          product_type: "credit-note",
+          status: "approved",
+          allowed_next: ["active", "cancelled"],
+          created_at: "2026-04-25T00:00:00.000000Z",
+          updated_at: "2026-04-25T00:00:01.000000Z",
+        },
+      };
+    });
+    const input: TransitionProductInput = { to: "approved" };
+    const got = await transitionProduct("p-1", input, {
+      workflowSvcUrl: "http://wf",
+      fetchImpl,
+    });
+
+    expect(got.status).toBe("approved");
+    expect(got.allowed_next).toEqual(["active", "cancelled"]);
+    expect(captured.url).toBe("http://wf/v1/products/p-1/transition");
+    expect(captured.init?.method).toBe("POST");
+    expect(captured.init?.body).toBe(JSON.stringify(input));
+    const headers = captured.init?.headers as Record<string, string>;
+    expect(headers["Content-Type"]).toBe("application/json");
+  });
+
+  it("propagates upstream 422 as ProductsUpstreamError with httpStatus=422", async () => {
+    const fetchImpl = fakeFetch(() => ({ ok: false, status: 422, body: {} }));
+    const err = await transitionProduct("p-1", { to: "matured" }, {
+      workflowSvcUrl: "http://wf",
+      fetchImpl,
+    }).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ProductsUpstreamError);
+    expect((err as ProductsUpstreamError).httpStatus).toBe(422);
+  });
+
+  it("converts a transport error into ProductsUpstreamError without httpStatus", async () => {
+    const fetchImpl = (async () => { throw new TypeError("network down"); }) as unknown as typeof fetch;
+    const err = await transitionProduct("p-1", { to: "approved" }, {
+      workflowSvcUrl: "http://wf",
+      fetchImpl,
+    }).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ProductsUpstreamError);
+    expect((err as ProductsUpstreamError).httpStatus).toBeUndefined();
   });
 });
