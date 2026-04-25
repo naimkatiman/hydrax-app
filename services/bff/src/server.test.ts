@@ -51,6 +51,18 @@ describe("bff /v1/products/{id} method guard", () => {
       );
     }
   });
+
+  it("returns 405 on DELETE /v1/approvals", async () => {
+    const { baseUrl, server } = await startServer({ port: 0, service: "bff" });
+    try {
+      const res = await fetch(`${baseUrl}/v1/approvals`, { method: "DELETE" });
+      expect(res.status).toBe(405);
+    } finally {
+      await new Promise<void>((resolve, reject) =>
+        server.close((err) => (err ? reject(err) : resolve())),
+      );
+    }
+  });
 });
 
 interface MockHandlerSpec {

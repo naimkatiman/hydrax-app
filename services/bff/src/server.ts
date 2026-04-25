@@ -7,6 +7,13 @@ import { fetchQuote, MarketDataUpstreamError } from "./marketdata/proxy.js";
 import { fetchProduct, createProduct, ProductsUpstreamError } from "./products/proxy.js";
 import { fetchSubscription, createSubscription, SubscriptionsUpstreamError } from "./subscriptions/proxy.js";
 import { listEvents, appendEvent, AuditUpstreamError, type ListEventsQuery } from "./audit/proxy.js";
+import {
+  listPendingApprovals,
+  fetchApproval,
+  createApproval,
+  decideApproval,
+  ApprovalsUpstreamError,
+} from "./approvals/proxy.js";
 
 export interface StartOptions {
   port: number;
@@ -165,6 +172,81 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
       return;
     }
 
+    if (req.url === "/v1/approvals" && req.method === "POST") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) {
+        respondJson(res, 413, { error: "payload_too_large" });
+        return;
+      }
+      let body: unknown;
+      try {
+        body = JSON.parse(raw.toString("utf8"));
+      } catch {
+        respondJson(res, 400, { error: "bad_json" });
+        return;
+      }
+      if (typeof body !== "object" || body === null) {
+        respondJson(res, 400, { error: "bad_body" });
+        return;
+      }
+      try {
+        const approval = await createApproval(body as Parameters<typeof createApproval>[0], {
+          approvalSvcUrl: upstreamConfig.approvalSvcUrl,
+        });
+        respondJson(res, 201, approval);
+      } catch (err: unknown) {
+        if (err instanceof ApprovalsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "approvals_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/approvals POST handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    // /v1/approvals/{id}/decide POST — must be matched BEFORE the bare /{id} GET below
+    if (req.url?.match(/^\/v1\/approvals\/[^/]+\/decide$/) && req.method === "POST") {
+      const segments = req.url.split("/");
+      const id = decodeURIComponent(segments[3] ?? "");
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 64 * 1024) {
+        respondJson(res, 413, { error: "payload_too_large" });
+        return;
+      }
+      let body: unknown;
+      try {
+        body = JSON.parse(raw.toString("utf8"));
+      } catch {
+        respondJson(res, 400, { error: "bad_json" });
+        return;
+      }
+      if (typeof body !== "object" || body === null) {
+        respondJson(res, 400, { error: "bad_body" });
+        return;
+      }
+      try {
+        const approval = await decideApproval(id, body as Parameters<typeof decideApproval>[1], {
+          approvalSvcUrl: upstreamConfig.approvalSvcUrl,
+        });
+        respondJson(res, 200, approval);
+      } catch (err: unknown) {
+        if (err instanceof ApprovalsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "approvals_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/approvals/{id}/decide handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
     if (req.method !== "GET") {
       respondJson(res, 405, { error: "method_not_allowed" });
       return;
@@ -193,6 +275,39 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           respondJson(res, status, { error: "audit_upstream", message: err.message });
         } else {
           console.error("bff: /v1/audit/events GET handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url === "/v1/approvals" && req.method === "GET") {
+      try {
+        const list = await listPendingApprovals({ approvalSvcUrl: upstreamConfig.approvalSvcUrl });
+        respondJson(res, 200, list);
+      } catch (err: unknown) {
+        if (err instanceof ApprovalsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "approvals_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/approvals GET handler:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url?.startsWith("/v1/approvals/") && req.method === "GET") {
+      const id = decodeURIComponent(req.url.slice("/v1/approvals/".length));
+      try {
+        const approval = await fetchApproval(id, { approvalSvcUrl: upstreamConfig.approvalSvcUrl });
+        respondJson(res, 200, approval);
+      } catch (err: unknown) {
+        if (err instanceof ApprovalsUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "approvals_upstream", message: err.message });
+        } else {
+          console.error("bff: /v1/approvals/{id} GET handler:", err);
           respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }
