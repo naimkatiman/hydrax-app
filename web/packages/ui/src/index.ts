@@ -8,4 +8,5 @@ export { Text } from "./Text";
 export { Skeleton } from "./Skeleton";
 export { EmptyState } from "./EmptyState";
 export { NavItem } from "./NavItem";
+export type { NavItemLinkProps } from "./NavItem";
 export { Avatar } from "./Avatar";

@@ -67,7 +67,10 @@ describe("<AppShell>", () => {
         <span>main</span>
       </AppShell>,
     );
-    const styleTag = container.querySelector("style");
-    expect(styleTag?.textContent ?? "").toContain("hydrax-skeleton-shimmer");
+    const styleTags = Array.from(container.querySelectorAll("style"));
+    const haveShimmer = styleTags.some((tag) =>
+      (tag.textContent ?? "").includes("hydrax-skeleton-shimmer"),
+    );
+    expect(haveShimmer).toBe(true);
   });
 });

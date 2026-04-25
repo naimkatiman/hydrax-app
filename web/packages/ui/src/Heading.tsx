@@ -36,7 +36,7 @@ export function Heading({ level = "h1", as, style, ...rest }: HeadingProps) {
         fontFamily: "var(--hydrax-font-sans)",
         fontSize: tokens.size,
         lineHeight: tokens.lineHeight,
-        fontWeight: tokens.weight as unknown as number,
+        fontWeight: tokens.weight,
         color: "var(--hydrax-color-text-strong)",
         letterSpacing: "-0.01em",
         ...style,

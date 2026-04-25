@@ -1,6 +1,14 @@
 import type { LucideIcon } from "lucide-react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ComponentType, CSSProperties, ReactNode } from "react";
 import { Icon } from "./Icon";
+
+export interface NavItemLinkProps {
+  readonly to: string;
+  readonly style?: CSSProperties | undefined;
+  readonly onClick?: (() => void) | undefined;
+  readonly "aria-current"?: "page" | undefined;
+  readonly children?: ReactNode | undefined;
+}
 
 interface NavItemProps {
   readonly icon: LucideIcon;
@@ -9,6 +17,7 @@ interface NavItemProps {
   readonly badge?: ReactNode;
   readonly href?: string;
   readonly onClick?: () => void;
+  readonly linkComponent?: ComponentType<NavItemLinkProps>;
 }
 
 const baseStyle: CSSProperties = {
@@ -31,7 +40,15 @@ const activeStyle: CSSProperties = {
   color: "var(--hydrax-color-text-strong)",
 };
 
-export function NavItem({ icon, label, active = false, badge, href, onClick }: NavItemProps) {
+export function NavItem({
+  icon,
+  label,
+  active = false,
+  badge,
+  href,
+  onClick,
+  linkComponent,
+}: NavItemProps) {
   const content = (
     <>
       <Icon icon={icon} label={label} size={16} />
@@ -56,9 +73,18 @@ export function NavItem({ icon, label, active = false, badge, href, onClick }: N
     </>
   );
   const style = active ? { ...baseStyle, ...activeStyle } : baseStyle;
+  const ariaCurrent: "page" | undefined = active ? "page" : undefined;
   if (href) {
+    if (linkComponent) {
+      const LinkComponent = linkComponent;
+      return (
+        <LinkComponent to={href} style={style} onClick={onClick} aria-current={ariaCurrent}>
+          {content}
+        </LinkComponent>
+      );
+    }
     return (
-      <a href={href} style={style} aria-current={active ? "page" : undefined}>
+      <a href={href} style={style} onClick={onClick} aria-current={ariaCurrent}>
         {content}
       </a>
     );
@@ -68,7 +94,7 @@ export function NavItem({ icon, label, active = false, badge, href, onClick }: N
       type="button"
       onClick={onClick}
       style={{ ...style, border: "none", textAlign: "left", width: "100%" }}
-      aria-current={active ? "page" : undefined}
+      aria-current={ariaCurrent}
     >
       {content}
     </button>

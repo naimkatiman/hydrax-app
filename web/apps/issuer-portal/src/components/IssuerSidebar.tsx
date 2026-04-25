@@ -7,10 +7,19 @@ import {
   History,
   Settings,
 } from "lucide-react";
-import { NavItem } from "@hydrax/ui";
+import { Link } from "react-router-dom";
+import { NavItem, type NavItemLinkProps } from "@hydrax/ui";
 
 interface IssuerSidebarProps {
   readonly currentPath: string;
+}
+
+function RouterLink({ to, style, onClick, children, ...rest }: NavItemLinkProps) {
+  return (
+    <Link to={to} style={style} onClick={onClick} {...rest}>
+      {children}
+    </Link>
+  );
 }
 
 const NAV: ReadonlyArray<{
@@ -36,6 +45,7 @@ export function IssuerSidebar({ currentPath }: IssuerSidebarProps) {
           label={item.label}
           href={item.path}
           active={currentPath === item.path}
+          linkComponent={RouterLink}
         />
       ))}
     </>
