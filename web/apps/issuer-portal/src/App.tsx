@@ -8,6 +8,7 @@ import { IssuerSidebar, IssuerBrand } from "./components/IssuerSidebar";
 import { IssuerTopBar } from "./components/IssuerTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
 import { ProductNewRoute } from "./routes/ProductNewRoute";
+import { ProductsListRoute } from "./routes/ProductsListRoute";
 import { ProductDetailRoute } from "./routes/ProductDetailRoute";
 
 const store = configureStore({
@@ -26,6 +27,7 @@ function ShellContents() {
     >
       <Routes>
         <Route path="/" element={<HomeRoute />} />
+        <Route path="/products" element={<ProductsListRoute />} />
         <Route path="/products/new" element={<ProductNewRoute />} />
         <Route path="/products/:id" element={<ProductDetailRoute />} />
       </Routes>
