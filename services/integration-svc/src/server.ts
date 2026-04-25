@@ -4,6 +4,10 @@ import type { AddressInfo } from "node:net";
 import { openPool, redactDsn, type Pool } from "./db.js";
 import { mountAuthRoutes, type AuthHandlerOptions } from "./auth/handlers.js";
 import { Sessions } from "./auth/repo.js";
+import { Passkeys } from "./auth/passkey-repo.js";
+import { createChallengeStore } from "./auth/challenge-store.js";
+import { loadPasskeyConfig } from "./auth/passkey-config.js";
+import { mountPasskeyRoutes, type PasskeyHandlerOptions } from "./auth/passkey-handlers.js";
 
 export interface StartOptions {
   port: number;
@@ -11,6 +15,7 @@ export interface StartOptions {
   pool?: Pool;
   devLoginEnabled?: boolean;
   ttlSeconds?: number;
+  passkeyEnv?: Record<string, string | undefined>;  // override for tests
 }
 
 export interface StartResult {
@@ -19,11 +24,19 @@ export interface StartResult {
 }
 
 export function startServer(opts: StartOptions): Promise<StartResult> {
+  const ttlSeconds = opts.ttlSeconds ?? 60 * 60 * 12;
+
   const authOpts: AuthHandlerOptions | null = opts.pool
+    ? { repo: new Sessions(opts.pool), ttlSeconds, devLoginEnabled: opts.devLoginEnabled ?? false }
+    : null;
+
+  const passkeyOpts: PasskeyHandlerOptions | null = opts.pool
     ? {
-        repo: new Sessions(opts.pool),
-        ttlSeconds: opts.ttlSeconds ?? 60 * 60 * 12,
-        devLoginEnabled: opts.devLoginEnabled ?? false,
+        sessions: new Sessions(opts.pool),
+        passkeys: new Passkeys(opts.pool),
+        challenges: createChallengeStore({ ttlSeconds: 60, maxEntries: 10_000 }),
+        config: loadPasskeyConfig(opts.passkeyEnv ?? process.env),
+        sessionTtlSeconds: ttlSeconds,
       }
     : null;
 
@@ -34,6 +47,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
       return;
     }
     if (authOpts && mountAuthRoutes(req, res, authOpts)) return;
+    if (passkeyOpts && mountPasskeyRoutes(req, res, passkeyOpts)) return;
 
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "not_found" }));
@@ -64,6 +78,8 @@ if (isMain) {
     if (!devLoginEnabled) {
       console.log("integration-svc: AUTH_DEV_LOGIN!=1 — dev/login disabled (returns 404)");
     }
+    const cfg = loadPasskeyConfig(process.env);
+    console.log(`integration-svc: passkey RP=${cfg.rpID}, origin=${cfg.origin}`);
   }
 
   startServer({ port, service: "integration-svc", pool, devLoginEnabled, ttlSeconds }).then(
