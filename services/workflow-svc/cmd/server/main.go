@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/handlers"
+	"github.com/naimkatiman/hydrax-app/services/workflow-svc/internal/railsclient"
 )
 
 const serviceName = "workflow-svc"
@@ -20,6 +21,17 @@ func main() {
 	if port == "" {
 		port = "7001"
 	}
+	hydraxURL := os.Getenv("HYDRAX_ADAPTER_URL")
+	if hydraxURL == "" {
+		hydraxURL = "http://localhost:7004"
+	}
+
+	// Cross-service rails client. workflow-svc never imports hydraxrails
+	// directly — all rails calls go through this HTTP boundary so the same
+	// shape works whether the server side is MockRails (v1) or a real
+	// HydraX-backed impl (PRD-v2 §14 Q1 unblock).
+	rails := railsclient.New(hydraxURL, 5*time.Second)
+	_ = rails // exposed to handlers in a follow-up commit when workflow logic actually issues
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handlers.Health(serviceName))
@@ -31,7 +43,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("%s listening on :%s", serviceName, port)
+		log.Printf("%s listening on :%s (rails=%s)", serviceName, port, hydraxURL)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("listen: %v", err)
 		}
