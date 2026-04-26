@@ -3,23 +3,23 @@
    `backdrop-filter` rules are paired with an `@supports` solid-bg fallback. */
 
 :root {
-  /* Brand */
-  --hx-bg: #0A0E1A;
-  --hx-bg-elevated: #0F1525;
-  --hx-ink: #F4F6FB;
-  --hx-ink-soft: rgba(244, 246, 251, 0.72);
-  --hx-ink-muted: rgba(244, 246, 251, 0.55);
-  --hx-accent: #5EA8FF;
-  --hx-accent-strong: #2B6FE6;
-  --hx-success: #4ADE80;
-  --hx-border: rgba(244, 246, 251, 0.12);
+  /* Brand — neutral grey core */
+  --hx-bg: hsl(0, 0%, 8%);
+  --hx-bg-elevated: hsl(0, 0%, 14%);
+  --hx-ink: hsl(0, 0%, 96%);
+  --hx-ink-soft: hsla(0, 0%, 96%, 0.72);
+  --hx-ink-muted: hsla(0, 0%, 96%, 0.55);
+  --hx-accent: hsl(30, 8%, 78%);
+  --hx-accent-strong: hsl(30, 8%, 92%);
+  --hx-success: hsl(140, 60%, 50%);
+  --hx-border: hsla(0, 0%, 96%, 0.12);
 
-  /* Liquid-glass surfaces */
-  --hx-glass-bg: rgba(20, 28, 48, 0.55);
-  --hx-glass-bg-strong: rgba(20, 28, 48, 0.78);
-  --hx-glass-tint: rgba(94, 168, 255, 0.06);
-  --hx-glass-border: rgba(244, 246, 251, 0.10);
-  --hx-glass-highlight: rgba(244, 246, 251, 0.08);
+  /* Liquid-glass surfaces — warm-grey wash, no blue chroma */
+  --hx-glass-bg: hsla(0, 0%, 14%, 0.55);
+  --hx-glass-bg-strong: hsla(0, 0%, 14%, 0.78);
+  --hx-glass-tint: hsla(0, 0%, 96%, 0.04);
+  --hx-glass-border: hsla(0, 0%, 96%, 0.10);
+  --hx-glass-highlight: hsla(0, 0%, 96%, 0.08);
   --hx-glass-blur: blur(24px) saturate(140%);
   --hx-glass-blur-nav: blur(18px) saturate(160%);
 
@@ -150,7 +150,7 @@ ul { list-style: none; }
 .glass--card:hover {
   transform: translateY(-2px);
   box-shadow: var(--hx-shadow-elevated);
-  border-color: rgba(94, 168, 255, 0.28);
+  border-color: hsla(30, 8%, 78%, 0.28);
 }
 .glass--button {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--hx-space-1);
@@ -160,16 +160,16 @@ ul { list-style: none; }
               border-color var(--hx-fast) var(--hx-ease),
               background-color var(--hx-fast) var(--hx-ease);
 }
-.glass--button:hover { border-color: rgba(94, 168, 255, 0.42); background-color: rgba(20, 28, 48, 0.7); }
+.glass--button:hover { border-color: hsla(30, 8%, 78%, 0.42); background-color: hsla(0, 0%, 14%, 0.7); }
 .glass--button:active { transform: translateY(1px); }
 .glass--button-primary {
-  background: var(--hx-accent); border-color: var(--hx-accent-strong); color: #051226;
-  box-shadow: 0 8px 24px rgba(94, 168, 255, 0.28), 0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  background: var(--hx-accent); border-color: var(--hx-accent-strong); color: hsl(0, 0%, 8%);
+  box-shadow: 0 8px 24px hsla(30, 8%, 78%, 0.28), 0 1px 0 rgba(255, 255, 255, 0.18) inset;
 }
 .glass--button-primary:hover { background: var(--hx-accent-strong); color: var(--hx-ink); border-color: var(--hx-accent-strong); }
 .glass--inset {
   display: inline-flex; align-items: center; gap: var(--hx-space-1);
-  padding: 6px 12px; background: rgba(244, 246, 251, 0.04);
+  padding: 6px 12px; background: hsla(0, 0%, 96%, 0.04);
   border: 1px solid var(--hx-glass-border); border-radius: 999px;
   font-size: var(--hx-small); color: var(--hx-ink-soft);
 }
@@ -190,12 +190,12 @@ ul { list-style: none; }
 .nav__brand-mark {
   width: 14px; height: 14px; border-radius: 50%;
   background: var(--hx-accent);
-  box-shadow: 0 0 0 4px rgba(94, 168, 255, 0.16);
+  box-shadow: 0 0 0 4px hsla(30, 8%, 78%, 0.16);
   animation: hxBrandPulse 2.6s var(--hx-ease) infinite;
 }
 @keyframes hxBrandPulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(94, 168, 255, 0.16); }
-  50%      { box-shadow: 0 0 0 6px rgba(94, 168, 255, 0.30); }
+  0%, 100% { box-shadow: 0 0 0 4px hsla(30, 8%, 78%, 0.16); }
+  50%      { box-shadow: 0 0 0 6px hsla(30, 8%, 78%, 0.30); }
 }
 .nav__brand-text { font-size: 1rem; }
 .nav__menu { display: flex; align-items: center; gap: var(--hx-space-3); }
@@ -262,7 +262,7 @@ ul { list-style: none; }
   transition: background-color var(--hx-fast) var(--hx-ease);
 }
 .solutions-menu__item:hover, .solutions-menu__item:focus-visible {
-  background-color: rgba(94, 168, 255, 0.08);
+  background-color: hsla(30, 8%, 78%, 0.08);
 }
 
 /* Hero */
@@ -277,7 +277,7 @@ ul { list-style: none; }
   background-color: var(--hx-bg-elevated);
   background-image:
     linear-gradient(180deg, rgba(10, 14, 26, 0.55) 0%, rgba(10, 14, 26, 0.92) 100%),
-    radial-gradient(ellipse at 20% 30%, rgba(94, 168, 255, 0.18), transparent 55%),
+    radial-gradient(ellipse at 20% 30%, hsla(30, 8%, 78%, 0.18), transparent 55%),
     radial-gradient(ellipse at 80% 60%, rgba(43, 111, 230, 0.14), transparent 60%),
     url("assets/hero-bg.jpg");
   background-size: cover; background-position: center;
@@ -335,7 +335,7 @@ ul { list-style: none; }
 .portal-card__icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 40px; height: 40px; border-radius: var(--hx-radius-sm);
-  background: rgba(244, 246, 251, 0.04);
+  background: hsla(0, 0%, 96%, 0.04);
   border: 1px solid var(--hx-glass-border);
   color: var(--hx-accent);
 }
@@ -374,7 +374,7 @@ ul { list-style: none; }
 .quickstart__tab:hover { color: var(--hx-ink); }
 .quickstart__tab.is-active,
 .quickstart__tab[aria-selected="true"] {
-  background: rgba(94, 168, 255, 0.18); color: var(--hx-ink); font-weight: 600;
+  background: hsla(30, 8%, 78%, 0.18); color: var(--hx-ink); font-weight: 600;
 }
 .quickstart__panel { display: none; }
 .quickstart__panel.is-active { display: block; }
@@ -410,7 +410,7 @@ ul { list-style: none; }
 .solution-card__media {
   height: 220px;
   background:
-    linear-gradient(135deg, rgba(94, 168, 255, 0.18) 0%, rgba(20, 28, 48, 0.55) 100%),
+    linear-gradient(135deg, hsla(30, 8%, 78%, 0.18) 0%, hsla(0, 0%, 14%, 0.55) 100%),
     var(--hx-bg-elevated);
   background-size: cover; background-position: center;
   border-block-end: 1px solid var(--hx-glass-border);
@@ -449,7 +449,7 @@ ul { list-style: none; }
 .solution-card__bullets li::before {
   content: ""; position: absolute; inset-inline-start: 0; inset-block-start: 6px;
   width: 14px; height: 14px; border-radius: 50%;
-  background: rgba(94, 168, 255, 0.16);
+  background: hsla(30, 8%, 78%, 0.16);
   border: 1px solid var(--hx-accent);
   background-image:
     linear-gradient(135deg, transparent 45%, var(--hx-accent) 46%, var(--hx-accent) 54%, transparent 55%),
@@ -543,7 +543,7 @@ ul { list-style: none; }
 }
 .footer__legal a {
   color: var(--hx-ink-soft); text-decoration: underline;
-  text-underline-offset: 3px; text-decoration-color: rgba(94, 168, 255, 0.32);
+  text-underline-offset: 3px; text-decoration-color: hsla(30, 8%, 78%, 0.32);
 }
 .footer__legal a:hover { color: var(--hx-ink); }
 
