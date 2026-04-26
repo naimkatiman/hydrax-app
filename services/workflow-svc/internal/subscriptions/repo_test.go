@@ -154,3 +154,83 @@ func TestGetByIDReturnsInsertedRow(t *testing.T) {
 		t.Errorf("Currency mismatch: got %q", got.Currency)
 	}
 }
+
+func TestUpdateStatusAdvancesPendingToApproved(t *testing.T) {
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
+	userID := seedUser(t, ctx, tx, tenantID)
+	productID := seedProduct(t, ctx, tx, tenantID)
+
+	created, err := repo.Insert(ctx, SubscriptionInput{
+		ProductID: productID, InvestorUserID: userID, AmountMinor: 1_000_00, Currency: "USD",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	updated, err := repo.UpdateStatus(ctx, created.ID, "pending", "approved")
+	if err != nil {
+		t.Fatalf("UpdateStatus: %v", err)
+	}
+	if updated.Status != "approved" {
+		t.Errorf("Status = %q, want approved", updated.Status)
+	}
+	if updated.ID != created.ID {
+		t.Errorf("ID changed across UpdateStatus: got %q want %q", updated.ID, created.ID)
+	}
+	if updated.UpdatedAt.Before(created.UpdatedAt) {
+		t.Errorf("UpdatedAt regressed: created=%v updated=%v", created.UpdatedAt, updated.UpdatedAt)
+	}
+}
+
+func TestUpdateStatusReturnsStaleOnDriftedFromStatus(t *testing.T) {
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
+	userID := seedUser(t, ctx, tx, tenantID)
+	productID := seedProduct(t, ctx, tx, tenantID)
+
+	created, err := repo.Insert(ctx, SubscriptionInput{
+		ProductID: productID, InvestorUserID: userID, AmountMinor: 500_00, Currency: "USD",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	// Pretend the row is currently "approved" when it's actually "pending"; WHERE matches zero rows.
+	_, err = repo.UpdateStatus(ctx, created.ID, "approved", "allocated")
+	if !IsStaleStatus(err) {
+		t.Fatalf("UpdateStatus: err = %v, want IsStaleStatus", err)
+	}
+}
+
+func TestUpdateStatusReturnsStaleOnUnknownID(t *testing.T) {
+	ctx, repo, _ := withTx(t)
+
+	_, err := repo.UpdateStatus(ctx, "00000000-0000-0000-0000-000000000000", "pending", "approved")
+	if !IsStaleStatus(err) {
+		t.Fatalf("UpdateStatus(unknown): err = %v, want IsStaleStatus", err)
+	}
+}
+
+func TestUpdateStatusRejectsIllegalStatusViaCheckConstraint(t *testing.T) {
+	ctx, repo, tx := withTx(t)
+	tenantID := seedTenant(t, ctx, tx)
+	userID := seedUser(t, ctx, tx, tenantID)
+	productID := seedProduct(t, ctx, tx, tenantID)
+
+	created, err := repo.Insert(ctx, SubscriptionInput{
+		ProductID: productID, InvestorUserID: userID, AmountMinor: 100, Currency: "USD",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	// "garbage" violates the CHECK; expect a non-stale error (DB-level constraint violation).
+	_, err = repo.UpdateStatus(ctx, created.ID, "pending", "garbage")
+	if err == nil {
+		t.Fatal("UpdateStatus with illegal status: want error, got nil")
+	}
+	if IsStaleStatus(err) {
+		t.Fatalf("UpdateStatus illegal status: got IsStaleStatus, want raw constraint error: %v", err)
+	}
+}
