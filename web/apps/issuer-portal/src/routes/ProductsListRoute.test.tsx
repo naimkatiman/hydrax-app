@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, cleanup, waitFor, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { MemoryRouter } from "react-router-dom";
@@ -131,5 +131,127 @@ describe("<ProductsListRoute>", () => {
         /could not load products/i,
       );
     });
+  });
+
+  it("requests the first page with limit=50 and offset=0", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          products: [
+            {
+              id: "p-1",
+              tenant_id: "ten-1",
+              code: "C-1",
+              name: "Prime Credit Note",
+              product_type: "short_duration_credit",
+              status: "pending",
+              created_at: "2026-04-26T00:00:00Z",
+              updated_at: "2026-04-26T00:00:00Z",
+            },
+          ],
+          next_offset: null,
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+    renderRoute();
+    await screen.findByTestId("product-row-p-1");
+    const firstInput = fetchSpy.mock.calls[0]?.[0];
+    const calledUrl =
+      firstInput instanceof Request ? firstInput.url : String(firstInput ?? "");
+    expect(calledUrl).toContain("limit=50");
+    expect(calledUrl).toContain("offset=0");
+  });
+
+  it("disables Previous on the first page and Next when next_offset is null", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          products: [
+            {
+              id: "p-1",
+              tenant_id: "ten-1",
+              code: "C-1",
+              name: "Prime Credit Note",
+              product_type: "short_duration_credit",
+              status: "pending",
+              created_at: "2026-04-26T00:00:00Z",
+              updated_at: "2026-04-26T00:00:00Z",
+            },
+          ],
+          next_offset: null,
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+    renderRoute();
+    await screen.findByTestId("product-row-p-1");
+    expect(screen.getByTestId("pagination-prev")).toBeDisabled();
+    expect(screen.getByTestId("pagination-next")).toBeDisabled();
+  });
+
+  it("advances to next page on Next click and re-enables Previous", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(
+      async (input) => {
+        const url = input instanceof Request ? input.url : String(input);
+        const offset = Number(new URL(url, "http://localhost").searchParams.get("offset") ?? "0");
+        const body =
+          offset === 0
+            ? {
+                products: [
+                  {
+                    id: "p-1",
+                    tenant_id: "ten-1",
+                    code: "C-1",
+                    name: "Page One Item",
+                    product_type: "short_duration_credit",
+                    status: "pending",
+                    created_at: "2026-04-26T00:00:00Z",
+                    updated_at: "2026-04-26T00:00:00Z",
+                  },
+                ],
+                next_offset: 50,
+              }
+            : {
+                products: [
+                  {
+                    id: "p-2",
+                    tenant_id: "ten-1",
+                    code: "C-2",
+                    name: "Page Two Item",
+                    product_type: "short_duration_credit",
+                    status: "pending",
+                    created_at: "2026-04-26T00:00:00Z",
+                    updated_at: "2026-04-26T00:00:00Z",
+                  },
+                ],
+                next_offset: null,
+              };
+        return new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      },
+    );
+
+    renderRoute();
+    await screen.findByTestId("product-row-p-1");
+    expect(screen.getByTestId("pagination-prev")).toBeDisabled();
+    expect(screen.getByTestId("pagination-next")).not.toBeDisabled();
+
+    fireEvent.click(screen.getByTestId("pagination-next"));
+
+    await screen.findByTestId("product-row-p-2");
+    expect(screen.getByTestId("pagination-prev")).not.toBeDisabled();
+    expect(screen.getByTestId("pagination-next")).toBeDisabled();
+
+    const callOffsets = fetchSpy.mock.calls
+      .map((c) => {
+        const inp = c[0];
+        return inp instanceof Request ? inp.url : String(inp ?? "");
+      })
+      .map((u) => new URL(u, "http://localhost").searchParams.get("offset"));
+    expect(callOffsets).toContain("0");
+    expect(callOffsets).toContain("50");
   });
 });

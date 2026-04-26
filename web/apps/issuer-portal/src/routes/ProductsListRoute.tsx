@@ -1,7 +1,10 @@
+import { useState } from "react";
 import {
   Archive,
   Boxes,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   FileX2,
   PackagePlus,
@@ -19,9 +22,8 @@ import {
   Text,
 } from "@hydrax/ui";
 
-// statusIcon maps a product status to a lucide icon. Mirrors the icon
-// vocabulary used by ProductDetailRoute so list and detail stay visually
-// consistent.
+const PAGE_SIZE = 50;
+
 function statusIcon(status: string): { icon: LucideIcon; label: string } {
   switch (status) {
     case "approved":
@@ -97,8 +99,68 @@ function ListSkeleton() {
   );
 }
 
+interface PageNavProps {
+  readonly offset: number;
+  readonly count: number;
+  readonly hasNext: boolean;
+  readonly onPrev: () => void;
+  readonly onNext: () => void;
+}
+
+const navButtonStyle = (disabled: boolean): React.CSSProperties => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "6px 12px",
+  background: disabled ? "transparent" : "var(--hydrax-color-bg-raised)",
+  color: disabled ? "var(--hydrax-color-text-muted)" : "var(--hydrax-color-text)",
+  border: "1px solid var(--hydrax-color-border)",
+  borderRadius: "var(--hydrax-radius-sm)",
+  cursor: disabled ? "not-allowed" : "pointer",
+  fontFamily: "var(--hydrax-font-sans)",
+  fontSize: 14,
+  opacity: disabled ? 0.5 : 1,
+});
+
+function PageNav({ offset, count, hasNext, onPrev, onNext }: PageNavProps) {
+  const hasPrev = offset > 0;
+  const start = count === 0 ? 0 : offset + 1;
+  const end = offset + count;
+  return (
+    <Stack direction="row" align="center" gap="md" wrap>
+      <Text size="bodySm" tone="muted">
+        {count === 0 ? "No results" : `Showing ${start}–${end}`}
+      </Text>
+      <button
+        type="button"
+        data-testid="pagination-prev"
+        disabled={!hasPrev}
+        onClick={onPrev}
+        style={navButtonStyle(!hasPrev)}
+      >
+        <Icon icon={ChevronLeft} label="Previous page" size={14} />
+        <span>Previous</span>
+      </button>
+      <button
+        type="button"
+        data-testid="pagination-next"
+        disabled={!hasNext}
+        onClick={onNext}
+        style={navButtonStyle(!hasNext)}
+      >
+        <span>Next</span>
+        <Icon icon={ChevronRight} label="Next page" size={14} />
+      </button>
+    </Stack>
+  );
+}
+
 export function ProductsListRoute() {
-  const { data, isLoading, isError } = useListProductsQuery();
+  const [offset, setOffset] = useState(0);
+  const { data, isLoading, isError } = useListProductsQuery({
+    limit: PAGE_SIZE,
+    offset,
+  });
 
   if (isLoading) {
     return (
@@ -123,8 +185,9 @@ export function ProductsListRoute() {
   }
 
   const products = data.products;
+  const hasNext = data.next_offset !== null;
 
-  if (products.length === 0) {
+  if (products.length === 0 && offset === 0) {
     return (
       <Stack gap="lg">
         <Heading level="h1">Products</Heading>
@@ -163,7 +226,7 @@ export function ProductsListRoute() {
       <Stack gap="xs">
         <Heading level="h1">Products</Heading>
         <Text tone="muted">
-          {products.length} most-recent product{products.length === 1 ? "" : "s"}.
+          {products.length} product{products.length === 1 ? "" : "s"} on this page.
         </Text>
       </Stack>
       <Stack gap="md">
@@ -171,9 +234,15 @@ export function ProductsListRoute() {
           <ProductRow key={p.id} product={p} />
         ))}
       </Stack>
-      <Text size="bodySm" tone="muted">
-        Showing first {products.length} products. Pagination coming soon.
-      </Text>
+      <PageNav
+        offset={offset}
+        count={products.length}
+        hasNext={hasNext}
+        onPrev={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+        onNext={() => {
+          if (data.next_offset !== null) setOffset(data.next_offset);
+        }}
+      />
     </Stack>
   );
 }
