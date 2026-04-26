@@ -111,7 +111,8 @@
       scroll-margin-top: 24px;
     }
 
-    /* Per-slide ambient hero backgrounds — 9 source JPGs reused thematically across 14 slides. */
+    /* Per-slide ambient hero backgrounds — 10 source JPGs reused thematically across 15 slides;
+       slides 15-17 will be added by phases 2-4 of docs/plans/2026-04-26-deep-dive-topics-deck-and-portals.md. */
     #slide-0,
     #slide-1,
     #slide-2,
@@ -125,7 +126,8 @@
     #slide-10,
     #slide-11,
     #slide-12,
-    #slide-13 {
+    #slide-13,
+    #slide-14 {
       background-color: var(--hydrax-color-bg);
       background-repeat: no-repeat;
       background-position: center center;
@@ -215,6 +217,12 @@
       background-image:
         linear-gradient(180deg, rgba(20, 20, 20, 0.92) 0%, rgba(20, 20, 20, 0.85) 50%, rgba(20, 20, 20, 0.94) 100%),
         url('./assets/slide-8-tradeoffs-roadmap.jpg');
+    }
+
+    #slide-14 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.86) 0%, rgba(20, 20, 20, 0.78) 50%, rgba(20, 20, 20, 0.92) 100%),
+        url('./assets/slide-14-tokenization.jpg');
     }
 
     .slide-nav {
@@ -2241,7 +2249,7 @@ template Subscription
         </div>
         <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
           <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Stakeholder set</strong> declared at template definition &mdash; privacy boundary, not a network policy</li>
-          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Lifecycle</strong> as enumerated `choice` transitions, not free-form mutations</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Lifecycle</strong> as enumerated <code style="font-family: 'IBM Plex Mono', monospace; color: var(--hydrax-color-accent);">choice</code> transitions, not free-form mutations</li>
           <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Issuer holds the original</strong>; distributors and investors are explicitly added at issuance</li>
           <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Off-ledger fields</strong> (KYC docs, marketing, fee schedules) live in Postgres &mdash; ledger keeps only the truth that needs multi-party signing</li>
         </ul>
