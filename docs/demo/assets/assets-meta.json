@@ -1,0 +1,46 @@
+{
+  "$comment": "Provenance for generated images consumed by docs/demo/canton-interview.html. Generated via /nano-banana skill (OpenRouter, google/gemini-3.1-flash-image-preview).",
+  "generated_at": "2026-04-26",
+  "model": "google/gemini-3.1-flash-image-preview",
+  "palette_source": "https://hydrax-portals-production.up.railway.app/styles.css (--hx-bg #141414, --hx-bg-elevated #242424, --hx-ink #F5F5F5, --hx-accent hsl(30,8%,78%) #CDC8C2)",
+  "assets": [
+    {
+      "file": "deck-bg.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "body { background-image }",
+      "role": "Global page atmospheric backdrop, fixed-position, layered behind dark gradient overlay so foreground text remains legible.",
+      "prompt": "Atmospheric institutional architecture backdrop, ultra-wide cinematic composition, monochrome warm-grey palette: deep charcoal #141414 base with subtle warm-grey #CDC8C2 highlights, soft volumetric haze drifting across angular concrete forms, faint horizon glow, editorial photography mood, near-black with quiet warm-grey gradients, no text, no logos, no people, no recognizable brands, designed as a quiet backdrop for overlaid presentation content, 16:9 widescreen, very low contrast so foreground text remains readable"
+    },
+    {
+      "file": "slide-0-stack.jpg",
+      "dimensions": "1024x1024",
+      "aspect": "1:1",
+      "consumed_by": "#slide-0 { background-image }",
+      "role": "Title slide ambient hero — three-tier architecture stack rendered abstractly. Sits behind the foreground P1/P2/P3 information panel; informational text remains primary.",
+      "prompt": "Three-tier architectural stack visualization, three horizontal floating glass-like slabs stacked vertically with subtle space between, monochrome warm-grey palette: charcoal #141414 background, panel grey #242424 slab bodies, off-white #F5F5F5 highlights, warm-grey #CDC8C2 edge accents, very thin vertical connection lines between tiers suggesting data flow, viewed at slight isometric angle, editorial 3D render, ultra-clean institutional finance aesthetic, no text, no labels, no logos, no people, square 1:1 composition, museum-quality minimalism"
+    },
+    {
+      "file": "slide-3-canton-wiring.jpg",
+      "dimensions": "1200x896",
+      "aspect": "4:3",
+      "consumed_by": "#slide-3 { background-image }",
+      "role": "Slide 3 (How Canton is Wired) ambient hero — abstract synchronizer + participant nodes topology rendered as ambient texture behind the slide's foreground content.",
+      "prompt": "Abstract distributed network topology, three large hexagonal participant nodes arranged in equilateral triangle formation around a central glowing synchronizer hub, thin warm-grey connection lines between all nodes with subtle directional indicators, monochrome warm-grey palette on near-black background (#141414 base, #242424 nodes, #CDC8C2 connection lines, #F5F5F5 hub highlight), minimal flat editorial style with depth, no text, no labels, no logos, ultra-clean institutional aesthetic, 4:3 composition, suggests multi-party consensus and shared truth"
+    },
+    {
+      "file": "slide-5-three-planes.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-5 { background-image }",
+      "role": "Slide 5 (Three Planes Above the Rails) ambient hero — three parallel floating planes in 3D, used as atmospheric backdrop for the foreground three-plane explanation.",
+      "prompt": "Three parallel horizontal planes floating in 3D space at slight angle, viewed from front-low perspective, monochrome dark warm-grey palette: deep charcoal #141414 background, panel #242424 plane bodies, warm-grey #CDC8C2 plane edges, off-white #F5F5F5 highlights, wireframe-meets-glass aesthetic, very thin vertical connecting columns between the three planes, faint volumetric light from below each plane, editorial 3D render, no text, no labels, no logos, institutional finance design language, 16:9 widescreen composition"
+    }
+  ],
+  "wiring_notes": [
+    "Body background uses linear-gradient overlay (rgba(20,20,20,0.78 → 0.86)) atop deck-bg.jpg with background-attachment: fixed.",
+    "#slide-0, #slide-3, #slide-5 share base bg behaviors via grouped selector (background-color, repeat, position, size, blend-mode), each then declares its own background-image stack.",
+    "background-blend-mode: luminosity strips remaining hue from any image residue, locking everything to greyscale even if a future regen drifts off-palette.",
+    "Inline style=\"background: #141414;\" was removed from #slide-0 because the shorthand was resetting background-image to none."
+  ]
+}

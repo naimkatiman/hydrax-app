@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HydraX | 5-Minute Video Deck</title>
+    <meta
+      name="description"
+      content="Slim presenter deck for the 5-minute HydraX video. Paired with script-5min.md and shot-list.md."
+    />
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --bg-elev: #11141b;
+        --ink: #e7eaf2;
+        --ink-muted: #8a93a6;
+        --ink-soft: #5b6478;
+        --accent: #d8b46b;
+        --rule: rgba(255, 255, 255, 0.08);
+        --shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter,
+          "Helvetica Neue", Arial, sans-serif;
+        font-feature-settings: "ss01", "cv11";
+        scroll-behavior: smooth;
+      }
+
+      body {
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+        height: 100vh;
+      }
+
+      .deck-nav {
+        position: fixed;
+        top: 18px;
+        right: 24px;
+        z-index: 50;
+        display: flex;
+        gap: 12px;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        background: rgba(11, 13, 18, 0.72);
+        backdrop-filter: blur(12px);
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--rule);
+      }
+
+      .deck-nav a {
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color 160ms ease;
+      }
+
+      .deck-nav a:hover {
+        color: var(--ink);
+      }
+
+      .slide {
+        scroll-snap-align: start;
+        min-height: 100vh;
+        padding: 96px 96px 72px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 32px;
+        position: relative;
+      }
+
+      .slide-meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        font-size: 13px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+
+      .slide-meta .timestamp {
+        color: var(--accent);
+      }
+
+      .slide-headline {
+        font-size: clamp(40px, 6vw, 84px);
+        line-height: 1.04;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+        margin: 0;
+        max-width: 22ch;
+      }
+
+      .slide-headline em {
+        font-style: normal;
+        color: var(--accent);
+      }
+
+      .slide-body {
+        display: grid;
+        gap: 20px;
+        font-size: clamp(18px, 1.45vw, 22px);
+        line-height: 1.55;
+        color: var(--ink);
+        max-width: 70ch;
+      }
+
+      .slide-body p {
+        margin: 0;
+      }
+
+      .slide-body .lede {
+        font-size: clamp(22px, 1.8vw, 28px);
+        color: var(--ink-muted);
+      }
+
+      .slide-foot {
+        font-size: 13px;
+        color: var(--ink-soft);
+        letter-spacing: 0.04em;
+        border-top: 1px solid var(--rule);
+        padding-top: 18px;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .pillar-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      .pillar {
+        padding: 24px 24px 28px;
+        background: var(--bg-elev);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .pillar .label {
+        font-size: 11px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+
+      .pillar h3 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+
+      .pillar p {
+        margin: 0;
+        font-size: 16px;
+        color: var(--ink-muted);
+        line-height: 1.5;
+      }
+
+      .arch-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 32px;
+        align-items: start;
+      }
+
+      .arch-card {
+        background: var(--bg-elev);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        padding: 24px 24px 26px;
+      }
+
+      .arch-card h3 {
+        margin: 0 0 14px;
+        font-size: 18px;
+        letter-spacing: 0.04em;
+      }
+
+      .arch-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 8px;
+        font-size: 15px;
+        color: var(--ink-muted);
+      }
+
+      .arch-card li::before {
+        content: "—";
+        color: var(--accent);
+        margin-right: 10px;
+      }
+
+      .qrow {
+        display: grid;
+        grid-template-columns: 80px 1fr auto;
+        gap: 24px;
+        padding: 18px 0;
+        border-bottom: 1px solid var(--rule);
+        align-items: baseline;
+      }
+
+      .qrow:last-child {
+        border-bottom: 0;
+      }
+
+      .qrow .qid {
+        font-size: 18px;
+        letter-spacing: 0.04em;
+        color: var(--accent);
+      }
+
+      .qrow .qbody {
+        font-size: 18px;
+        color: var(--ink);
+        line-height: 1.45;
+      }
+
+      .qrow .qstatus {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        white-space: nowrap;
+      }
+
+      .ask-card {
+        background: var(--bg-elev);
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        padding: 32px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .ask-card h3 {
+        margin: 0;
+        font-size: 24px;
+        letter-spacing: -0.01em;
+      }
+
+      .ask-card ol {
+        margin: 0;
+        padding-left: 22px;
+        display: grid;
+        gap: 8px;
+        font-size: 18px;
+      }
+
+      .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      .brand-mark::before {
+        content: "";
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: var(--accent);
+        border-radius: 2px;
+      }
+
+      @media (max-width: 880px) {
+        .slide {
+          padding: 64px 32px 56px;
+        }
+
+        .pillar-grid,
+        .arch-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .qrow {
+          grid-template-columns: 60px 1fr;
+        }
+
+        .qrow .qstatus {
+          grid-column: 2 / 3;
+        }
+      }
+
+      @media print {
+        body {
+          scroll-snap-type: none;
+          height: auto;
+          overflow: visible;
+        }
+
+        .slide {
+          page-break-after: always;
+        }
+
+        .deck-nav {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="deck-nav" aria-label="Slide navigation">
+      <a href="#vd-slide-1">1</a>
+      <a href="#vd-slide-2">2</a>
+      <a href="#vd-slide-3">3</a>
+      <a href="#vd-slide-4">4</a>
+      <a href="#vd-slide-5">5</a>
+    </nav>
+
+    <section class="slide" id="vd-slide-1" aria-labelledby="vd-slide-1-title">
+      <header class="slide-meta">
+        <span class="brand-mark">HydraX</span>
+        <span><span class="timestamp">00:00 — 00:30</span></span>
+      </header>
+
+      <div class="slide-body">
+        <h1 class="slide-headline" id="vd-slide-1-title">
+          The <em>workflow layer</em> above the rails.
+        </h1>
+        <p class="lede">
+          HydraX is the regulated rails — tokenization, custody, trading. We
+          are building what's missing above them: the institutional workflow.
+        </p>
+        <div class="pillar-grid">
+          <article class="pillar">
+            <span class="label">Aligned</span>
+            <h3>Canton-native</h3>
+            <p>Privacy-preserving multi-party state on a shared synchronizer.</p>
+          </article>
+          <article class="pillar">
+            <span class="label">Bounded</span>
+            <h3>Role-aware by default</h3>
+            <p>Tenant isolation and least-privilege from day one.</p>
+          </article>
+          <article class="pillar">
+            <span class="label">Not</span>
+            <h3>Not an exchange</h3>
+            <p>Not a custody system. Not another DeFi front end.</p>
+          </article>
+        </div>
+      </div>
+
+      <footer class="slide-foot">
+        <span>Slide 1 / 5 — Positioning</span>
+        <span>Companion: canton-interview.html#slide-1</span>
+      </footer>
+    </section>
+
+    <section class="slide" id="vd-slide-2" aria-labelledby="vd-slide-2-title">
+      <header class="slide-meta">
+        <span class="brand-mark">HydraX</span>
+        <span><span class="timestamp">00:30 — 01:15</span></span>
+      </header>
+
+      <div class="slide-body">
+        <h1 class="slide-headline" id="vd-slide-2-title">
+          First wedge: <em>institutional issuance + subscription servicing.</em>
+        </h1>
+        <p class="lede">
+          One workspace. Four roles. Every state change provable on a Daml-anchored
+          audit trail.
+        </p>
+        <div class="pillar-grid">
+          <article class="pillar">
+            <span class="label">Today</span>
+            <h3>Email + spreadsheets</h3>
+            <p>Bilateral PDFs stitched across counterparties.</p>
+          </article>
+          <article class="pillar">
+            <span class="label">v1</span>
+            <h3>One command-room UI</h3>
+            <p>Issuer, distributor, investor, ops console — same surface.</p>
+          </article>
+          <article class="pillar">
+            <span class="label">Underneath</span>
+            <h3>Daml-anchored audit</h3>
+            <p>Provable, attributable, replayable.</p>
+          </article>
+        </div>
+      </div>
+
+      <footer class="slide-foot">
+        <span>Slide 2 / 5 — Wedge</span>
+        <span>Companion: canton-interview.html#slide-2 / #slide-3</span>
+      </footer>
+    </section>
+
+    <section class="slide" id="vd-slide-3" aria-labelledby="vd-slide-3-title">
+      <header class="slide-meta">
+        <span class="brand-mark">HydraX</span>
+        <span><span class="timestamp">03:30 — 04:15</span></span>
+      </header>
+
+      <div class="slide-body">
+        <h1 class="slide-headline" id="vd-slide-3-title">
+          Eight services. <em>Five portals.</em> One ledger.
+        </h1>
+
+        <div class="arch-grid">
+          <article class="arch-card">
+            <h3>Backend services</h3>
+            <ul>
+              <li>workflow-svc — orchestration (Go)</li>
+              <li>approval-svc — chains + escalations (Go)</li>
+              <li>audit-svc — action log (Go)</li>
+              <li>hydrax-adapter — rails bridge (Go, mock today)</li>
+              <li>canton-adapter — Daml command + event (Go)</li>
+              <li>notify-svc — email, in-app, webhook (Node/TS)</li>
+              <li>integration-svc — KYC, SSO, CRM (Node/TS)</li>
+              <li>bff — aggregation for React (Node/TS)</li>
+            </ul>
+          </article>
+          <article class="arch-card">
+            <h3>Frontend portals</h3>
+            <ul>
+              <li>issuer-portal — product setup + launch</li>
+              <li>distributor-portal — subscription routing</li>
+              <li>investor-portal — onboarding + holdings</li>
+              <li>ops-console — exceptions + approvals</li>
+              <li>admin — tenant + role management</li>
+            </ul>
+            <h3 style="margin-top: 18px">Data + ledger</h3>
+            <ul>
+              <li>Postgres — relational truth</li>
+              <li>Mongo — tenant-flexible payloads</li>
+              <li>Daml — shared multi-party state</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+
+      <footer class="slide-foot">
+        <span>Slide 3 / 5 — Architecture</span>
+        <span>Companion: canton-interview.html#slide-7</span>
+      </footer>
+    </section>
+
+    <section class="slide" id="vd-slide-4" aria-labelledby="vd-slide-4-title">
+      <header class="slide-meta">
+        <span class="brand-mark">HydraX</span>
+        <span><span class="timestamp">04:15 — 04:45</span></span>
+      </header>
+
+      <div class="slide-body">
+        <h1 class="slide-headline" id="vd-slide-4-title">
+          Open questions. <em>None block v1.</em>
+        </h1>
+
+        <div>
+          <div class="qrow">
+            <span class="qid">Q1</span>
+            <span class="qbody">HydraX rails API surface — mocked adapter behind a stable interface</span>
+            <span class="qstatus">Deferred-not-resolved</span>
+          </div>
+          <div class="qrow">
+            <span class="qid">Q3</span>
+            <span class="qbody">First product type — short-duration credit, 30 to 180 day tenor</span>
+            <span class="qstatus">Proposed</span>
+          </div>
+          <div class="qrow">
+            <span class="qid">Q4</span>
+            <span class="qbody">First tenant persona — shortlist memo in repo</span>
+            <span class="qstatus">Memo ready</span>
+          </div>
+          <div class="qrow">
+            <span class="qid">Q7</span>
+            <span class="qbody">Pricing model — options memo in repo</span>
+            <span class="qstatus">Memo ready</span>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-foot">
+        <span>Slide 4 / 5 — Open questions</span>
+        <span>Companion: canton-interview.html#slide-8</span>
+      </footer>
+    </section>
+
+    <section class="slide" id="vd-slide-5" aria-labelledby="vd-slide-5-title">
+      <header class="slide-meta">
+        <span class="brand-mark">HydraX</span>
+        <span><span class="timestamp">04:45 — 05:00</span></span>
+      </header>
+
+      <div class="slide-body">
+        <h1 class="slide-headline" id="vd-slide-5-title">
+          The rails are <em>yours.</em> Let's connect them.
+        </h1>
+
+        <article class="ask-card">
+          <h3>What we are asking for</h3>
+          <ol>
+            <li>Validation of the wedge — institutional issuance + subscription servicing.</li>
+            <li>Alignment on the four open questions, especially Q1.</li>
+            <li>A working session on the HydraX adapter contract.</li>
+          </ol>
+        </article>
+      </div>
+
+      <footer class="slide-foot">
+        <span>Slide 5 / 5 — Ask + close</span>
+        <span>Workflow code is moving.</span>
+      </footer>
+    </section>
+  </body>
+</html>
