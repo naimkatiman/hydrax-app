@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/naimkatiman/hydrax-app/services/approval-svc/internal/approvals"
+	"github.com/naimkatiman/hydrax-app/services/approval-svc/internal/db"
 	"github.com/naimkatiman/hydrax-app/services/approval-svc/internal/handlers"
 )
 
@@ -22,7 +24,29 @@ func main() {
 	if port == "" {
 		port = "7002"
 	}
-	repo := approvals.NewMemRepo()
+	dbURL := os.Getenv("DATABASE_URL")
+
+	var repo approvals.Repo
+	var pool interface{ Close() error }
+	if dbURL != "" {
+		p, err := db.OpenPool(dbURL)
+		if err != nil {
+			log.Fatalf("db.OpenPool: %v", err)
+		}
+		// Startup ping: fail fast on bad DSN rather than at first query.
+		pingCtx, pingCancel := context.WithTimeout(context.Background(), 3*time.Second)
+		if err := p.PingContext(pingCtx); err != nil {
+			pingCancel()
+			log.Fatalf("db.OpenPool ping: %v", err)
+		}
+		pingCancel()
+		pool = p
+		repo = approvals.NewPgRepo(p)
+		log.Printf("%s pg-backed approvals enabled (db=%s)", serviceName, redactDSN(dbURL))
+	} else {
+		repo = approvals.NewMemRepo()
+		log.Printf("%s DATABASE_URL unset — falling back to in-memory MemRepo (process restart wipes state)", serviceName)
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handlers.Health(serviceName))
@@ -31,7 +55,7 @@ func main() {
 
 	srv := &http.Server{Addr: ":" + port, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	go func() {
-		log.Printf("%s listening on :%s (in-memory repo — persistence deferred)", serviceName, port)
+		log.Printf("%s listening on :%s", serviceName, port)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("listen: %v", err)
 		}
@@ -44,10 +68,13 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Printf("shutdown: %v", err)
 	}
+	if pool != nil {
+		_ = pool.Close()
+	}
 }
 
 // routeCollection fans /v1/approvals.
-func routeCollection(repo *approvals.MemRepo) http.HandlerFunc {
+func routeCollection(repo approvals.Repo) http.HandlerFunc {
 	appendH := handlers.Append(repo)
 	listH := handlers.ListPending(repo)
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +92,7 @@ func routeCollection(repo *approvals.MemRepo) http.HandlerFunc {
 }
 
 // routeItem fans /v1/approvals/{id} and /v1/approvals/{id}/decide.
-func routeItem(repo *approvals.MemRepo) http.HandlerFunc {
+func routeItem(repo approvals.Repo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/v1/approvals/")
 		// path is now either "{id}" or "{id}/decide".
@@ -81,4 +108,14 @@ func routeItem(repo *approvals.MemRepo) http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"error":"not_found"}`))
 		}
 	}
+}
+
+// redactDSN strips credentials from a Postgres URL for logging. Mirrors
+// workflow-svc's helper.
+func redactDSN(dsn string) string {
+	u, err := url.Parse(dsn)
+	if err != nil {
+		return "<unparseable-dsn>"
+	}
+	return u.Redacted()
 }

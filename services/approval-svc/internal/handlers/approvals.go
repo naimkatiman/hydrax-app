@@ -54,7 +54,7 @@ func errorJSON(w http.ResponseWriter, status int, code, msg string) {
 }
 
 // Append POST /v1/approvals
-func Append(repo *approvals.MemRepo) http.HandlerFunc {
+func Append(repo approvals.Repo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "POST only")
@@ -88,7 +88,7 @@ func Append(repo *approvals.MemRepo) http.HandlerFunc {
 }
 
 // Get GET /v1/approvals/{id}. id pre-extracted by router.
-func Get(repo *approvals.MemRepo, id string) http.HandlerFunc {
+func Get(repo approvals.Repo, id string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "GET only")
@@ -111,7 +111,7 @@ func Get(repo *approvals.MemRepo, id string) http.HandlerFunc {
 }
 
 // ListPending GET /v1/approvals (status=pending currently the only filter).
-func ListPending(repo *approvals.MemRepo) http.HandlerFunc {
+func ListPending(repo approvals.Repo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "GET only")
@@ -134,7 +134,7 @@ func ListPending(repo *approvals.MemRepo) http.HandlerFunc {
 }
 
 // Decide POST /v1/approvals/{id}/decide. id pre-extracted by router.
-func Decide(repo *approvals.MemRepo, id string) http.HandlerFunc {
+func Decide(repo approvals.Repo, id string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			errorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "POST only")
