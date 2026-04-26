@@ -107,6 +107,14 @@
       "consumed_by": "#slide-16 { background-image }",
       "role": "Slide 16 (Infrastructure) ambient hero — service-mesh topology with convergent composite-health node.",
       "prompt": "Top-down architectural diagram of a service mesh: a clean grid of eight square server-rack tiles in the upper region and five thin static-site cards in the lower region, both connected by thin tracing lines that converge into a single central composite-health node, monochrome warm-grey palette: deep charcoal #141414 background, panel #242424 service tiles, warm-grey #CDC8C2 connection lines and central node, off-white #F5F5F5 active-status highlights, editorial flat-isometric render, ultra-clean institutional infrastructure aesthetic, no text, no labels, no logos, 16:9 widescreen, 1376x768"
+    },
+    {
+      "file": "slide-17-data-sync.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-17 { background-image }",
+      "role": "Slide 17 (Data & sync) ambient hero — event-projection pipeline from ledger to dual store silos.",
+      "prompt": "Top-down architectural diagram of an event-projection pipeline: a central ledger column on the left emitting a horizontal flow of square event packets traveling rightward, splitting into two parallel destination silos (a tall cylindrical Postgres-shape and a wider rounded Mongo-shape) on the right, with thin warm-grey lag-indicator lines and small timestamp ticks along the flow path, monochrome warm-grey palette: deep charcoal #141414 background, panel #242424 silos and central column, warm-grey #CDC8C2 event packets and flow lines, off-white #F5F5F5 active-write highlights, editorial isometric render, ultra-clean institutional data-engineering aesthetic, no text, no labels, no logos, 16:9 widescreen, 1376x768"
     }
   ],
   "wiring_notes": [
