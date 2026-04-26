@@ -8,6 +8,7 @@ import { OpsSidebar, OpsBrand } from "./components/OpsSidebar";
 import { OpsTopBar } from "./components/OpsTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
 import { AuditRoute } from "./routes/AuditRoute";
+import { HealthRoute } from "./routes/HealthRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -26,6 +27,7 @@ function ShellContents() {
       <Routes>
         <Route path="/" element={<HomeRoute />} />
         <Route path="/audit" element={<AuditRoute />} />
+        <Route path="/health" element={<HealthRoute />} />
       </Routes>
     </AppShell>
   );
