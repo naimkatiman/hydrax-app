@@ -2,7 +2,8 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/deck", "destination": "/deck.html" },
-    { "source": "/script", "destination": "/script.html" }
+    { "source": "/script", "destination": "/script.html" },
+    { "source": "/interview", "destination": "/canton-interview.html" }
   ],
   "headers": [
     {

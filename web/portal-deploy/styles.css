@@ -250,6 +250,9 @@ ul { list-style: none; }
   transform: translateX(-50%) translateY(-4px);
   display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: var(--hx-space-3);
   width: min(880px, 92vw); padding: var(--hx-space-4);
+  background: hsla(0, 0%, 9%, 0.96);
+  border-color: hsla(30, 8%, 78%, 0.18);
+  box-shadow: 0 24px 60px hsla(0, 0%, 0%, 0.55), var(--hx-shadow-glass);
   opacity: 0; pointer-events: none;
   transition: opacity var(--hx-medium) var(--hx-ease), transform var(--hx-medium) var(--hx-ease);
   z-index: 950;
@@ -470,6 +473,103 @@ ul { list-style: none; }
     linear-gradient(135deg, transparent 45%, var(--hx-accent) 46%, var(--hx-accent) 54%, transparent 55%),
     linear-gradient(45deg, transparent 45%, var(--hx-accent) 46%, var(--hx-accent) 54%, transparent 55%);
   background-size: 8px 8px; background-position: center; background-repeat: no-repeat;
+}
+
+/* Pricing */
+.pricing { padding-block: var(--hx-space-7); }
+.pricing__grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--hx-space-3); align-items: stretch;
+}
+.pricing-card {
+  display: flex; flex-direction: column; gap: var(--hx-space-3);
+  padding: var(--hx-space-4);
+}
+.pricing-card--featured {
+  border-color: var(--hx-teal);
+  box-shadow: 0 0 0 1px var(--hx-teal-soft), 0 18px 60px -28px var(--hx-teal-glow);
+}
+.pricing-card__head {
+  display: flex; flex-direction: column; gap: var(--hx-space-2);
+  padding-block-end: var(--hx-space-3);
+  border-block-end: 1px solid var(--hx-glass-border);
+}
+.pricing-card__icon {
+  width: 48px; height: 48px; border-radius: var(--hx-radius-md);
+  color: var(--hx-teal);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.pricing-card__badge {
+  align-self: flex-start;
+  font-size: var(--hx-eyebrow); font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--hx-ink-muted);
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--hx-glass-border);
+  background: var(--hx-glass-tint);
+}
+.pricing-card__badge--featured {
+  color: var(--hx-teal-strong);
+  border-color: var(--hx-teal);
+  background: var(--hx-teal-soft);
+}
+.pricing-card__title {
+  font-family: var(--hx-font-display);
+  font-size: 1.625rem; font-weight: 600; color: var(--hx-ink);
+  letter-spacing: -0.015em;
+}
+.pricing-card__subtitle {
+  font-size: var(--hx-small); color: var(--hx-ink-soft); line-height: 1.55;
+}
+.pricing-card__price {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-block-start: var(--hx-space-1);
+}
+.pricing-card__price-band {
+  font-family: var(--hx-font-display);
+  font-size: 1.75rem; font-weight: 600; color: var(--hx-ink);
+  letter-spacing: -0.02em;
+}
+.pricing-card__price-cta {
+  font-size: var(--hx-small); color: var(--hx-ink-muted);
+  letter-spacing: 0.02em;
+}
+.pricing-card__bullets {
+  display: flex; flex-direction: column; gap: var(--hx-space-2);
+  font-size: var(--hx-small); color: var(--hx-ink-soft); line-height: 1.55;
+  flex: 1;
+}
+.pricing-card__bullets li {
+  position: relative; padding-inline-start: 26px;
+}
+.pricing-card__bullets li::before {
+  content: ""; position: absolute; inset-inline-start: 0; inset-block-start: 6px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: hsla(30, 8%, 78%, 0.16);
+  border: 1px solid var(--hx-accent);
+  background-image:
+    linear-gradient(135deg, transparent 45%, var(--hx-accent) 46%, var(--hx-accent) 54%, transparent 55%),
+    linear-gradient(45deg, transparent 45%, var(--hx-accent) 46%, var(--hx-accent) 54%, transparent 55%);
+  background-size: 8px 8px; background-position: center; background-repeat: no-repeat;
+}
+.pricing-card--featured .pricing-card__bullets li::before {
+  border-color: var(--hx-teal);
+  background-image:
+    linear-gradient(135deg, transparent 45%, var(--hx-teal) 46%, var(--hx-teal) 54%, transparent 55%),
+    linear-gradient(45deg, transparent 45%, var(--hx-teal) 46%, var(--hx-teal) 54%, transparent 55%);
+  background-color: var(--hx-teal-soft);
+}
+.pricing-card__cta {
+  align-self: flex-start;
+  margin-block-start: var(--hx-space-2);
+}
+.pricing__footnote {
+  margin-block-start: var(--hx-space-4);
+  font-size: var(--hx-small); color: var(--hx-ink-muted); line-height: 1.55;
+  text-align: center;
+}
+@media (max-width: 960px) {
+  .pricing__grid { grid-template-columns: 1fr; }
 }
 
 /* Trust */
