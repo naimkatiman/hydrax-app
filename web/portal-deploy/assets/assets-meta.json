@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-04-26",
+  "tool": "nano-banana via openrouter (google/gemini-3.1-flash-image-preview)",
+  "consumed_by": "web/portal-deploy",
+  "post_processing": "Pillow JPEG re-encode (quality 76-78, progressive, optimize); hero downscaled to max-width 2000, solutions cards to max-width 1200",
+  "assets": [
+    {
+      "file": "hero-bg.jpg",
+      "prompt": "Abstract architectural photograph for an institutional fintech landing page. Deep navy and graphite, with subtle indigo and teal highlights. A modern bank-vault interior reimagined: long perspective corridor, soft volumetric light from above, hint of brushed-metal partitions, no people, no text. Slightly cinematic, slightly cold, MAS regulator-grade. Wide 16:9 cinematic banner. No logos, no UI, no glass-panel mockups, no charts.",
+      "dimensions": "1376x768",
+      "consumed_by": "styles.css :: .hero__bg background-image"
+    },
+    {
+      "file": "solutions-issuance.jpg",
+      "prompt": "Editorial macro photo: a single transparent token-shaped acrylic disc resting on a dark slate desk under one warm overhead light, paperwork edge visible at frame margin. Deep navy plus warm amber accent. Institutional, calm, document-led. 4:3 aspect ratio, landscape orientation. No text, no logos, no UI.",
+      "dimensions": "1200x896",
+      "consumed_by": "styles.css :: .solution-card__media[data-img=\"issuance\"]"
+    },
+    {
+      "file": "solutions-distribution.jpg",
+      "prompt": "Top-down editorial photo: a network of brushed-metal cables converging into a single hub on dark slate, soft directional lighting, no logos. Suggests routed flow, brokerage allocation. Deep navy plus cool steel. 4:3 aspect ratio, landscape orientation. No text, no UI.",
+      "dimensions": "1200x896",
+      "consumed_by": "styles.css :: .solution-card__media[data-img=\"distribution\"]"
+    },
+    {
+      "file": "solutions-servicing.jpg",
+      "prompt": "Editorial photo of a worn institutional client portfolio binder open at an indexed page on a dark walnut desk, a fountain pen resting beside it, single warm desk-lamp light from upper-left. Suggests servicing, statements, audit. Deep brown plus warm cream. 4:3 aspect ratio, landscape orientation. No text, no logos, no UI.",
+      "dimensions": "1200x896",
+      "consumed_by": "styles.css :: .solution-card__media[data-img=\"servicing\"]"
+    }
+  ]
+}
