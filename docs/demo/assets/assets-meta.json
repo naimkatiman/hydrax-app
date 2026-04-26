@@ -99,6 +99,14 @@
       "consumed_by": "#slide-15 { background-image }",
       "role": "Slide 15 (Composability) ambient hero — selective stakeholder-driven composition; nodes only connect via matching stakeholder dots.",
       "prompt": "Abstract network of distinct contract nodes connected by carefully drawn pathways: each contract a small floating panel with a thin halo of stakeholder-marker dots around it, several panels linked by precisely-drawn warm-grey lines that touch only the matching stakeholder dots (not arbitrary nodes), suggesting selective composition by explicit stakeholder declaration, monochrome warm-grey palette: deep charcoal #141414 background, panel #242424 contract bodies, warm-grey #CDC8C2 connection lines and dots, off-white #F5F5F5 highlights on connection endpoints, editorial flat-isometric render style, ultra-clean institutional minimalism, no text, no labels, no logos, 16:9 widescreen, 1376x768"
+    },
+    {
+      "file": "slide-16-infra-ops.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-16 { background-image }",
+      "role": "Slide 16 (Infrastructure) ambient hero — service-mesh topology with convergent composite-health node.",
+      "prompt": "Top-down architectural diagram of a service mesh: a clean grid of eight square server-rack tiles in the upper region and five thin static-site cards in the lower region, both connected by thin tracing lines that converge into a single central composite-health node, monochrome warm-grey palette: deep charcoal #141414 background, panel #242424 service tiles, warm-grey #CDC8C2 connection lines and central node, off-white #F5F5F5 active-status highlights, editorial flat-isometric render, ultra-clean institutional infrastructure aesthetic, no text, no labels, no logos, 16:9 widescreen, 1376x768"
     }
   ],
   "wiring_notes": [
