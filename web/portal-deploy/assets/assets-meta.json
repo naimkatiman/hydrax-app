@@ -27,6 +27,27 @@
       "prompt": "Editorial photo of a worn institutional client portfolio binder open at an indexed page on a dark walnut desk, a fountain pen resting beside it, single warm desk-lamp light from upper-left. Suggests servicing, statements, audit. Deep brown plus warm cream. 4:3 aspect ratio, landscape orientation. No text, no logos, no UI.",
       "dimensions": "1200x896",
       "consumed_by": "styles.css :: .solution-card__media[data-img=\"servicing\"]"
+    },
+    {
+      "file": "quickstart-hero.jpg",
+      "prompt": "Editorial wide-angle photograph of a minimalist institutional war-room interior. Long matte-black operations desk, three vertical monitor silhouettes (off, no on-screen content), soft volumetric daylight from a tall side window casting clean diagonal light beams, hint of brushed-steel acoustic partition, polished concrete floor. Deep navy and graphite tones with subtle warm-stone highlights. Mood: structured, MAS regulator-grade, suggests guided first-run onboarding. Wide 16:9 cinematic banner. No people, no logos, no text, no UI mockups, no charts.",
+      "dimensions": "1376x768",
+      "generated_at": "2026-04-27",
+      "consumed_by": "styles.css :: .hero--quickstart .hero__bg background-image"
+    },
+    {
+      "file": "pricing-hero.jpg",
+      "prompt": "Editorial architectural photograph of a stacked institutional ledger column. Tall column of horizontally layered marble and basalt slabs of varying tones (charcoal, pewter, warm-stone, single subtle amber band), receding diagonally into soft diffused light, single overhead beam catching one mid-stack slab. Deep graphite tones with warm amber accent. Mood: layered, transparent, tiered, suggests honest tiered commercial pricing. Wide 16:9 cinematic banner. No people, no logos, no text, no UI, no charts.",
+      "dimensions": "1376x768",
+      "generated_at": "2026-04-27",
+      "consumed_by": "styles.css :: .hero--pricing .hero__bg background-image"
+    },
+    {
+      "file": "docs-hero.jpg",
+      "prompt": "Editorial photograph of an institutional research library aisle at dusk. Long perspective corridor of tall walnut bookshelves filled with leather-bound volumes receding into deep shadow, single warm desk-lamp pool of light spilling onto a herringbone parquet floor in mid-frame, brass shelf tags catching the light. Deep brown and walnut tones with warm cream and amber accents. Mood: durable record, deep reference, suggests architecture and product documentation. Wide 16:9 cinematic banner. No people, no logos, no text, no UI, no charts.",
+      "dimensions": "1376x768",
+      "generated_at": "2026-04-27",
+      "consumed_by": "styles.css :: .hero--docs .hero__bg background-image"
     }
   ]
 }

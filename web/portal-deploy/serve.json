@@ -1,5 +1,11 @@
 {
   "rewrites": [
+    { "source": "/quickstart", "destination": "/quickstart/index.html" },
+    { "source": "/quickstart/", "destination": "/quickstart/index.html" },
+    { "source": "/pricing", "destination": "/pricing/index.html" },
+    { "source": "/pricing/", "destination": "/pricing/index.html" },
+    { "source": "/docs", "destination": "/docs/index.html" },
+    { "source": "/docs/", "destination": "/docs/index.html" },
     { "source": "/issuer", "destination": "/issuer/index.html" },
     { "source": "/issuer/", "destination": "/issuer/index.html" },
     { "source": "/issuer/**", "destination": "/issuer/index.html" },

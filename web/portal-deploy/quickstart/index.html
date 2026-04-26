@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141414" />
+    <title>Quickstart | HydraX Workflow</title>
+    <meta name="description" content="Three personas, three guided 60-second flows. The demo data is pre-baked so you can walk an issuer, distributor, or investor end to end." />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preload" as="image" href="/assets/quickstart-hero.jpg" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="nav glass--nav" id="nav">
+      <div class="container nav__inner">
+        <a class="nav__brand" href="/">
+          <span class="nav__brand-mark" aria-hidden="true"></span>
+          <span class="nav__brand-text">HydraX Workflow</span>
+        </a>
+
+        <nav class="nav__menu" id="navMenu" aria-label="Primary">
+          <div class="nav__solutions">
+            <button class="nav__link" id="solutionsTrigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="solutionsMenu">
+              Solutions
+              <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+            </button>
+            <div class="solutions-menu glass" id="solutionsMenu" role="menu" aria-labelledby="solutionsTrigger">
+              <div class="solutions-menu__col">
+                <p class="solutions-menu__title">By capability</p>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Issuance</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Distribution</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Servicing</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Compliance</a>
+              </div>
+              <div class="solutions-menu__col">
+                <p class="solutions-menu__title">By role</p>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Issuer Workbench</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Distributor Approvals</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Investor Subscriptions</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Operations Console</a>
+              </div>
+            </div>
+          </div>
+
+          <a class="nav__link" href="/#portals">Portals</a>
+          <a class="nav__link" href="/quickstart/" aria-current="page">Quickstart</a>
+          <a class="nav__link" href="/pricing/">Pricing</a>
+          <a class="nav__link" href="/docs/">Docs</a>
+          <a class="nav__link" href="/#contact">Contact</a>
+
+          <div class="nav__cta-row">
+            <a class="glass--button" href="/investor/">Open Investor Portal</a>
+            <a class="glass--button glass--button-primary" href="/#contact">Request Access</a>
+          </div>
+        </nav>
+
+        <button class="nav__toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navMenu">
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero hero--page hero--quickstart">
+        <div class="hero__bg" aria-hidden="true"></div>
+        <div class="container hero__inner">
+          <div class="hero__copy">
+            <p class="hero__eyebrow">Sixty-second flows</p>
+            <h1 class="hero__title">Walk a full lifecycle in under three minutes.</h1>
+            <p class="hero__lede">Three personas, three guided flows. The demo data is pre-baked &mdash; pick a role and follow the steps.</p>
+            <div class="hero__actions">
+              <a class="glass--button glass--button-primary" href="#flows">Start the issuer flow <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+              <a class="glass--button" href="/#portals">Skip to the portals</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section quickstart" id="flows">
+        <div class="container">
+          <header class="section__header">
+            <p class="section__eyebrow">Pick a persona</p>
+            <h2 class="section__title">What to try first.</h2>
+            <p class="section__lede">Each flow ends with a real state transition you can see reflected in the audit log.</p>
+          </header>
+
+          <div class="quickstart__tabs glass" id="personaTabs" role="tablist" aria-label="Persona flows">
+            <button class="quickstart__tab is-active" type="button" role="tab" id="tab-issuer" data-persona="issuer" aria-selected="true" aria-controls="panel-issuer">Issuer</button>
+            <button class="quickstart__tab" type="button" role="tab" id="tab-distributor" data-persona="distributor" aria-selected="false" tabindex="-1" aria-controls="panel-distributor">Distributor</button>
+            <button class="quickstart__tab" type="button" role="tab" id="tab-investor" data-persona="investor" aria-selected="false" tabindex="-1" aria-controls="panel-investor">Investor</button>
+          </div>
+
+          <div class="quickstart__panels" id="personaPanels">
+            <div class="quickstart__panel is-active" data-persona="issuer" id="panel-issuer" role="tabpanel" aria-labelledby="tab-issuer">
+              <ol class="quickstart__steps">
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">01</p>
+                  <p class="quickstart__step-title">Open the Issuer Workbench</p>
+                  <p class="quickstart__step-copy">Lands on the products list. The pre-baked product MMF-DEMO-PENDING is visible at the top.</p>
+                  <a class="quickstart__step-cta" href="/issuer/" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">02</p>
+                  <p class="quickstart__step-title">Open the product detail</p>
+                  <p class="quickstart__step-copy">You will see the lifecycle state machine &mdash; Draft, Pending Approval, Active. The Transition button is wired.</p>
+                  <a class="quickstart__step-cta" href="/issuer/products/MMF-DEMO-PENDING" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">03</p>
+                  <p class="quickstart__step-title">Approve the transition</p>
+                  <p class="quickstart__step-copy">Audit timeline updates. Open the Ops Console to see the same event reflected.</p>
+                  <a class="quickstart__step-cta" href="/ops/" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+              </ol>
+            </div>
+
+            <div class="quickstart__panel" data-persona="distributor" id="panel-distributor" role="tabpanel" aria-labelledby="tab-distributor" hidden>
+              <ol class="quickstart__steps">
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">01</p>
+                  <p class="quickstart__step-title">Open Distributor Approvals</p>
+                  <p class="quickstart__step-copy">The approval queue lists SUB-DEMO-PENDING at the top.</p>
+                  <a class="quickstart__step-cta" href="/distributor/" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">02</p>
+                  <p class="quickstart__step-title">Inspect a pending subscription</p>
+                  <p class="quickstart__step-copy">Click the row. Detail view shows investor, product, amount, and KYC state.</p>
+                  <a class="quickstart__step-cta" href="/distributor/" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">03</p>
+                  <p class="quickstart__step-title">Approve or reject</p>
+                  <p class="quickstart__step-copy">Click either action. Toast confirms; the row drops out of the queue.</p>
+                  <a class="quickstart__step-cta" href="/distributor/" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+              </ol>
+            </div>
+
+            <div class="quickstart__panel" data-persona="investor" id="panel-investor" role="tabpanel" aria-labelledby="tab-investor" hidden>
+              <ol class="quickstart__steps">
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">01</p>
+                  <p class="quickstart__step-title">Browse products</p>
+                  <p class="quickstart__step-copy">The demo product MMF-DEMO-ACTIVE is subscribable.</p>
+                  <a class="quickstart__step-cta" href="/investor/products" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">02</p>
+                  <p class="quickstart__step-title">Open a product, click Subscribe</p>
+                  <p class="quickstart__step-copy">Fill the form, submit. Redirects to /subscriptions/SUB-DEMO-PENDING.</p>
+                  <a class="quickstart__step-cta" href="/investor/products" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+                <li class="quickstart__step glass">
+                  <p class="quickstart__step-num">03</p>
+                  <p class="quickstart__step-title">Watch the audit timeline</p>
+                  <p class="quickstart__step-copy">Scroll to Activity. Three pre-baked events trace the lifecycle.</p>
+                  <a class="quickstart__step-cta" href="/investor/" target="_self">Take me there <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__cols">
+        <div class="footer__col">
+          <p class="footer__title">Product</p>
+          <ul class="footer__links">
+            <li><a href="/issuer/">Issuer Portal</a></li>
+            <li><a href="/distributor/">Distributor Portal</a></li>
+            <li><a href="/investor/">Investor Portal</a></li>
+            <li><a href="/ops/">Ops Console</a></li>
+            <li><a href="/admin/">Admin</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__title">Platform</p>
+          <ul class="footer__links">
+            <li><a href="/quickstart/">Quickstart</a></li>
+            <li><a href="/pricing/">Pricing</a></li>
+            <li><a href="/docs/">Docs</a></li>
+            <li><a href="/#portals">Status</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__title">HydraX rails</p>
+          <ul class="footer__links">
+            <li><a href="https://www.hydrax.io/" target="_blank" rel="noopener">hydrax.io</a></li>
+            <li><a href="https://www.hydrax.io/services/tokenisation-services/" target="_blank" rel="noopener">Tokenisation</a></li>
+            <li><a href="https://www.hydrax.io/services/custody/" target="_blank" rel="noopener">Custody</a></li>
+            <li><a href="https://www.hydrax.io/services/digitalsecurities-exchange/" target="_blank" rel="noopener">Exchange</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__title">Company</p>
+          <ul class="footer__links">
+            <li><a href="https://www.hydrax.io/about/" target="_blank" rel="noopener">About</a></li>
+            <li><a href="/#contact">Contact</a></li>
+            <li><a href="https://www.hydrax.io/careers/" target="_blank" rel="noopener">Careers</a></li>
+            <li><a href="https://www.hydrax.io/privacy-policy/" target="_blank" rel="noopener">Privacy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="container footer__legal">
+        <p>&copy; 2026 HydraX Workflow. Built above the regulated rails of <a href="https://www.hydrax.io/" target="_blank" rel="noopener">Hydra X Pte. Ltd.</a></p>
+      </div>
+    </footer>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

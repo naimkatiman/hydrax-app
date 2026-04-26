@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141414" />
+    <title>Docs | HydraX Workflow</title>
+    <meta name="description" content="Product requirements, architecture, and reference for the HydraX Workflow platform." />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preload" as="image" href="/assets/docs-hero.jpg" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="nav glass--nav" id="nav">
+      <div class="container nav__inner">
+        <a class="nav__brand" href="/">
+          <span class="nav__brand-mark" aria-hidden="true"></span>
+          <span class="nav__brand-text">HydraX Workflow</span>
+        </a>
+
+        <nav class="nav__menu" id="navMenu" aria-label="Primary">
+          <div class="nav__solutions">
+            <button class="nav__link" id="solutionsTrigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="solutionsMenu">
+              Solutions
+              <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+            </button>
+            <div class="solutions-menu glass" id="solutionsMenu" role="menu" aria-labelledby="solutionsTrigger">
+              <div class="solutions-menu__col">
+                <p class="solutions-menu__title">By capability</p>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Issuance</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Distribution</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Servicing</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#solutions">Compliance</a>
+              </div>
+              <div class="solutions-menu__col">
+                <p class="solutions-menu__title">By role</p>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Issuer Workbench</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Distributor Approvals</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Investor Subscriptions</a>
+                <a class="solutions-menu__item" role="menuitem" href="/#portals">Operations Console</a>
+              </div>
+            </div>
+          </div>
+
+          <a class="nav__link" href="/#portals">Portals</a>
+          <a class="nav__link" href="/quickstart/">Quickstart</a>
+          <a class="nav__link" href="/pricing/">Pricing</a>
+          <a class="nav__link" href="/docs/" aria-current="page">Docs</a>
+          <a class="nav__link" href="/#contact">Contact</a>
+
+          <div class="nav__cta-row">
+            <a class="glass--button" href="/investor/">Open Investor Portal</a>
+            <a class="glass--button glass--button-primary" href="/#contact">Request Access</a>
+          </div>
+        </nav>
+
+        <button class="nav__toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navMenu">
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+          <span class="nav__toggle-bar"></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero hero--page hero--docs">
+        <div class="hero__bg" aria-hidden="true"></div>
+        <div class="container hero__inner">
+          <div class="hero__copy">
+            <p class="hero__eyebrow">Documentation</p>
+            <h1 class="hero__title">The product on paper.</h1>
+            <p class="hero__lede">The PRD, the architecture brief, and the reference material we hand to design partners. These are the same documents we use internally.</p>
+            <div class="hero__actions">
+              <a class="glass--button glass--button-primary" href="/docs/prd.md" target="_blank" rel="noopener">Open the PRD <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span></a>
+              <a class="glass--button" href="/docs/architecture.md" target="_blank" rel="noopener">Read the architecture</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section solutions" id="library">
+        <div class="container">
+          <header class="section__header">
+            <p class="section__eyebrow">Reference library</p>
+            <h2 class="section__title">Start here.</h2>
+            <p class="section__lede">Three documents cover what the platform is, why it exists, and how it is built.</p>
+          </header>
+
+          <div class="solutions__grid">
+            <article class="solution-card glass glass--card solution-card--icon-only">
+              <div class="solution-card__body">
+                <span class="solution-card__icon glass--inset icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><path d="M9 9h1"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></span>
+                <h3 class="solution-card__title">Product Requirements</h3>
+                <p class="solution-card__copy">The authoritative spec. Sections 1&ndash;24 cover positioning, roles, MVP scope, and open questions. Read this first.</p>
+                <a class="portal-card__cta" href="/docs/prd.md" target="_blank" rel="noopener">Open PRD <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span></a>
+              </div>
+            </article>
+
+            <article class="solution-card glass glass--card solution-card--icon-only">
+              <div class="solution-card__body">
+                <span class="solution-card__icon glass--inset icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+                <h3 class="solution-card__title">Architecture brief</h3>
+                <p class="solution-card__copy">Service map, data ownership, ledger boundaries, and how the workflow layer composes with HydraX rails.</p>
+                <a class="portal-card__cta" href="/docs/architecture.md" target="_blank" rel="noopener">Open architecture <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span></a>
+              </div>
+            </article>
+
+            <article class="solution-card glass glass--card solution-card--icon-only">
+              <div class="solution-card__body">
+                <span class="solution-card__icon glass--inset icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                <h3 class="solution-card__title">Demo flow</h3>
+                <p class="solution-card__copy">Three guided 60-second walkthroughs across issuer, distributor, and investor. Pre-baked demo data, no backend round-trip.</p>
+                <a class="portal-card__cta" href="/quickstart/">Open quickstart <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+              </div>
+            </article>
+          </div>
+
+          <p class="pricing__footnote">More to land here over the next few weeks: API references, integration runbooks, and a tenant-onboarding checklist. Want to see a specific doc first? <a href="mailto:partnerships@hydrax-app.dev?subject=Docs%20request">Email us</a>.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__cols">
+        <div class="footer__col">
+          <p class="footer__title">Product</p>
+          <ul class="footer__links">
+            <li><a href="/issuer/">Issuer Portal</a></li>
+            <li><a href="/distributor/">Distributor Portal</a></li>
+            <li><a href="/investor/">Investor Portal</a></li>
+            <li><a href="/ops/">Ops Console</a></li>
+            <li><a href="/admin/">Admin</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__title">Platform</p>
+          <ul class="footer__links">
+            <li><a href="/quickstart/">Quickstart</a></li>
+            <li><a href="/pricing/">Pricing</a></li>
+            <li><a href="/docs/">Docs</a></li>
+            <li><a href="/#portals">Status</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__title">HydraX rails</p>
+          <ul class="footer__links">
+            <li><a href="https://www.hydrax.io/" target="_blank" rel="noopener">hydrax.io</a></li>
+            <li><a href="https://www.hydrax.io/services/tokenisation-services/" target="_blank" rel="noopener">Tokenisation</a></li>
+            <li><a href="https://www.hydrax.io/services/custody/" target="_blank" rel="noopener">Custody</a></li>
+            <li><a href="https://www.hydrax.io/services/digitalsecurities-exchange/" target="_blank" rel="noopener">Exchange</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="footer__title">Company</p>
+          <ul class="footer__links">
+            <li><a href="https://www.hydrax.io/about/" target="_blank" rel="noopener">About</a></li>
+            <li><a href="/#contact">Contact</a></li>
+            <li><a href="https://www.hydrax.io/careers/" target="_blank" rel="noopener">Careers</a></li>
+            <li><a href="https://www.hydrax.io/privacy-policy/" target="_blank" rel="noopener">Privacy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="container footer__legal">
+        <p>&copy; 2026 HydraX Workflow. Built above the regulated rails of <a href="https://www.hydrax.io/" target="_blank" rel="noopener">Hydra X Pte. Ltd.</a></p>
+      </div>
+    </footer>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
