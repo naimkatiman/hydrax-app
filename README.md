@@ -155,18 +155,43 @@ Tracked in [PRD-v2 §14](docs/prd-v2.md). Each blocker has a draft response in `
 
 All four require external action to actually unblock.
 
-## Canton interview deck
+## Canton decks
 
-Nine slides covering the architecture story. Source: [docs/demo/canton-interview.html](docs/demo/canton-interview.html) — open it for the keyboard-navigable deck (←/→/space/PgUp/PgDn/Home/End, mouse-wheel paging, IntersectionObserver reveal, `prefers-reduced-motion` respected). Hero imagery below is the per-slide ambient backdrop generated via `/nano-banana`; provenance is in [docs/demo/assets/assets-meta.json](docs/demo/assets/assets-meta.json).
+Two slide decks live in this repo. Both are single-file HTML, keyboard-navigable (←/→/space/PgUp/PgDn/Home/End, mouse-wheel paging, IntersectionObserver reveal, `prefers-reduced-motion` respected). Hero imagery is generated via `/nano-banana`; provenance is in [docs/demo/assets/assets-meta.json](docs/demo/assets/assets-meta.json).
+
+### Primary — homework-aligned deck (14 slides)
+
+[docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) — structured directly around the homework's three required sections. Deployed at [hydrax-context-production.up.railway.app/deck](https://hydrax-context-production.up.railway.app/deck). Pairs with the long-form article [docs/demo/canton-homework.md](docs/demo/canton-homework.md).
+
+| # | Section | Title | Hero |
+|---|---|---|---|
+| 0 | Cover | Canton Network — Homework Submission | ![slide-0](docs/demo/assets/slide-0-stack.jpg) |
+| 1 | §1 Conceptual Overview | Canton in one frame | ![slide-1](docs/demo/assets/slide-1-thesis-split.jpg) |
+| 2 | §1 | Participants, synchronisers, Daml contracts | ![slide-2](docs/demo/assets/slide-2-three-primitives.jpg) |
+| 3 | §1 | Four layers, one direction of authority | ![slide-3](docs/demo/assets/slide-3-canton-wiring.jpg) |
+| 4 | §1 | Canton vs public L1 vs traditional permissioned DLT | ![slide-4](docs/demo/assets/slide-4-where-canton-stops.jpg) |
+| 5 | §2 Building on Canton | Developer toolchain that actually feels like dev | ![slide-5](docs/demo/assets/slide-3-canton-wiring.jpg) |
+| 6 | §2 | Local → testnet → mainnet | ![slide-6](docs/demo/assets/slide-1-thesis-split.jpg) |
+| 7 | §2 | Where Canton stops, where Web2 takes over | ![slide-7](docs/demo/assets/slide-4-where-canton-stops.jpg) |
+| 8 | §2 | Practical assumptions if I were starting today | ![slide-8](docs/demo/assets/slide-6-one-workflow.jpg) |
+| 9 | §3 Technical Deep Dive | Privacy & security model | ![slide-9](docs/demo/assets/slide-4-where-canton-stops.jpg) |
+| 10 | §3 | Single sync vs Global Synchronizer | ![slide-10](docs/demo/assets/slide-3-canton-wiring.jpg) |
+| 11 | §3 | Daml choices as state transitions | ![slide-11](docs/demo/assets/slide-2-three-primitives.jpg) |
+| 12 | §3 | What I built above Canton | ![slide-12](docs/demo/assets/slide-6-one-workflow.jpg) |
+| 13 | Close | Trade-offs now, roadmap next | ![slide-13](docs/demo/assets/slide-8-tradeoffs-roadmap.jpg) |
+
+### Alternate — architecture-positioning deck (9 slides)
+
+[docs/demo/canton-interview.html](docs/demo/canton-interview.html) — the earlier framing, organised around the "Canton owns the rails, we build above" thesis rather than the homework's three-section structure. Kept for reference.
 
 | # | Title | Hero |
 |---|---|---|
-| 0 | Canton Network + the layer above it | ![slide-0](docs/demo/assets/slide-0-stack.jpg) |
-| 1 | Canton owns the rails. We own the layer above. | ![slide-1](docs/demo/assets/slide-1-thesis-split.jpg) |
-| 2 | Canton in three primitives | ![slide-2](docs/demo/assets/slide-2-three-primitives.jpg) |
-| 3 | How Canton is wired | ![slide-3](docs/demo/assets/slide-3-canton-wiring.jpg) |
-| 4 | Where Canton stops vs what the app must do | ![slide-4](docs/demo/assets/slide-4-where-canton-stops.jpg) |
-| 5 | Three planes above the rails | ![slide-5](docs/demo/assets/slide-5-three-planes.jpg) |
-| 6 | One workflow across three planes | ![slide-6](docs/demo/assets/slide-6-one-workflow.jpg) |
-| 7 | Status, grounded in commits | ![slide-7](docs/demo/assets/slide-7-status.jpg) |
-| 8 | Trade-offs now, roadmap next | ![slide-8](docs/demo/assets/slide-8-tradeoffs-roadmap.jpg) |
+| 0 | Canton Network + the layer above it | ![alt-slide-0](docs/demo/assets/slide-0-stack.jpg) |
+| 1 | Canton owns the rails. We own the layer above. | ![alt-slide-1](docs/demo/assets/slide-1-thesis-split.jpg) |
+| 2 | Canton in three primitives | ![alt-slide-2](docs/demo/assets/slide-2-three-primitives.jpg) |
+| 3 | How Canton is wired | ![alt-slide-3](docs/demo/assets/slide-3-canton-wiring.jpg) |
+| 4 | Where Canton stops vs what the app must do | ![alt-slide-4](docs/demo/assets/slide-4-where-canton-stops.jpg) |
+| 5 | Three planes above the rails | ![alt-slide-5](docs/demo/assets/slide-5-three-planes.jpg) |
+| 6 | One workflow across three planes | ![alt-slide-6](docs/demo/assets/slide-6-one-workflow.jpg) |
+| 7 | Status, grounded in commits | ![alt-slide-7](docs/demo/assets/slide-7-status.jpg) |
+| 8 | Trade-offs now, roadmap next | ![alt-slide-8](docs/demo/assets/slide-8-tradeoffs-roadmap.jpg) |

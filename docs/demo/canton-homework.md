@@ -4,13 +4,14 @@
 
 > Canton owns the rails. The interesting work is the layer above.
 
-**Live:** https://hydrax-context-production.up.railway.app — single-URL presentation: cover article + 9-slide deck + 5-minute script + live multi-portal demo + public source.
+**Live:** https://hydrax-context-production.up.railway.app — single-URL presentation: cover article + 14-slide homework deck + 5-minute script + live multi-portal demo + public source.
 
 This is a single-page index for the homework. The substantive material lives in three artifacts and a working prototype:
 
 | Artifact | What it is |
 |---|---|
-| [docs/demo/canton-interview.html](docs/demo/canton-interview.html) | 9-slide visual deck (slide-0 cover → slide-8 trade-offs) |
+| [docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) | **Primary deck** — 14 slides structured to answer the homework's three sections (§1 Conceptual Overview, §2 Building on Canton, §3 Technical Deep Dive). Deployed at `hydrax-context/deck`. |
+| [docs/demo/canton-interview.html](docs/demo/canton-interview.html) | Alternate deck — 9-slide architecture-positioning narrative (slide-0 cover → slide-8 trade-offs). The earlier framing, kept for reference. |
 | [docs/demo/script-5min.md](docs/demo/script-5min.md) | 5-minute walkthrough script + [shot-list.md](docs/demo/shot-list.md) |
 | [docs/prd.md](docs/prd.md) | 24-section PRD for the platform built above the rails |
 | [hydrax-app/](hydrax-app/) repo | 8 backend services + 5 white-label portals; the "build above Canton" answer expressed as code, not prose |

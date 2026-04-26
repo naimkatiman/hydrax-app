@@ -244,9 +244,33 @@
       }
     }
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Deck-specific overrides so the topnav doesn't fight the slide layout */
+    body { background: #1a1a1a; }
+    .topnav { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; }
+    .deck { padding-top: 60px; }
+    .slide-nav { top: 80px !important; }
+  </style>
 </head>
 
 <body>
+  <nav class="topnav" aria-label="Primary">
+    <div class="topnav-inner">
+      <a href="/" class="topnav-brand"><span class="dot"></span>HydraX × Canton</a>
+      <div class="topnav-links">
+        <a href="/">Home</a>
+        <a href="/deck" class="active">Deck</a>
+        <a href="/script">Script</a>
+        <a href="https://hydrax-portals-production.up.railway.app/" target="_blank" rel="noopener">Live App <span class="ext-arrow">↗</span></a>
+        <a href="https://github.com/naimkatiman/hydrax-app" target="_blank" rel="noopener">GitHub <span class="ext-arrow">↗</span></a>
+      </div>
+    </div>
+  </nav>
+
   <div class="slide-nav" aria-label="Slide navigation">
     <button type="button" data-nav="prev" aria-label="Previous slide">&larr;</button>
     Slide <b id="slide-num">1</b> <small>/ 9</small>
@@ -305,8 +329,8 @@
             <p style="font-size: 14px; color: #BCBCBC; font-weight: 500; margin: 0;">5 Daml Scripts Green</p>
           </div>
           <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(205,200,194,0.15);">
-            <p style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #888; margin: 0 0 8px 0;">Hosted version</p>
-            <a href="https://hydrax-context-production.up.railway.app" target="_blank" rel="noopener" style="font-size: 14px; color: #CDC8C2; font-weight: 500; text-decoration: none; border-bottom: 1px solid rgba(205,200,194,0.4);">hydrax-context-production.up.railway.app &rarr;</a>
+            <p style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #888; margin: 0 0 8px 0;">Written companion</p>
+            <a href="/" style="font-size: 14px; color: #CDC8C2; font-weight: 500; text-decoration: none; border-bottom: 1px solid rgba(205,200,194,0.4);">Read the cover article &rarr;</a>
           </div>
         </div>
       </div>

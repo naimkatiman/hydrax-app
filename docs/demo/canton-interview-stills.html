@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canton interview deck — stills only</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: #141414;
+      color: #F5F5F5;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 48px 16px 96px;
+    }
+
+    .slide-container {
+      position: relative;
+      width: 1280px;
+      max-width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #0c0c0c;
+      border: 1px solid rgba(245, 245, 245, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
+      flex-shrink: 0;
+      scroll-margin-top: 24px;
+    }
+
+    .slide-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #0c0c0c;
+    }
+
+    .slide-nav {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(36, 36, 36, 0.82);
+      border: 1px solid rgba(245, 245, 245, 0.28);
+      font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;
+      font-size: 13px;
+      color: #F5F5F5;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      user-select: none;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .slide-nav b { color: #CDC8C2; font-weight: 600; }
+    .slide-nav small { color: #BCBCBC; }
+
+    .slide-nav button {
+      background: transparent;
+      border: 1px solid rgba(245, 245, 245, 0.28);
+      color: #F5F5F5;
+      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .slide-nav button:hover,
+    .slide-nav button:focus-visible {
+      border-color: #CDC8C2;
+      color: #CDC8C2;
+      background: rgba(205, 200, 194, 0.14);
+      outline: none;
+    }
+
+    @media print {
+      .slide-nav { display: none; }
+      .deck { padding: 0; gap: 0; }
+      .slide-container { page-break-after: always; border: none; box-shadow: none; border-radius: 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="slide-nav" aria-label="Slide navigation">
+    <button type="button" data-nav="prev" aria-label="Previous slide">&larr;</button>
+    Slide <b id="slide-num">1</b> <small>/ 9</small>
+    <button type="button" data-nav="next" aria-label="Next slide">&rarr;</button>
+  </div>
+
+  <main class="deck">
+    <section class="slide-container slide-page" id="slide-0" aria-label="Slide 1">
+      <img class="slide-image" src="./assets/slide-0-stack.jpg"
+        alt="Three-tier architectural stack visualization" />
+    </section>
+    <section class="slide-container slide-page" id="slide-1" aria-label="Slide 2">
+      <img class="slide-image" src="./assets/slide-1-thesis-split.jpg"
+        alt="Two architectural strata separated by a sharp horizon" />
+    </section>
+    <section class="slide-container slide-page" id="slide-2" aria-label="Slide 3">
+      <img class="slide-image" src="./assets/slide-2-three-primitives.jpg"
+        alt="Three monolithic columns suggesting Canton primitives" />
+    </section>
+    <section class="slide-container slide-page" id="slide-3" aria-label="Slide 4">
+      <img class="slide-image" src="./assets/slide-3-canton-wiring.jpg"
+        alt="Synchronizer and participant nodes topology" />
+    </section>
+    <section class="slide-container slide-page" id="slide-4" aria-label="Slide 5">
+      <img class="slide-image" src="./assets/slide-4-where-canton-stops.jpg"
+        alt="Quiet horizon evoking the trust boundary" />
+    </section>
+    <section class="slide-container slide-page" id="slide-5" aria-label="Slide 6">
+      <img class="slide-image" src="./assets/slide-5-three-planes.jpg"
+        alt="Three parallel floating planes" />
+    </section>
+    <section class="slide-container slide-page" id="slide-6" aria-label="Slide 7">
+      <img class="slide-image" src="./assets/slide-6-one-workflow.jpg"
+        alt="A single ribbon of light threading through three planes" />
+    </section>
+    <section class="slide-container slide-page" id="slide-7" aria-label="Slide 8">
+      <img class="slide-image" src="./assets/slide-7-status.jpg"
+        alt="Minimalist instrumentation panel with indicator dots" />
+    </section>
+    <section class="slide-container slide-page" id="slide-8" aria-label="Slide 9">
+      <img class="slide-image" src="./assets/slide-8-tradeoffs-roadmap.jpg"
+        alt="A single path forking into multiple trajectories" />
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide-page'));
+      var label = document.getElementById('slide-num');
+      var current = 0;
+      function update(i) {
+        current = Math.max(0, Math.min(slides.length - 1, i));
+        if (label) label.textContent = String(current + 1);
+        slides[current].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); update(current + 1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); update(current - 1); }
+        else if (e.key === 'Home') { e.preventDefault(); update(0); }
+        else if (e.key === 'End') { e.preventDefault(); update(slides.length - 1); }
+      });
+      document.querySelectorAll('.slide-nav [data-nav]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          update(current + (btn.dataset.nav === 'next' ? 1 : -1));
+        });
+      });
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              var idx = slides.indexOf(entry.target);
+              if (idx >= 0 && label) { current = idx; label.textContent = String(idx + 1); }
+            }
+          });
+        }, { threshold: 0.55 });
+        slides.forEach(function (s) { io.observe(s); });
+      }
+    })();
+  </script>
+</body>
+
+</html>
