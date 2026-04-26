@@ -11,6 +11,7 @@ export {
   useListPendingApprovalsQuery,
   useDecideApprovalMutation,
   useGetSubscriptionQuery,
+  useCreateSubscriptionMutation,
 } from "./api";
 export type {
   HealthResponse,
@@ -29,5 +30,6 @@ export type {
   ApprovalStatus,
   DecideApprovalArgs,
   Subscription,
+  CreateSubscriptionInput,
 } from "./api";
 export * from "./auth.js";

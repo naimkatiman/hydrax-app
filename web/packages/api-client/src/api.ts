@@ -115,6 +115,13 @@ export interface Subscription {
   readonly updated_at: string;
 }
 
+export interface CreateSubscriptionInput {
+  readonly product_id: string;
+  readonly amount_minor: number;
+  readonly currency: string;
+  readonly investor_user_id: string;
+}
+
 type ViteEnv = { readonly VITE_BFF_URL?: string; readonly VITE_DEMO_MODE?: string };
 
 function readBffUrl(): string {
@@ -197,6 +204,27 @@ function demoQuery(url: string, method: string, body?: unknown): unknown {
     return { ...approval, status: decision, decided_at: "2026-04-26T00:00:00.000000Z" };
   }
 
+  if (path === "/v1/subscriptions" && method === "POST") {
+    // Pretends to create a subscription but actually returns the
+    // pre-baked pending subscription so the redirect lands on a
+    // detail page with a populated audit timeline. Form values are
+    // echoed in the returned object so the optimistic UI feels right;
+    // the persistent state is the fixture in DEMO_SUBSCRIPTIONS.
+    const input = body && typeof body === "object"
+      ? (body as { product_id?: string; amount_minor?: number; currency?: string; investor_user_id?: string })
+      : {};
+    return {
+      id: "cccccccc-1111-4ccc-8ccc-000000000002",
+      product_id: input.product_id ?? DEMO_PRODUCTS[2]!.id,
+      investor_user_id: input.investor_user_id ?? "dddddddd-1111-4ddd-8ddd-000000000002",
+      amount_minor: input.amount_minor ?? 25_000_000_000,
+      currency: input.currency ?? "USD",
+      status: "pending",
+      created_at: "2026-04-26T09:00:00.000000Z",
+      updated_at: "2026-04-26T09:00:00.000000Z",
+    };
+  }
+
   const subMatch = /^\/v1\/subscriptions\/([^/]+)$/.exec(path);
   if (subMatch) {
     const id = decodeURIComponent(subMatch[1]!);
@@ -273,6 +301,9 @@ export const hydraxApi = createApi({
     getSubscription: builder.query<Subscription, string>({
       query: (id) => ({ url: `/v1/subscriptions/${encodeURIComponent(id)}` }),
     }),
+    createSubscription: builder.mutation<Subscription, CreateSubscriptionInput>({
+      query: (body) => ({ url: "/v1/subscriptions", method: "POST", body }),
+    }),
   }),
 });
 
@@ -305,3 +336,6 @@ export const useDecideApprovalMutation: typeof hydraxApi.endpoints.decideApprova
 
 export const useGetSubscriptionQuery: typeof hydraxApi.endpoints.getSubscription.useQuery =
   hydraxApi.endpoints.getSubscription.useQuery;
+
+export const useCreateSubscriptionMutation: typeof hydraxApi.endpoints.createSubscription.useMutation =
+  hydraxApi.endpoints.createSubscription.useMutation;
