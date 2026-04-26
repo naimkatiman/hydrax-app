@@ -118,7 +118,7 @@ const navButtonStyle = (disabled: boolean): React.CSSProperties => ({
   borderRadius: "var(--hydrax-radius-sm)",
   cursor: disabled ? "not-allowed" : "pointer",
   fontFamily: "var(--hydrax-font-sans)",
-  fontSize: 14,
+  fontSize: "var(--hydrax-type-body-size)",
   opacity: disabled ? 0.5 : 1,
 });
 

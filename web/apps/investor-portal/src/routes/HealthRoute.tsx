@@ -27,22 +27,24 @@ interface StatusGlyph {
 
 function glyphForUpstream(s: UpstreamHealthStatus): StatusGlyph {
   if (s === "ok") {
-    return { icon: CheckCircle2, color: "#16a34a", label: "ok" };
+    return { icon: CheckCircle2, color: "var(--hydrax-color-success)", label: "ok" };
   }
   if (s === "unreachable") {
+    // FIXME(token): no warning/amber token in TenantThemeTokens yet.
+    // Add colorWarning to default-theme.ts + applyTheme.ts then swap.
     return { icon: AlertCircle, color: "#d97706", label: "unreachable" };
   }
-  return { icon: XCircle, color: "#dc2626", label: "down" };
+  return { icon: XCircle, color: "var(--hydrax-color-danger)", label: "down" };
 }
 
 function glyphForBff(s: CompositeHealthStatus): StatusGlyph {
   if (s === "ok") {
-    return { icon: CheckCircle2, color: "#16a34a", label: "ok" };
+    return { icon: CheckCircle2, color: "var(--hydrax-color-success)", label: "ok" };
   }
   if (s === "degraded") {
     return { icon: AlertCircle, color: "#d97706", label: "degraded" };
   }
-  return { icon: XCircle, color: "#dc2626", label: "down" };
+  return { icon: XCircle, color: "var(--hydrax-color-danger)", label: "down" };
 }
 
 function truncate(text: string, max: number): string {
@@ -63,7 +65,7 @@ const tileStyle: CSSProperties = {
 
 const monoStyle: CSSProperties = {
   fontFamily: "var(--hydrax-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-  fontSize: 13,
+  fontSize: "var(--hydrax-type-body-size)",
   fontWeight: 600,
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -74,17 +76,17 @@ const statusRowStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   gap: 6,
-  fontSize: 13,
+  fontSize: "var(--hydrax-type-body-size)",
 };
 
 const metaStyle: CSSProperties = {
   color: "var(--hydrax-color-text-muted)",
-  fontSize: 12,
+  fontSize: "var(--hydrax-type-body-sm-size)",
 };
 
 const errorStyle: CSSProperties = {
-  color: "#dc2626",
-  fontSize: 12,
+  color: "var(--hydrax-color-danger)",
+  fontSize: "var(--hydrax-type-body-sm-size)",
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
@@ -175,7 +177,7 @@ export function HealthRoute(): ReactNode {
         >
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
             <Icon icon={Activity} label="Platform health" size={18} />
-            <h1 style={{ margin: 0, fontSize: 20 }}>Platform Health</h1>
+            <h1 style={{ margin: 0, fontSize: "var(--hydrax-type-h1-size)" }}>Platform Health</h1>
           </span>
           <Button
             variant="secondary"
@@ -196,7 +198,7 @@ export function HealthRoute(): ReactNode {
       {isLoading ? (
         <p>Loading…</p>
       ) : error ? (
-        <p role="alert" style={{ color: "#dc2626" }}>
+        <p role="alert" style={{ color: "var(--hydrax-color-danger)" }}>
           {getErrorMessage(error)}
         </p>
       ) : data ? (
