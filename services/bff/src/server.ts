@@ -27,6 +27,10 @@ import {
   proxyPasskeyRegisterOptions,
   proxyPasskeyRegisterVerify,
 } from "./auth/passkey-proxy.js";
+import {
+  proxyMagicLinkRequest,
+  proxyMagicLinkConsume,
+} from "./auth/magic-link-proxy.js";
 import { extractBearer, requireSession } from "./auth/middleware.js";
 
 export interface StartOptions {
@@ -180,6 +184,52 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
           respondJson(res, status, { error: "auth_upstream", message: err.message });
         } else {
           console.error("bff: passkey auth verify:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    // ── Magic-link routes (unprotected — magic link IS the authentication) ──
+    if (req.url === "/v1/auth/magic-link/request" && req.method === "POST") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      const raw = Buffer.concat(chunks);
+      if (raw.length > 16 * 1024) { respondJson(res, 413, { error: "payload_too_large" }); return; }
+      let body: unknown;
+      try { body = JSON.parse(raw.toString("utf8")); }
+      catch { respondJson(res, 400, { error: "bad_json" }); return; }
+      if (typeof body !== "object" || body === null) { respondJson(res, 400, { error: "bad_body" }); return; }
+      try {
+        await proxyMagicLinkRequest(
+          body as Parameters<typeof proxyMagicLinkRequest>[0],
+          { integrationSvcUrl: upstreamConfig.integrationSvcUrl },
+        );
+        respondJson(res, 202, { accepted: true });
+      } catch (err) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: magic-link request:", err);
+          respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
+        }
+      }
+      return;
+    }
+
+    if (req.url?.startsWith("/v1/auth/magic-link/consume") && req.method === "GET") {
+      const url = new URL(req.url, "http://_");
+      const token = url.searchParams.get("token") ?? "";
+      try {
+        const result = await proxyMagicLinkConsume(token, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
+        respondJson(res, 200, result);
+      } catch (err) {
+        if (err instanceof AuthUpstreamError) {
+          const status = err.httpStatus && err.httpStatus >= 400 && err.httpStatus < 600 ? err.httpStatus : 502;
+          respondJson(res, status, { error: "auth_upstream", message: err.message });
+        } else {
+          console.error("bff: magic-link consume:", err);
           respondJson(res, 500, { error: "internal", message: "an internal error occurred" });
         }
       }

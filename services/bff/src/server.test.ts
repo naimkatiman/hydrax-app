@@ -659,3 +659,86 @@ describe("passkey routes proxy to integration-svc", () => {
     }
   });
 });
+
+describe("magic-link routes proxy to integration-svc", () => {
+  it("POST /v1/auth/magic-link/request forwards body and returns 202", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "POST /v1/auth/magic-link/request": { status: 202, body: { accepted: true } },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/magic-link/request`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ tenant_slug: "acme", email: "a@a.test" }),
+      });
+      expect(res.status).toBe(202);
+      expect(integrationSvc.received[0]?.method).toBe("POST");
+      expect(integrationSvc.received[0]?.url).toBe("/v1/auth/magic-link/request");
+      expect(JSON.parse(integrationSvc.received[0]!.body)).toEqual({ tenant_slug: "acme", email: "a@a.test" });
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
+    }
+  });
+
+  it("POST /v1/auth/magic-link/request relays 429 from upstream", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "POST /v1/auth/magic-link/request": { status: 429, body: { error: "rate_limited" } },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/magic-link/request`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ tenant_slug: "acme", email: "a@a.test" }),
+      });
+      expect(res.status).toBe(429);
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
+    }
+  });
+
+  it("GET /v1/auth/magic-link/consume forwards token query and returns session", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "GET /v1/auth/magic-link/consume": {
+        status: 200,
+        body: { token: "T", session: { id: "s", user_id: "u", tenant_id: "tn", tenant_slug: "acme", email: "a@a.test", role: "admin", expires_at: "2099-01-01T00:00:00Z" } },
+      },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/magic-link/consume?token=abc123`);
+      expect(res.status).toBe(200);
+      const body = await res.json() as { token: string };
+      expect(body.token).toBe("T");
+      expect(integrationSvc.received[0]?.url).toBe("/v1/auth/magic-link/consume?token=abc123");
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
+    }
+  });
+
+  it("GET /v1/auth/magic-link/consume relays 401 on invalid token", async () => {
+    const integrationSvc = await startMockIntegrationSvc({
+      "GET /v1/auth/magic-link/consume": { status: 401, body: { error: "unauthenticated" } },
+    });
+    const workflowSvc = await startMockWorkflowSvc({});
+    const bff = await startBffWithUpstream(workflowSvc.url, integrationSvc.url);
+    try {
+      const res = await fetch(`${bff.baseUrl}/v1/auth/magic-link/consume?token=bad`);
+      expect(res.status).toBe(401);
+    } finally {
+      await bff.close();
+      await workflowSvc.close();
+      await integrationSvc.close();
+    }
+  });
+});
