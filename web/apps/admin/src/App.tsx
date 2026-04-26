@@ -7,6 +7,7 @@ import { AppShell } from "@hydrax/ui";
 import { AdminSidebar, AdminBrand } from "./components/AdminSidebar";
 import { AdminTopBar } from "./components/AdminTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
+import { ComposabilityRoute } from "./routes/ComposabilityRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -24,6 +25,7 @@ function ShellContents() {
     >
       <Routes>
         <Route path="/" element={<HomeRoute />} />
+        <Route path="/composability" element={<ComposabilityRoute />} />
       </Routes>
     </AppShell>
   );
