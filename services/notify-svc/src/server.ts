@@ -2,12 +2,20 @@ import http from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { loadEmailConfig } from "./email-config.js";
+import { loadSmtpConfig } from "./smtp-config.js";
 import { mountEmailRoutes, type EmailHandlerOptions } from "./email-handlers.js";
+import {
+  consoleSender,
+  noopSender,
+  createSmtpSender,
+  type EmailSender,
+} from "./email-sender.js";
 
 export interface StartOptions {
   port: number;
   service: string;
   emailEnv?: Record<string, string | undefined>;
+  sender?: EmailSender;
 }
 
 export interface StartResult {
@@ -15,9 +23,21 @@ export interface StartResult {
   baseUrl: string;
 }
 
+function buildSender(env: Record<string, string | undefined>): EmailSender {
+  const cfg = loadEmailConfig(env);
+  switch (cfg.transport) {
+    case "console":
+      return consoleSender;
+    case "noop":
+      return noopSender;
+    case "smtp":
+      return createSmtpSender(loadSmtpConfig(env));
+  }
+}
+
 export function startServer(opts: StartOptions): Promise<StartResult> {
-  const emailConfig = loadEmailConfig(opts.emailEnv ?? process.env);
-  const emailOpts: EmailHandlerOptions = { transport: emailConfig.transport };
+  const sender = opts.sender ?? buildSender(opts.emailEnv ?? process.env);
+  const emailOpts: EmailHandlerOptions = { sender };
 
   const server = http.createServer((req, res) => {
     if (req.url === "/healthz" && req.method === "GET") {
@@ -44,6 +64,10 @@ if (isMain) {
   const port = Number(process.env.PORT ?? 7101);
   const cfg = loadEmailConfig(process.env);
   console.log(`notify-svc: email transport = ${cfg.transport}`);
+  if (cfg.transport === "smtp") {
+    const smtp = loadSmtpConfig(process.env);
+    console.log(`notify-svc: smtp host=${smtp.host} port=${smtp.port} secure=${smtp.secure} from=${smtp.from} auth=${smtp.user ? "yes" : "no"}`);
+  }
   startServer({ port, service: "notify-svc" }).then(({ baseUrl }) => {
     console.log(`notify-svc listening on ${baseUrl}`);
   });

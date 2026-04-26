@@ -1,8 +1,8 @@
 import type http from "node:http";
-import type { EmailTransport } from "./email-config.js";
+import type { EmailSender } from "./email-sender.js";
 
 export interface EmailHandlerOptions {
-  transport: EmailTransport;
+  sender: EmailSender;
 }
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -72,9 +72,11 @@ async function handleSendEmail(
     return;
   }
 
-  if (opts.transport === "console") {
-    console.log(`[notify-svc:email] To: ${to} | Subject: ${subject} | Text: ${text}`);
+  try {
+    await opts.sender.send({ to, subject, text });
+    respondJson(res, 202, { accepted: true });
+  } catch (err) {
+    console.error("notify-svc: email-sender failed:", err);
+    respondJson(res, 502, { error: "transport_failed", message: "email transport rejected the message" });
   }
-
-  respondJson(res, 202, { accepted: true });
 }

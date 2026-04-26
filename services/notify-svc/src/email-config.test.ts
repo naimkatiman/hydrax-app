@@ -14,8 +14,12 @@ describe("loadEmailConfig", () => {
     expect(loadEmailConfig({ EMAIL_TRANSPORT: "noop" }).transport).toBe("noop");
   });
 
-  it("rejects unknown EMAIL_TRANSPORT (slice 2c will widen)", () => {
-    expect(() => loadEmailConfig({ EMAIL_TRANSPORT: "smtp" }))
-      .toThrow(/unsupported.*smtp/i);
+  it("reads EMAIL_TRANSPORT=smtp (added in slice 2c)", () => {
+    expect(loadEmailConfig({ EMAIL_TRANSPORT: "smtp" }).transport).toBe("smtp");
+  });
+
+  it("rejects unknown EMAIL_TRANSPORT (e.g. 'sendgrid')", () => {
+    expect(() => loadEmailConfig({ EMAIL_TRANSPORT: "sendgrid" }))
+      .toThrow(/unsupported.*sendgrid/i);
   });
 });
