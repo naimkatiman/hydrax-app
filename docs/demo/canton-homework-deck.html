@@ -111,8 +111,8 @@
       scroll-margin-top: 24px;
     }
 
-    /* Per-slide ambient hero backgrounds — 10 source JPGs reused thematically across 15 slides;
-       slides 15-17 will be added by phases 2-4 of docs/plans/2026-04-26-deep-dive-topics-deck-and-portals.md. */
+    /* Per-slide ambient hero backgrounds — 11 source JPGs reused thematically across 16 slides;
+       slides 16-17 will be added by phases 3-4 of docs/plans/2026-04-26-deep-dive-topics-deck-and-portals.md. */
     #slide-0,
     #slide-1,
     #slide-2,
@@ -127,7 +127,8 @@
     #slide-11,
     #slide-12,
     #slide-13,
-    #slide-14 {
+    #slide-14,
+    #slide-15 {
       background-color: var(--hydrax-color-bg);
       background-repeat: no-repeat;
       background-position: center center;
@@ -223,6 +224,12 @@
       background-image:
         linear-gradient(180deg, rgba(20, 20, 20, 0.86) 0%, rgba(20, 20, 20, 0.78) 50%, rgba(20, 20, 20, 0.92) 100%),
         url('./assets/slide-14-tokenization.jpg');
+    }
+
+    #slide-15 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.86) 0%, rgba(20, 20, 20, 0.78) 50%, rgba(20, 20, 20, 0.92) 100%),
+        url('./assets/slide-15-composability.jpg');
     }
 
     .slide-nav {
@@ -2299,6 +2306,103 @@ template Subscription
     <div
       style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
       docs/canton-homework.md &middot; PRD &sect;14
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 15 — DEEP DIVE — DEFI COMPOSABILITY UNDER PRIVACY      -->
+<!-- ============================================================ -->
+<div class="slide-container slide-page" id="slide-15">
+  <div data-object-type="textbox" class="page-num"
+    style="position: absolute; top: 40px; right: 60px; width: 110px; height: 100px; text-align: right; z-index: 10;">
+    <div
+      style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
+      15</div>
+  </div>
+  <div data-object-type="textbox" class="slide-title"
+    style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <div style="width: 8px; height: 8px; background: var(--hydrax-color-accent); border-radius: 50%;"></div>
+      <span
+        style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--hydrax-color-accent);">deep dive &middot; composability</span>
+    </div>
+    <h1
+      style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 50px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 10px 0; color: var(--hydrax-color-text-strong);">
+      Composability moves <span style="color: var(--hydrax-color-accent); font-weight: 700;">up the stack</span>
+    </h1>
+    <p style="font-size: 17px; line-height: 1.4; color: var(--hydrax-color-text-muted); margin: 0; max-width: 1080px;">
+      Public-chain DeFi composes because state is globally readable. Canton's contract-level privacy disqualifies that pattern. Composition lives in the orchestration plane &mdash; "bring the parties to the contract".
+    </p>
+  </div>
+  <div data-object-type="graphic"
+    style="position: absolute; left: 60px; top: 210px; width: 1160px; height: 320px; z-index: 10;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 100%;">
+      <!-- LEFT: What we lose -->
+      <div
+        style="background: rgba(36,36,36,0.78); border: 1px solid var(--hydrax-color-accent-soft); border-radius: 14px; padding: 22px 26px; display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+          <div
+            style="width: 38px; height: 38px; background: rgba(205,200,194,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--hydrax-color-text-strong);">What we don't get</div>
+            <div style="font-size: 12px; color: var(--hydrax-color-accent);">vs public-chain DeFi</div>
+          </div>
+        </div>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Anyone-can-call composition</strong> &mdash; a contract is opaque to non-stakeholders by construction</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Global state reads</strong> &mdash; no shared mempool, no public RPC of all contracts</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Atomic same-block flash composition</strong> across arbitrary protocols built by strangers</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Permissionless interop</strong> with adversarial counterparties</li>
+        </ul>
+      </div>
+      <!-- RIGHT: What we gain -->
+      <div
+        style="background: rgba(36,36,36,0.78); border: 1px solid rgba(205,200,194,0.25); border-radius: 14px; padding: 22px 26px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--hydrax-color-accent), #EEEAE6);"></div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+          <div
+            style="width: 38px; height: 38px; background: rgba(205,200,194,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--hydrax-color-text-strong);">What we get instead</div>
+            <div style="font-size: 12px; color: var(--hydrax-color-accent);">orchestration-plane composition</div>
+          </div>
+        </div>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Stakeholders declared at modelling time</strong> &mdash; cross-contract logic is a deliberate design step</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>"Bring parties to the contract"</strong> &mdash; <code style="font-family: 'IBM Plex Mono', monospace; color: var(--hydrax-color-accent);">workflow-svc</code> adds the right principals at issuance so downstream choices are even possible</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Compliance-by-construction</strong> &mdash; you cannot accidentally compose a custodian into a flow they shouldn't see</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Atomicity preserved</strong> &mdash; the same Daml choice can mutate multiple contracts in one signed step (within a domain)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div data-object-type="textbox"
+    style="position: absolute; left: 60px; top: 545px; width: 1160px; height: 110px; z-index: 10;">
+    <div
+      style="background: rgba(205,200,194,0.04); border: 1px solid var(--hydrax-color-accent-soft); border-radius: 12px; padding: 16px 22px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="9" cy="7" r="4"/><circle cx="18" cy="15" r="3"/><path d="M10 15H6a4 4 0 0 0-4 4v2"/><path d="m14.5 13.5 4-4"/></svg>
+        <span class="mono" style="font-size: 11px; color: var(--hydrax-color-accent); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;">where it lands in the portal</span>
+      </div>
+      <p style="font-size: 13px; color: var(--hydrax-color-text-strong); margin: 0; line-height: 1.5;">
+        Admin portal &rarr; <strong style="color: var(--hydrax-color-accent);">Composability map</strong>. Renders the active contract templates as cards with their stakeholder rosters, and shows which workflows are responsible for adding each principal. Mock data today; production view drives off the workflow-svc projection.
+      </p>
+    </div>
+  </div>
+  <div data-object-type="textbox" class="slide-info"
+    style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Get the stakeholder set wrong at modelling time and no UI work fixes it.</span>
+    </div>
+    <div
+      style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
+      docs/canton-homework.md &sect;3A
     </div>
   </div>
 </div>

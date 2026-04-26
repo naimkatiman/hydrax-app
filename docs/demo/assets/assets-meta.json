@@ -91,6 +91,14 @@
       "consumed_by": "#slide-14 { background-image }",
       "role": "Slide 14 (Tokenization stance) ambient hero — nested template/instance framing with stakeholder satellites, evoking token-as-Daml-template.",
       "prompt": "Two architectural strata visualized as nested frames: an outer monolithic structure (the Daml template) containing a smaller framed inner element (the contract instance), with thin warm-grey lines connecting four smaller satellite nodes (stakeholders) to the inner frame, monochrome warm-grey palette: charcoal #141414 background, panel #242424 frame bodies, warm-grey #CDC8C2 accent edges, off-white #F5F5F5 highlights, editorial 3D render at slight isometric angle, ultra-clean institutional finance aesthetic, museum-quality minimalism, no text, no labels, no logos, no people, 16:9 widescreen, 1376x768"
+    },
+    {
+      "file": "slide-15-composability.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-15 { background-image }",
+      "role": "Slide 15 (Composability) ambient hero — selective stakeholder-driven composition; nodes only connect via matching stakeholder dots.",
+      "prompt": "Abstract network of distinct contract nodes connected by carefully drawn pathways: each contract a small floating panel with a thin halo of stakeholder-marker dots around it, several panels linked by precisely-drawn warm-grey lines that touch only the matching stakeholder dots (not arbitrary nodes), suggesting selective composition by explicit stakeholder declaration, monochrome warm-grey palette: deep charcoal #141414 background, panel #242424 contract bodies, warm-grey #CDC8C2 connection lines and dots, off-white #F5F5F5 highlights on connection endpoints, editorial flat-isometric render style, ultra-clean institutional minimalism, no text, no labels, no logos, 16:9 widescreen, 1376x768"
     }
   ],
   "wiring_notes": [
