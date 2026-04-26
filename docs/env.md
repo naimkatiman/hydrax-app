@@ -76,8 +76,7 @@ local validation against the in-memory backend.
 | Var | Service | Default | Purpose |
 |---|---|---|---|
 | `INTEGRATION_SVC_DATABASE_URL` | integration-svc | falls back to `DATABASE_URL` | Postgres DSN for the auth Sessions repo |
-| `AUTH_DEV_LOGIN` | integration-svc | unset (off) | Set to `1` to enable `POST /v1/auth/dev/login`. Returns 404 when unset. **Never set in prod.** |
-| `SESSION_TTL_SECONDS` | integration-svc | `43200` (12h) | TTL for sessions issued via dev/login |
+| `SESSION_TTL_SECONDS` | integration-svc | `43200` (12h) | TTL for all bearer sessions issued by integration-svc (magic-link consume + passkey verify) |
 | `INTEGRATION_SVC_URL` | bff | `http://localhost:7102` | Upstream URL for auth proxy + composite healthz (already listed in bff upstream URLs table above) |
 
 ### Auth Slice 2a — WebAuthn (Passkeys, server substrate)
@@ -89,7 +88,7 @@ local validation against the in-memory backend.
 | `WEBAUTHN_ORIGIN` | integration-svc | `http://localhost:5173` | Expected origin of the calling browser. Production: must be HTTPS (browsers reject WebAuthn over plain HTTP except for `localhost`). |
 | `WEBAUTHN_CHALLENGE_TTL_SECONDS` | integration-svc | `60` | Challenge LRU TTL. Range 30–300. Validated at startup; bad value crashes the process. |
 
-**Slice 2a is server-side substrate only.** New users have no first-credential bootstrap path until slice 2b (magic-link enrollment) ships. Slice 2a's prototype path uses `AUTH_DEV_LOGIN=1` to bootstrap, which is fail-closed in production.
+**Slice 2a is server-side substrate only.** New users get their first-credential bootstrap via slice 2b's magic-link enrollment (with slice 2c's real SMTP transport in production). Slice 2e (2026-04-27) removed the prior `AUTH_DEV_LOGIN=1` dev-only bootstrap entirely.
 
 Slice 2c (email transport) and slice 2d (portal UI) will add: SMTP / SES / Resend creds, browser asset paths, etc.
 
@@ -106,7 +105,7 @@ If OIDC is later chosen as a complementary auth path: `OIDC_ISSUER_URL`, `OIDC_C
 | `EMAIL_TRANSPORT` | notify-svc | `console` | Email transport. Slice 2b ships `console` (logs to stdout) and `noop` (silently drops). **Slice 2c adds `smtp`** (raw SMTP via nodemailer; covers MailHog locally and AWS SES / SendGrid / Resend / Postmark via their SMTP endpoints). |
 | `NOTIFY_SVC_URL` | integration-svc | `http://localhost:7101` | Where integration-svc POSTs `/v1/notifications/email`. |
 
-**Slice 2b is server-side substrate + console-transport only.** Magic-link URLs are printed to `notify-svc` stdout when `EMAIL_TRANSPORT=console`; nothing reaches a real inbox. Production-ready bootstrap pairs slice 2b's substrate with slice 2c's real email transport before `AUTH_DEV_LOGIN=1` can come down (slice 2e).
+**Slice 2b is server-side substrate + console-transport only.** Magic-link URLs are printed to `notify-svc` stdout when `EMAIL_TRANSPORT=console`; nothing reaches a real inbox. Production-ready bootstrap pairs slice 2b's substrate with slice 2c's real email transport (slice 2e removed `AUTH_DEV_LOGIN=1` on 2026-04-27 — passwordless via passkey + magic-link is now the only login path).
 
 **Email enumeration safety:** `POST /v1/auth/magic-link/request` always returns 202 regardless of whether the user exists. Send failures are swallowed and logged via `console.error` — they never surface to the requester. Rate-limit responses (HTTP 429) are the only non-202 success-path response.
 
