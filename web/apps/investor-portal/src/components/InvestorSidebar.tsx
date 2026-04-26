@@ -1,6 +1,7 @@
 import {
   Wallet,
   LayoutDashboard,
+  Boxes,
   FileSignature,
   PieChart,
   FileText,
@@ -29,6 +30,7 @@ const NAV: ReadonlyArray<{
   readonly icon: typeof LayoutDashboard;
 }> = [
   { label: "Home", path: "/", icon: LayoutDashboard },
+  { label: "Products", path: "/products", icon: Boxes },
   { label: "Subscriptions", path: "/subscriptions", icon: FileSignature },
   { label: "Holdings", path: "/holdings", icon: PieChart },
   { label: "Statements", path: "/statements", icon: FileText },

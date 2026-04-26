@@ -9,6 +9,7 @@ import { InvestorTopBar } from "./components/InvestorTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
 import { HealthRoute } from "./routes/HealthRoute";
 import { SubscriptionsRoute } from "./routes/SubscriptionsRoute";
+import { ProductsListRoute } from "./routes/ProductsListRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -28,6 +29,7 @@ function ShellContents() {
         <Route path="/" element={<HomeRoute />} />
         <Route path="/health" element={<HealthRoute />} />
         <Route path="/subscriptions" element={<SubscriptionsRoute />} />
+        <Route path="/products" element={<ProductsListRoute />} />
       </Routes>
     </AppShell>
   );
