@@ -9,20 +9,73 @@ interface AppShellProps {
   readonly children: ReactNode;
 }
 
-const SHIMMER_KEYFRAMES = `
+const SHELL_STYLES = `
 @keyframes hydrax-skeleton-shimmer {
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
 }
+.hydrax-app-shell {
+  min-height: 100vh;
+  height: 100vh;
+  background: var(--hydrax-color-bg);
+  color: var(--hydrax-color-text);
+  font-family: var(--hydrax-font-sans);
+  font-size: var(--hydrax-type-body-size);
+  line-height: var(--hydrax-type-body-line-height);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 56px 1fr;
+  grid-template-areas: "sidebar topbar" "sidebar main";
+}
+.hydrax-app-shell[data-no-sidebar="true"] {
+  grid-template-columns: 1fr;
+  grid-template-areas: "topbar" "main";
+}
+.hydrax-app-shell[data-no-topbar="true"] {
+  grid-template-rows: 1fr;
+}
+.hydrax-app-shell[data-no-sidebar="true"][data-no-topbar="true"] {
+  grid-template-areas: "main";
+}
+.hydrax-app-shell-sidebar {
+  grid-area: sidebar;
+  border-right: 1px solid var(--hydrax-color-border);
+  background: var(--hydrax-color-surface);
+  display: flex;
+  flex-direction: column;
+}
+.hydrax-app-shell-topbar {
+  grid-area: topbar;
+  border-bottom: 1px solid var(--hydrax-color-border);
+  background: var(--hydrax-color-bg);
+  padding: 0 var(--hydrax-space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--hydrax-space-md);
+}
+.hydrax-app-shell-main {
+  grid-area: main;
+  padding: var(--hydrax-space-xl);
+  overflow-y: auto;
+}
+@media (max-width: 768px) {
+  .hydrax-app-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas: "topbar" "main";
+  }
+  .hydrax-app-shell-sidebar {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .hydrax-app-shell-main {
+    padding: var(--hydrax-space-md);
+  }
+  .hydrax-app-shell-topbar {
+    padding: 0 var(--hydrax-space-md);
+  }
+}
 `;
-
-const sidebarStyle: CSSProperties = {
-  gridArea: "sidebar",
-  borderRight: "1px solid var(--hydrax-color-border)",
-  background: "var(--hydrax-color-surface)",
-  display: "flex",
-  flexDirection: "column",
-};
 
 const sidebarBrandStyle: CSSProperties = {
   height: 56,
@@ -49,22 +102,6 @@ const sidebarFooterStyle: CSSProperties = {
   borderTop: "1px solid var(--hydrax-color-border)",
 };
 
-const topbarStyle: CSSProperties = {
-  gridArea: "topbar",
-  borderBottom: "1px solid var(--hydrax-color-border)",
-  background: "var(--hydrax-color-bg)",
-  padding: "0 var(--hydrax-space-xl)",
-  display: "flex",
-  alignItems: "center",
-  gap: "var(--hydrax-space-md)",
-};
-
-const mainStyle: CSSProperties = {
-  gridArea: "main",
-  padding: "var(--hydrax-space-xl)",
-  overflowY: "auto",
-};
-
 export function AppShell({
   appName,
   brand,
@@ -79,40 +116,24 @@ export function AppShell({
   return (
     <div
       data-app-name={appName}
-      style={{
-        minHeight: "100vh",
-        height: "100vh",
-        background: "var(--hydrax-color-bg)",
-        color: "var(--hydrax-color-text)",
-        fontFamily: "var(--hydrax-font-sans)",
-        fontSize: "var(--hydrax-type-body-size)",
-        lineHeight: "var(--hydrax-type-body-line-height)",
-        display: "grid",
-        gridTemplateColumns: hasSidebar ? "240px 1fr" : "1fr",
-        gridTemplateRows: hasTopbar ? "56px 1fr" : "1fr",
-        gridTemplateAreas: hasSidebar
-          ? hasTopbar
-            ? `"sidebar topbar" "sidebar main"`
-            : `"sidebar main"`
-          : hasTopbar
-            ? `"topbar" "main"`
-            : `"main"`,
-      }}
+      data-no-sidebar={hasSidebar ? undefined : "true"}
+      data-no-topbar={hasTopbar ? undefined : "true"}
+      className="hydrax-app-shell"
     >
-      <style>{SHIMMER_KEYFRAMES}</style>
+      <style>{SHELL_STYLES}</style>
       {hasSidebar ? (
-        <aside style={sidebarStyle}>
+        <aside className="hydrax-app-shell-sidebar">
           {brand ? <div style={sidebarBrandStyle}>{brand}</div> : null}
           {sidebar ? <nav style={sidebarBodyStyle}>{sidebar}</nav> : null}
           {sidebarFooter ? <div style={sidebarFooterStyle}>{sidebarFooter}</div> : null}
         </aside>
       ) : null}
       {hasTopbar ? (
-        <header role="banner" style={topbarStyle}>
+        <header role="banner" className="hydrax-app-shell-topbar">
           {topbar}
         </header>
       ) : null}
-      <main style={mainStyle}>{children}</main>
+      <main className="hydrax-app-shell-main">{children}</main>
     </div>
   );
 }

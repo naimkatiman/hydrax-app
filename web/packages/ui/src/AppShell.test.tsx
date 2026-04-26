@@ -73,4 +73,30 @@ describe("<AppShell>", () => {
     );
     expect(haveShimmer).toBe(true);
   });
+
+  it("declares a responsive collapse breakpoint that hides the sidebar at small viewports", () => {
+    const { container } = render(
+      <AppShell appName="x" brand={<span>B</span>} sidebar={<span>SB</span>}>
+        <span>main</span>
+      </AppShell>,
+    );
+    const styleTags = Array.from(container.querySelectorAll("style"));
+    const haveResponsive = styleTags.some((tag) =>
+      (tag.textContent ?? "").includes("@media (max-width: 768px)"),
+    );
+    expect(haveResponsive).toBe(true);
+  });
+
+  it("declares a tighter padding breakpoint at 600px", () => {
+    const { container } = render(
+      <AppShell appName="x" topbar={<span>tb</span>}>
+        <span>main</span>
+      </AppShell>,
+    );
+    const styleTags = Array.from(container.querySelectorAll("style"));
+    const haveTight = styleTags.some((tag) =>
+      (tag.textContent ?? "").includes("@media (max-width: 600px)"),
+    );
+    expect(haveTight).toBe(true);
+  });
 });
