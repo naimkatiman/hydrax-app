@@ -1,4 +1,14 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery, type BaseQueryFn, type FetchArgs, type FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
+
+import {
+  DEMO_AUDIT_EVENTS,
+  DEMO_APPROVALS,
+  DEMO_COMPOSITE_HEALTH,
+  DEMO_HEALTH,
+  DEMO_LIST_PRODUCTS_RESPONSE,
+  DEMO_PRODUCTS,
+  DEMO_SUBSCRIPTIONS,
+} from "./demo-fixtures.js";
 
 export interface HealthResponse {
   readonly ok: boolean;
@@ -105,7 +115,7 @@ export interface Subscription {
   readonly updated_at: string;
 }
 
-type ViteEnv = { readonly VITE_BFF_URL?: string };
+type ViteEnv = { readonly VITE_BFF_URL?: string; readonly VITE_DEMO_MODE?: string };
 
 function readBffUrl(): string {
   const viteEnv = (import.meta as { env?: ViteEnv }).env;
@@ -116,11 +126,107 @@ function readBffUrl(): string {
   return "http://localhost:8080";
 }
 
+function readDemoMode(): boolean {
+  const viteEnv = (import.meta as { env?: ViteEnv }).env;
+  if (viteEnv?.VITE_DEMO_MODE === "true" || viteEnv?.VITE_DEMO_MODE === "1") return true;
+  if (typeof process !== "undefined" && (process.env.VITE_DEMO_MODE === "true" || process.env.VITE_DEMO_MODE === "1")) {
+    return true;
+  }
+  return false;
+}
+
 const BFF_URL = readBffUrl();
+const DEMO_MODE = readDemoMode();
+
+/**
+ * demoBaseQuery returns canned fixtures for every endpoint the portals
+ * consume. Toggle via VITE_DEMO_MODE=true at build time. Lets the 5
+ * static-site portals run in production without a live BFF — useful for
+ * marketing demos, design reviews, and smoke-checking deploys before
+ * the real backend ships per-portal.
+ *
+ * Mutation endpoints (createProduct, transitionProduct, decideApproval)
+ * return a synthesized response shape but do NOT mutate the fixtures —
+ * the next query call returns the original list. This is intentional:
+ * demo mode is read-mostly; round-tripping mutations would require a
+ * client-side store and feels misleading for a demo deployment.
+ */
+function demoQuery(url: string, method: string, body?: unknown): unknown {
+  const path = url.split("?")[0] ?? url;
+
+  if (path === "/health") return DEMO_HEALTH;
+  if (path === "/healthz/composite") return DEMO_COMPOSITE_HEALTH;
+
+  if (path === "/v1/products") {
+    if (method === "POST" && body && typeof body === "object") {
+      const input = body as { tenant_id?: string; code?: string; name?: string; product_type?: string };
+      return {
+        ...DEMO_PRODUCTS[0]!,
+        id: "demo-new-product",
+        code: input.code ?? "DEMO-CODE",
+        name: input.name ?? "Demo Product",
+        product_type: input.product_type ?? "short_duration_credit",
+        status: "pending",
+        allowed_next: ["approved", "cancelled"],
+      };
+    }
+    return DEMO_LIST_PRODUCTS_RESPONSE;
+  }
+
+  const productMatch = /^\/v1\/products\/([^/]+)(\/transition)?$/.exec(path);
+  if (productMatch) {
+    const id = decodeURIComponent(productMatch[1]!);
+    const isTransition = Boolean(productMatch[2]);
+    const product = DEMO_PRODUCTS.find((p) => p.id === id) ?? DEMO_PRODUCTS[0]!;
+    if (isTransition && method === "POST" && body && typeof body === "object") {
+      const to = (body as { to?: string }).to ?? product.status;
+      return { ...product, status: to };
+    }
+    return product;
+  }
+
+  if (path === "/v1/audit/events") return DEMO_AUDIT_EVENTS;
+
+  if (path === "/v1/approvals") return DEMO_APPROVALS;
+
+  const approvalDecide = /^\/v1\/approvals\/([^/]+)\/decide$/.exec(path);
+  if (approvalDecide) {
+    const id = decodeURIComponent(approvalDecide[1]!);
+    const decision = body && typeof body === "object" ? (body as { status?: "approved" | "rejected" }).status ?? "approved" : "approved";
+    const approval = DEMO_APPROVALS.find((a) => a.id === id) ?? DEMO_APPROVALS[0]!;
+    return { ...approval, status: decision, decided_at: "2026-04-26T00:00:00.000000Z" };
+  }
+
+  const subMatch = /^\/v1\/subscriptions\/([^/]+)$/.exec(path);
+  if (subMatch) {
+    const id = decodeURIComponent(subMatch[1]!);
+    return DEMO_SUBSCRIPTIONS[id] ?? Object.values(DEMO_SUBSCRIPTIONS)[0];
+  }
+
+  // Unknown path — return empty object so RTK Query's onSuccess fires.
+  return {};
+}
+
+const realBaseQuery = fetchBaseQuery({ baseUrl: BFF_URL });
+
+const demoBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+) => {
+  const url = typeof args === "string" ? args : args.url;
+  const method = typeof args === "string" ? "GET" : (args.method ?? "GET");
+  const body = typeof args === "string" ? undefined : args.body;
+  await new Promise((r) => setTimeout(r, 60)); // simulate network for skeleton states
+  const data = demoQuery(url, method, body);
+  return { data };
+};
+
+const baseQuery = DEMO_MODE ? demoBaseQuery : realBaseQuery;
+
+export const isDemoMode = (): boolean => DEMO_MODE;
 
 export const hydraxApi = createApi({
   reducerPath: "hydraxApi",
-  baseQuery: fetchBaseQuery({ baseUrl: BFF_URL }),
+  baseQuery,
   endpoints: (builder) => ({
     getHealth: builder.query<HealthResponse, void>({
       query: () => "/health",

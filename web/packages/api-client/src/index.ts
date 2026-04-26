@@ -1,5 +1,6 @@
 export {
   hydraxApi,
+  isDemoMode,
   useGetHealthQuery,
   useGetHealthzCompositeQuery,
   useCreateProductMutation,
