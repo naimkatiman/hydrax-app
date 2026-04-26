@@ -13,5 +13,11 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "nodemailer": "^8.0.6"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^8.0.0"
   }
 }

@@ -27,6 +27,17 @@ func IsAlreadyDecided(err error) bool {
 	return errors.Is(err, errAlreadyDecided)
 }
 
+// Repo is the storage surface the approval-svc handlers depend on.
+// Both *MemRepo and *PgRepo satisfy it; main.go picks one based on
+// whether DATABASE_URL is set. Errors flow through the package-level
+// IsNotFound and IsAlreadyDecided guards regardless of backend.
+type Repo interface {
+	Insert(ctx context.Context, in ApprovalInput) (*Approval, error)
+	GetByID(ctx context.Context, id string) (*Approval, error)
+	ListPending(ctx context.Context) ([]Approval, error)
+	Decide(ctx context.Context, id string, in DecideInput) (*Approval, error)
+}
+
 // MemRepo is the process-local in-memory approval store. Safe for
 // concurrent use. Persistence is deferred to a future plan.
 type MemRepo struct {
