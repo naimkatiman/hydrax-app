@@ -162,6 +162,11 @@ func Decide(repo *approvals.MemRepo, id string) http.HandlerFunc {
 				errorJSON(w, http.StatusNotFound, "not_found", "approval not found")
 				return
 			}
+			if approvals.IsAlreadyDecided(err) {
+				errorJSON(w, http.StatusConflict, "already_decided",
+					"approval already decided — first decide wins")
+				return
+			}
 			log.Printf("approval-svc: Decide(%s): %v", id, err)
 			errorJSON(w, http.StatusInternalServerError, "internal", "an internal error occurred")
 			return

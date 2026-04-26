@@ -126,6 +126,36 @@ func TestDecide_400OnInvalidStatus(t *testing.T) {
 	}
 }
 
+func TestDecide_409OnAlreadyDecided(t *testing.T) {
+	repo := newRepo()
+	in, _ := repo.Insert(bgCtx(), approvals.ApprovalInput{TenantID: "t1", ResourceType: "product", ResourceID: "p1"})
+
+	// First decide.
+	body, _ := json.Marshal(map[string]string{"status": "approved", "decided_by_user_id": "u1"})
+	req := httptest.NewRequest(http.MethodPost, "/v1/approvals/"+in.ID+"/decide", bytes.NewReader(body))
+	rr := httptest.NewRecorder()
+	Decide(repo, in.ID)(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("first decide status = %d body=%s", rr.Code, rr.Body.String())
+	}
+
+	// Second decide must 409.
+	body2, _ := json.Marshal(map[string]string{"status": "rejected", "decided_by_user_id": "u2"})
+	req2 := httptest.NewRequest(http.MethodPost, "/v1/approvals/"+in.ID+"/decide", bytes.NewReader(body2))
+	rr2 := httptest.NewRecorder()
+	Decide(repo, in.ID)(rr2, req2)
+	if rr2.Code != http.StatusConflict {
+		t.Fatalf("second decide status = %d body=%s, want 409", rr2.Code, rr2.Body.String())
+	}
+	var got map[string]string
+	if err := json.NewDecoder(rr2.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got["error"] != "already_decided" {
+		t.Errorf("error code: got %q want already_decided", got["error"])
+	}
+}
+
 func TestAppend_413OnOversizeBody(t *testing.T) {
 	repo := newRepo()
 	big := strings.Repeat("x", 70*1024)

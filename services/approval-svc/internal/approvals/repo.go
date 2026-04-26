@@ -11,9 +11,20 @@ import (
 
 var errNotFound = errors.New("approval: not found")
 
+// errAlreadyDecided is returned by Decide when the row exists but is
+// no longer pending (first-decide-wins). Distinct from errNotFound so
+// the handler can return 409 vs 404.
+var errAlreadyDecided = errors.New("approval: already decided")
+
 // IsNotFound reports whether err signals a missing approval row.
 func IsNotFound(err error) bool {
 	return errors.Is(err, errNotFound)
+}
+
+// IsAlreadyDecided reports whether err signals an attempt to re-decide
+// an approval that has already been approved or rejected.
+func IsAlreadyDecided(err error) bool {
+	return errors.Is(err, errAlreadyDecided)
 }
 
 // MemRepo is the process-local in-memory approval store. Safe for
@@ -76,7 +87,11 @@ func (r *MemRepo) ListPending(_ context.Context) ([]Approval, error) {
 	return out, nil
 }
 
-// Decide applies the decision and returns the updated row.
+// Decide applies the decision and returns the updated row. First-decide-
+// wins: a second Decide on a row whose status is already "approved" or
+// "rejected" returns errAlreadyDecided (callers branch via IsAlreadyDecided).
+// This matches the Pg backend's WHERE status = 'pending' predicate so
+// behavior is consistent across repos.
 func (r *MemRepo) Decide(_ context.Context, id string, in DecideInput) (*Approval, error) {
 	if in.Status != "approved" && in.Status != "rejected" {
 		return nil, errors.New(`approval: status must be "approved" or "rejected"`)
@@ -86,6 +101,9 @@ func (r *MemRepo) Decide(_ context.Context, id string, in DecideInput) (*Approva
 	row, ok := r.data[id]
 	if !ok {
 		return nil, errNotFound
+	}
+	if row.Status != "pending" {
+		return nil, errAlreadyDecided
 	}
 	now := time.Now().UTC()
 	by := in.DecidedByID

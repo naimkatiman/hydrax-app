@@ -97,3 +97,36 @@ func TestMemRepo_Decide_RejectsInvalidStatus(t *testing.T) {
 		t.Fatal("Decide(maybe): want error, got nil")
 	}
 }
+
+func TestMemRepo_Decide_FirstDecideWins(t *testing.T) {
+	r := NewMemRepo()
+	in, _ := r.Insert(context.Background(), ApprovalInput{TenantID: "t1", ResourceType: "product", ResourceID: "p1"})
+
+	// First decide succeeds.
+	first, err := r.Decide(context.Background(), in.ID, DecideInput{Status: "approved", DecidedByID: "u1"})
+	if err != nil {
+		t.Fatalf("first Decide: %v", err)
+	}
+	if first.Status != "approved" {
+		t.Fatalf("first Decide status = %q, want approved", first.Status)
+	}
+
+	// Second decide on the same id must fail with errAlreadyDecided
+	// regardless of attempted target status.
+	_, err = r.Decide(context.Background(), in.ID, DecideInput{Status: "rejected", DecidedByID: "u2"})
+	if !IsAlreadyDecided(err) {
+		t.Fatalf("second Decide: err = %v, want IsAlreadyDecided", err)
+	}
+
+	// Underlying state must reflect the first decision, not the second attempt.
+	got, err := r.GetByID(context.Background(), in.ID)
+	if err != nil {
+		t.Fatalf("GetByID: %v", err)
+	}
+	if got.Status != "approved" {
+		t.Errorf("post-second-Decide status = %q, want approved (first wins)", got.Status)
+	}
+	if got.DecidedByUserID == nil || *got.DecidedByUserID != "u1" {
+		t.Errorf("post-second-Decide DecidedByUserID = %v, want u1", got.DecidedByUserID)
+	}
+}
