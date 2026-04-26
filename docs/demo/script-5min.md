@@ -70,7 +70,7 @@
 **On screen:** `video-deck.html` slide 3 — services + portals diagram
 **Deep-deck anchor:** `canton-interview.html#slide-7`
 
-> Under the surface — eight backend services already scaffolded. Five Go services for performance-critical workflow, approval, audit, HydraX adapter, Canton adapter. Three Node services for notifications, integrations, and a BFF that aggregates for React. Five role-aware portals on top: issuer, distributor, investor, ops console, admin. Tenant theming via CSS variables. Lucide icons only — no emoji, ever. Postgres for relational truth, Mongo for tenant-flexible payloads, Daml as the shared multi-party ledger. Browsers never call Daml directly — adapters mediate.
+> Under the surface — nine backend services. Five Go services for performance-critical workflow, approval, audit, HydraX adapter, Canton adapter. Three Node services for notifications, integrations, and a BFF that aggregates for React. Plus market-data-svc for quotes and FX. Five role-aware portals on top: issuer, distributor, investor, ops console, admin. Tenant theming via CSS variables. Lucide icons only — no emoji. Postgres for relational truth, Mongo for tenant-flexible payloads, Daml as the shared multi-party ledger. Browsers never call Daml directly — adapters mediate.
 
 ---
 
@@ -79,7 +79,7 @@
 **On screen:** `video-deck.html` slide 4 — Q1 / Q3 / Q4 / Q7 status
 **Deep-deck anchor:** `canton-interview.html#slide-8`
 
-> Four open questions from the PRD. Q1 — HydraX rails API surface. We run a mocked adapter behind a stable interface, so v1 ships without blocking. Q3 — first product type. Proposal: short-duration credit, 30 to 180 day tenor. Q4 — first tenant persona. Q7 — pricing model. Memos for both are in the repo. None block the workflow stack from shipping.
+> Four open questions from the PRD. Q1 — HydraX rails API surface. Mocked adapter behind a stable interface, now covering issue, subscribe, transfer custody, settle, and NAV. Q3 — first product type. Short-duration credit FSM is wired in workflow-svc. Q4 — first tenant persona. Q7 — pricing model. Decision memos for both in the repo, Q7 recommends a hybrid setup-plus-platform-plus-volume model. None block the workflow stack from shipping.
 
 ---
 
@@ -92,7 +92,15 @@
 
 ---
 
-## Verification (recorded 2026-04-26)
+## Live URL inventory (verified 2026-04-27)
+
+- **Institutional landing + 5 portals (production):** [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — use this for executive-facing demos.
+- **Canton homework cover + deck + script bundle:** [hydrax-context-production.up.railway.app](https://hydrax-context-production.up.railway.app/) — pairs with this script's narrative directly. **Status:** currently regressed (serving the operator-prototype landing on every route); see [docs/plans/2026-04-27-demo-prep-codebase-sync.md](../plans/2026-04-27-demo-prep-codebase-sync.md) for the fix runbook.
+- **Bare original prototype:** [hydrax-prototype-production.up.railway.app](https://hydrax-prototype-production.up.railway.app/) — historical reference; `index.html` element ids in this script point at the same prototype source.
+
+---
+
+## Verification (recorded 2026-04-26, refreshed 2026-04-27)
 
 - **Spoken-word count:** 527 words across the blockquoted narration. With screen-action dwells in Segment 3 (avg ~95 wpm) and talking-head pacing in Segments 1, 2, 4, 5, 6 (105–135 wpm), this fits 5:00. The 700–800 target in the plan doc assumed pure-narration; the demo segment is intentionally lower wpm.
 - **Timestamps:** monotonic 00:00 → 00:30 → 01:15 → 01:35 → 02:05 → 02:35 → 03:05 → 03:30 → 04:15 → 04:45 → 05:00.

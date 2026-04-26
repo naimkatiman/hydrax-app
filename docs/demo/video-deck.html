@@ -414,7 +414,7 @@
 
       <div class="slide-body">
         <h1 class="slide-headline" id="vd-slide-3-title">
-          Eight services. <em>Five portals.</em> One ledger.
+          Nine services. <em>Five portals.</em> One ledger.
         </h1>
 
         <div class="arch-grid">
@@ -424,11 +424,12 @@
               <li>workflow-svc — orchestration (Go)</li>
               <li>approval-svc — chains + escalations (Go)</li>
               <li>audit-svc — action log (Go)</li>
-              <li>hydrax-adapter — rails bridge (Go, mock today)</li>
-              <li>canton-adapter — Daml command + event (Go)</li>
-              <li>notify-svc — email, in-app, webhook (Node/TS)</li>
-              <li>integration-svc — KYC, SSO, CRM (Node/TS)</li>
+              <li>hydrax-adapter — rails bridge, expanded mock (Go)</li>
+              <li>canton-adapter — in-memory Daml ledger + bridge (Go)</li>
+              <li>notify-svc — email, magic-link over SMTP (Node/TS)</li>
+              <li>integration-svc — auth, KYC, SSO, CRM (Node/TS)</li>
               <li>bff — aggregation for React (Node/TS)</li>
+              <li>market-data-svc — quotes + FX (Go)</li>
             </ul>
           </article>
           <article class="arch-card">
@@ -470,13 +471,13 @@
         <div>
           <div class="qrow">
             <span class="qid">Q1</span>
-            <span class="qbody">HydraX rails API surface — mocked adapter behind a stable interface</span>
+            <span class="qbody">HydraX rails API surface — mock now covers issue, subscribe, custody, settle, NAV</span>
             <span class="qstatus">Deferred-not-resolved</span>
           </div>
           <div class="qrow">
             <span class="qid">Q3</span>
             <span class="qbody">First product type — short-duration credit, 30 to 180 day tenor</span>
-            <span class="qstatus">Proposed</span>
+            <span class="qstatus">FSM landed</span>
           </div>
           <div class="qrow">
             <span class="qid">Q4</span>
@@ -485,8 +486,13 @@
           </div>
           <div class="qrow">
             <span class="qid">Q7</span>
-            <span class="qbody">Pricing model — options memo in repo</span>
-            <span class="qstatus">Memo ready</span>
+            <span class="qbody">Pricing model — Option D recommended (setup + platform + volume)</span>
+            <span class="qstatus">Decision memo</span>
+          </div>
+          <div class="qrow">
+            <span class="qid">2d</span>
+            <span class="qbody">Portal auth UI — passkey + magic-link flows already plumbed end-to-end</span>
+            <span class="qstatus">Plan executable</span>
           </div>
         </div>
       </div>

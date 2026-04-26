@@ -5,7 +5,13 @@
 
 - Slim presenter deck — [video-deck.html](video-deck.html) — 5 slides, video-paced
 - Deep deck — [canton-interview.html](canton-interview.html) — 9 slides, full detail
-- Prototype — [../../index.html](../../index.html) — operator console, served via `python3 -m http.server 8000`
+- Prototype source — [../../index.html](../../index.html) — operator console, served via `python3 -m http.server 8000`
+
+**Live production URLs (verified 2026-04-27):**
+
+- **Executive demos use this:** [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — institutional landing + 5 role portals. The polished face of the product. If the audience is a stakeholder, distributor, or investor, record against this URL.
+- **Canton-narrative paired site:** [hydrax-context-production.up.railway.app](https://hydrax-context-production.up.railway.app/) — cover article + deck + script. **Currently regressed** (serving the prototype landing on every route); fix runbook in [docs/plans/2026-04-27-demo-prep-codebase-sync.md](../plans/2026-04-27-demo-prep-codebase-sync.md).
+- **Bare prototype:** [hydrax-prototype-production.up.railway.app](https://hydrax-prototype-production.up.railway.app/) — historical reference; this is the URL whose source matches `../../index.html`. Use for the operator-console walkthrough segments below if you want to record against the deployed copy instead of localhost.
 
 **Recording setup:**
 

@@ -50,7 +50,7 @@
 
 **Anchor:** [#slide-5](canton-interview.html#slide-5) — "Three planes above the rails"
 
-> Above the rails, three planes. Plane one, rails. Two adapters — hydrax-adapter and canton-adapter — translate domain commands into HydraX REST calls and Daml commands. Mock wired today, real surface drops in behind the same interface. Plane two, orchestration. Seven Go and Node services — workflow, approval, audit, notify, integration, BFF — each owning one concern. Plane three, UX. Five React portals — issuer, distributor, investor, ops, admin — same component library, role-scoped at the route.
+> Above the rails, three planes. Plane one, rails. Two adapters — hydrax-adapter and canton-adapter — translate domain commands into HydraX REST calls and Daml commands. The hydrax-adapter mock now covers issue, subscribe, transfer custody, settle, and NAV. The canton-adapter ships an in-memory ledger with parties, commands, and event polling. Plane two, orchestration. Nine Go and Node services — workflow, approval, audit, notify, integration, BFF, market-data, plus the two adapters — each owning one concern. Plane three, UX. Five React portals — issuer, distributor, investor, ops, admin — same component library, role-scoped at the route.
 
 ---
 
@@ -66,7 +66,7 @@
 
 **Anchor:** [#slide-7](canton-interview.html#slide-7) — "Status, grounded in commits"
 
-> Status, grounded in commits, not slides. Five Daml scripts green. Eight backend services scaffolded with health checks, persistence, per-service tests. Five React portals live on Railway behind one domain. Magic-link auth wired through SMTP. Subscription lifecycle and approval persistence land this week. The mocked HydraX adapter is a deliberate bet — workflow ships now, real API drops in later, no rework.
+> Status, grounded in commits. Five Daml scripts green. Nine backend services with health checks, persistence, per-service tests. Five React portals live across three Railway services — institutional landing, Canton homework site, original prototype. Auth substrate complete: passkeys, magic-link over SMTP, dev login removed. Subscription lifecycle and approvals persisted in Postgres. Q3 credit FSM wired. The mocked HydraX adapter is a deliberate bet — workflow ships now, real API drops in later.
 
 ---
 
@@ -74,7 +74,7 @@
 
 **Anchor:** [#slide-8](canton-interview.html#slide-8) — "Trade-offs now, roadmap next"
 
-> Trade-offs and roadmap. Today, scope is disciplined — single synchronizer, mocked rails, demo-mode portals, no secondary market UX, no portfolio analytics. Right cut for v1. Next — connect the real HydraX adapter, ship portal auth UI, harden audit-svc for institutional retention, start a pilot with a real issuer and distributor. Four open PRD questions remain: rails surface, first product type, first tenant persona, pricing model. None block the workflow stack. The rails are yours. The layer above is moving. Thank you.
+> Trade-offs and roadmap. Today, scope is disciplined — single synchronizer, mocked rails, demo-mode portals, no secondary market UX. Right cut for v1. Next — ship portal auth UI, connect the real HydraX adapter when the API drops, harden audit-svc for institutional retention, start a pilot with a real issuer and distributor. Four open PRD questions: rails surface, product type, tenant persona, pricing. Decision memos exist for each. None block the stack. The rails are yours. The layer above is moving. Thank you.
 
 ---
 

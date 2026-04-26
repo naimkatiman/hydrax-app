@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5-Minute Walkthrough Script · Canton Network · Naim Katiman</title>
-  <meta name="description" content="The 5-minute walkthrough script for the HydraX Canton Network homework — what I would say if I narrated the deck." />
+  <meta name="description" content="The 5-minute walkthrough script for the HydraX Canton Network homework — one paragraph per slide, anchored to the deck." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
@@ -29,97 +29,116 @@
 <!-- ─── Hero ─────────────────────────────────────────────────────────── -->
 <header class="hero">
   <p class="hero-eyebrow">Appendix B · 5-Minute Walkthrough Script</p>
-  <h1>What I would say <span class="accent">if I narrated the deck.</span></h1>
-  <p class="hero-lede">5:00 runtime at ~150 wpm. Six segments. Recordable as-is. The blockquoted narration is what gets spoken; the meta lines describe what's on screen.</p>
+  <h1>One paragraph per slide. <span class="accent">Read the deck out loud in five.</span></h1>
+  <p class="hero-lede">Nine paragraphs anchored to the nine slides on the deck page. The blockquoted prose is the spoken narration. Pace ~130 wpm with comfortable screen dwell. Refreshed against the codebase 2026-04-27.</p>
 
   <div class="hero-status">
     <span class="status-pill"><span class="dot"></span>5:00 total</span>
-    <span class="status-pill"><span class="dot"></span>527 words narration</span>
-    <span class="status-pill"><span class="dot"></span>6 segments</span>
+    <span class="status-pill"><span class="dot"></span>654 words narration</span>
+    <span class="status-pill"><span class="dot"></span>9 slides</span>
   </div>
 </header>
 
-<!-- ─── Segments ─────────────────────────────────────────────────────── -->
-<section class="section" id="segments">
+<!-- ─── Slides ───────────────────────────────────────────────────────── -->
+<section class="section" id="slides">
   <p class="section-eyebrow">The Walkthrough</p>
-  <h2 style="margin-bottom: 8px;">Six segments, one continuous take.</h2>
+  <h2 style="margin-bottom: 8px;">Nine slides, one continuous take.</h2>
 
   <div class="segment">
-    <div class="seg-meta">Segment 01<span class="seg-time">00:00 → 00:30</span></div>
+    <div class="seg-meta">Slide 0 · Cover<span class="seg-time">00:00 → 00:25</span></div>
     <div>
-      <h3>Positioning</h3>
+      <h3>Canton Network + the layer above it</h3>
       <div class="prose">
-        <p><strong>On screen:</strong> deck cover + thesis split (slides 0–1).</p>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">HydraX is the regulated rails — tokenization, custody, trading. What's missing above those rails is the institutional workflow layer: onboarding, issuance, subscription, approvals, audit. We are building that layer. Canton-aligned, privacy-preserving, multi-party. Not a competing exchange. Not a custody system. Not another DeFi front end. The control room above the rails.</p>
+        <p><strong>On screen:</strong> deck cover (slide-0).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Hello, I'm Naim. Over the last few weeks I've built a workflow platform for institutional tokenisation that sits on top of HydraX's regulated rails and a Canton synchronizer. Thesis in one sentence: Canton owns the shared truth, we own the path that gets there. It's live on Railway, five Daml scripts run green.</p>
       </div>
     </div>
   </div>
 
   <div class="segment">
-    <div class="seg-meta">Segment 02<span class="seg-time">00:30 → 01:15</span></div>
+    <div class="seg-meta">Slide 1 · The Thesis<span class="seg-time">00:25 → 01:00</span></div>
     <div>
-      <h3>The Wedge</h3>
+      <h3>Canton owns the rails. We own the layer above.</h3>
       <div class="prose">
-        <p><strong>On screen:</strong> three primitives + Canton wiring (slides 2–3).</p>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">The first wedge is institutional onboarding plus issuance plus subscription servicing for tokenized products. One workspace shared across issuer, distributor, investor, and operator — each role sees what their role is allowed to see, and only that. Tenant isolation and least-privilege from day one. Today institutions stitch this workflow across email, spreadsheets, and bilateral PDFs. We replace that surface with a single command-room UI, with a Daml-anchored audit trail underneath, so every state change is provable, attributable, and replayable.</p>
+        <p><strong>On screen:</strong> trust-boundary diagram (slide-1).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">The whole presentation hangs on this slide. Clean trust boundary down the middle. On the left, Canton — multi-party truth on Daml, sub-transaction privacy, atomic cross-institution commits. On the right, the application layer — five role-scoped React portals, workflow state machines with SLA timers, approval ceremonies that gate on-chain commands, plus notification, KYC, and audit fabric. The browser never holds rails credentials.</p>
       </div>
     </div>
   </div>
 
   <div class="segment">
-    <div class="seg-meta">Segment 03<span class="seg-time">01:15 → 03:30</span></div>
+    <div class="seg-meta">Slide 2 · Three Canton Primitives<span class="seg-time">01:00 → 01:30</span></div>
     <div>
-      <h3>Live Walkthrough</h3>
+      <h3>Canton in three primitives</h3>
       <div class="prose">
-        <p><strong>On screen:</strong> the operator console (the <a href="https://hydrax-portals-production.up.railway.app/" target="_blank" rel="noopener">live app</a>) — five sub-segments with screen actions.</p>
-
-        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3a · Open the workspace · 01:15 → 01:35</h4>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Here is the operator console. Top — system view, mode, drift, primary venue. Below — the operator workspace. Six lanes: orders, positions, venues, risk, settings, activity. Single surface, role-aware, white-labelable per tenant.</p>
-
-        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3b · Orders + drill-down · 01:35 → 02:05</h4>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Orders panel. Sortable by id, venue, mode, exposure, status. Pick a row — the detail rail opens with the route's venue mix, operator rationale, and fallback sequencing. Every venue name is a cross-link; clicking it jumps to that venue's record. The console is built so an operator can trace any decision in two clicks.</p>
-
-        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3c · Mode change + state cycle · 02:05 → 02:35</h4>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Mode change. Watch the routing posture flip — Balanced Sweep, Latency Shield, Inventory Protect — and the drift recompute. Now state cycle. The same panel handles loading skeletons, the populated ready state, and an empty filtered state, with no layout jump. This is the pattern every workflow surface in HydraX inherits.</p>
-
-        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3d · Cross-panel jump + risk · 02:35 → 03:05</h4>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Cross-panel jump — orders to venues, one click, deep-linked. Risk lane. Operator review queue with severity, venue, time, status. Accept or defer is one keystroke. Every action is logged.</p>
-
-        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3e · Activity persistence · 03:05 → 03:30</h4>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Activity log. Every panel switch, every filter change, every risk decision is recorded. Persisted across sessions in versioned local storage during prototype phase, audit-svc-backed in v1. This is the audit trail an institutional ops desk actually needs.</p>
+        <p><strong>On screen:</strong> three pillars (slide-2).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Why Canton. Three primitives. First, selective disclosure — signatories see full state, observers get a scoped view, no global state. Privacy by design, the way regulated finance actually needs it. Second, atomic interop — trade and settlement commit together across domains, all-or-nothing, no reconciliation glue between institutions. Third, multi-party coordination — issuer, distributor, custodian, regulator each get authorisation rules enforced by the contract itself.</p>
       </div>
     </div>
   </div>
 
   <div class="segment">
-    <div class="seg-meta">Segment 04<span class="seg-time">03:30 → 04:15</span></div>
+    <div class="seg-meta">Slide 3 · How Canton Is Wired<span class="seg-time">01:30 → 02:00</span></div>
     <div>
-      <h3>Architecture</h3>
+      <h3>Four-layer wiring</h3>
       <div class="prose">
-        <p><strong>On screen:</strong> three planes + status (slides 5–7).</p>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Under the surface — eight backend services already scaffolded. Five Go services for performance-critical workflow, approval, audit, HydraX adapter, Canton adapter. Three Node services for notifications, integrations, and a BFF that aggregates for React. Five role-aware portals on top: issuer, distributor, investor, ops console, admin. Tenant theming via CSS variables. Lucide icons only — no emoji, ever. Postgres for relational truth, Mongo for tenant-flexible payloads, Daml as the shared multi-party ledger. Browsers never call Daml directly — adapters mediate.</p>
+        <p><strong>On screen:</strong> participant nodes + synchronizer (slide-3).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Quick wiring diagram. Four layers. Top — the application, our portals and orchestration. Below, participant nodes — each institution runs one, holding its private slice. Below that, the synchronizer — Canton's sequencing fabric, the thing that orders multi-party commits. Underneath, Daml — the contract language and runtime. Commands flow down, events flow back up. Our code only ever talks to the participant node.</p>
       </div>
     </div>
   </div>
 
   <div class="segment">
-    <div class="seg-meta">Segment 05<span class="seg-time">04:15 → 04:45</span></div>
+    <div class="seg-meta">Slide 4 · Boundary<span class="seg-time">02:00 → 02:30</span></div>
     <div>
-      <h3>Roadmap &amp; Open Questions</h3>
+      <h3>Where Canton stops vs what the app must do</h3>
       <div class="prose">
-        <p><strong>On screen:</strong> trade-offs + roadmap (slide 8).</p>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Four open questions from the PRD. Q1 — HydraX rails API surface. We run a mocked adapter behind a stable interface, so v1 ships without blocking. Q3 — first product type. Proposal: short-duration credit, 30 to 180 day tenor. Q4 — first tenant persona. Q7 — pricing model. Memos for both are in the repo. None block the workflow stack from shipping.</p>
+        <p><strong>On screen:</strong> boundary table (slide-4).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">The boundary slide — load-bearing. Canton handles shared truth, atomic transitions, signatory disclosure, multi-party authorisation. Canton does not handle SLA timers, retry policy, human approvals with escalation, KYC pipelines, audit outside the ledger, role-aware UI, or notifications. Every one of those is on the app side. Put SLA logic inside Daml and you regret it within a week. Recreate Canton's commits in your app and you regret it forever.</p>
       </div>
     </div>
   </div>
 
   <div class="segment">
-    <div class="seg-meta">Segment 06<span class="seg-time">04:45 → 05:00</span></div>
+    <div class="seg-meta">Slide 5 · Three Planes Above the Rails<span class="seg-time">02:30 → 03:05</span></div>
     <div>
-      <h3>Close</h3>
+      <h3>Rails · Orchestration · UX</h3>
       <div class="prose">
-        <p><strong>On screen:</strong> ask + contact (slide 8 outro).</p>
-        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">What we are asking for: validation of the wedge, alignment on the open questions, and a working session on the HydraX adapter contract. Workflow-layer code is moving. The rails are yours. Let's connect them.</p>
+        <p><strong>On screen:</strong> three-plane stack (slide-5).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Above the rails, three planes. Plane one, rails. Two adapters — hydrax-adapter and canton-adapter — translate domain commands into HydraX REST calls and Daml commands. The hydrax-adapter mock now covers issue, subscribe, transfer custody, settle, and NAV. The canton-adapter ships an in-memory ledger with parties, commands, and event polling. Plane two, orchestration. Nine Go and Node services — workflow, approval, audit, notify, integration, BFF, market-data, plus the two adapters — each owning one concern. Plane three, UX. Five React portals — issuer, distributor, investor, ops, admin — same component library, role-scoped at the route.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Slide 6 · End-to-End Flow<span class="seg-time">03:05 → 03:55</span></div>
+    <div>
+      <h3>One subscription, end to end</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> investor → workflow → approval → notify → rails → audit (slide-6).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">One workflow end-to-end. An investor opens the portal, submits a subscription. workflow-svc validates and forwards to approval-svc, which opens the ceremony, starts an SLA timer, routes to approvers. notify-svc fans out an email and a toast. The approver clicks accept; workflow-svc reads the lifecycle as approved and calls hydrax-adapter, which posts to the HydraX issuance endpoint. canton-adapter commits the Daml command on the synchronizer. The event flows back through audit-svc, the UI refreshes, the investor sees their subscription allocated. Submit to ledger — every state change provable, attributable, replayable. That's the whole product in one diagram.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Slide 7 · Status<span class="seg-time">03:55 → 04:25</span></div>
+    <div>
+      <h3>Status, grounded in commits</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> status grid (slide-7).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Status, grounded in commits. Five Daml scripts green. Nine backend services with health checks, persistence, per-service tests. Five React portals live across three Railway services — institutional landing, Canton homework site, original prototype. Auth substrate complete: passkeys, magic-link over SMTP, dev login removed. Subscription lifecycle and approvals persisted in Postgres. Q3 credit FSM wired. The mocked HydraX adapter is a deliberate bet — workflow ships now, real API drops in later.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Slide 8 · Trade-offs and Roadmap<span class="seg-time">04:25 → 05:00</span></div>
+    <div>
+      <h3>Disciplined now, expanding next</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> trade-offs + roadmap (slide-8).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Trade-offs and roadmap. Today, scope is disciplined — single synchronizer, mocked rails, demo-mode portals, no secondary market UX. Right cut for v1. Next — ship portal auth UI, connect the real HydraX adapter when the API drops, harden audit-svc for institutional retention, start a pilot with a real issuer and distributor. Four open PRD questions: rails surface, product type, tenant persona, pricing. Decision memos exist for each. None block the stack. The rails are yours. The layer above is moving. Thank you.</p>
       </div>
     </div>
   </div>
@@ -127,15 +146,15 @@
 
 <!-- ─── Verification footer ──────────────────────────────────────────── -->
 <section class="section" id="verification" style="border-top: 1px solid var(--border-soft);">
-  <p class="section-eyebrow">Verification · Recorded 2026-04-26</p>
+  <p class="section-eyebrow">Verification · Refreshed 2026-04-27</p>
   <h2>Pacing math.</h2>
   <div class="prose">
     <ul>
-      <li><strong>Spoken-word count:</strong> 527 words across the narration above.</li>
-      <li><strong>Pacing:</strong> ~95 wpm during demo segments (Segment 3) with screen-action dwells; 105–135 wpm during talking-head segments (1, 2, 4, 5, 6).</li>
-      <li><strong>Timestamp ladder:</strong> monotonic 00:00 → 00:30 → 01:15 → 01:35 → 02:05 → 02:35 → 03:05 → 03:30 → 04:15 → 04:45 → 05:00.</li>
-      <li><strong>Slide refs:</strong> all 9 slide ids in the deep deck resolve.</li>
-      <li><strong>Element refs:</strong> every UI handle named in Segment 3 resolves in the live app.</li>
+      <li><strong>Spoken-word count:</strong> 654 words across the nine paragraphs above.</li>
+      <li><strong>Pacing:</strong> 8 of 9 slides at 110–165 wpm; slide 1 at 106 wpm intentionally slow for thesis-statement dwell.</li>
+      <li><strong>Timestamp ladder:</strong> monotonic 00:00 → 00:25 → 01:00 → 01:30 → 02:00 → 02:30 → 03:05 → 03:55 → 04:25 → 05:00. Slide 6 (end-to-end flow) gets the largest 50s slot.</li>
+      <li><strong>Slide refs:</strong> all 9 slide ids on the deck page resolve.</li>
+      <li><strong>Codebase claims:</strong> 9 services, 5 Daml scripts, auth complete through 2e, subscription/approval persisted, Q3 credit FSM landed — all verified against current code on 2026-04-27.</li>
     </ul>
   </div>
 </section>
