@@ -22,6 +22,7 @@ import {
   XCircle,
   type LucideIcon,
 } from "lucide-react";
+import { TokenModelCard } from "../components/TokenModelCard";
 
 interface TransitionAction {
   readonly to: Exclude<LifecycleState, "pending">;
@@ -59,6 +60,16 @@ const TRANSITION_ACTIONS: Record<
     variant: "danger",
   },
 };
+
+function tokenTemplateForProductType(productType: string): string {
+  const map: Record<string, string> = {
+    short_duration_credit: "ShortDurationCreditNote",
+    fund: "FundUnit",
+    structured_product: "StructuredNote",
+    treasury: "TreasuryToken",
+  };
+  return map[productType] ?? "GenericProductInstrument";
+}
 
 export function ProductDetailRoute() {
   const { id = "" } = useParams<{ id: string }>();
@@ -175,6 +186,17 @@ export function ProductDetailRoute() {
           </div>
         )}
       </Stack>
+      <TokenModelCard
+        templateName={tokenTemplateForProductType(data.product_type)}
+        stakeholders={["Issuer", "Distributor", "Investor", "Custodian"]}
+        lifecycleStates={["pending", "approved", "active", "matured", "cancelled"]}
+        offLedgerFields={[
+          "KYC documents",
+          "marketing collateral",
+          "fee schedule",
+          "investor reporting",
+        ]}
+      />
     </Stack>
   );
 }
