@@ -6,6 +6,24 @@ This is the **layer above** Canton + HydraX. The rails handle shared business tr
 
 For the load-bearing operating rules see [CLAUDE.md](CLAUDE.md). For the product spec see [docs/prd-v2.md](docs/prd-v2.md).
 
+## Live preview
+
+The static prototype operator console (`index.html` + `app.js` + `styles.css`), deployed at [hydrax-prototype-production.up.railway.app](https://hydrax-prototype-production.up.railway.app/):
+
+![HydraX operator console prototype](docs/demo/captures/prototype.png)
+
+The five role-scoped React portals served from a single static deploy at [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — one persona each. Each GIF below cycles between the home route and the portal's primary work surface.
+
+| Portal | Routes shown | Live |
+|---|---|---|
+| Issuer | `/issuer/` &rarr; `/issuer/products` | ![issuer-portal](docs/demo/captures/issuer.gif) |
+| Distributor | `/distributor/` &rarr; `/distributor/approvals` | ![distributor-portal](docs/demo/captures/distributor.gif) |
+| Investor | `/investor/` &rarr; `/investor/products` | ![investor-portal](docs/demo/captures/investor.gif) |
+| Ops | `/ops/` &rarr; `/ops/audit` | ![ops-console](docs/demo/captures/ops.gif) |
+| Admin | `/admin/` &rarr; `/admin/tenants` | ![admin-portal](docs/demo/captures/admin.gif) |
+
+Captures were taken via headless chromium against the live URLs (`--window-size=1280,800 --virtual-time-budget=4000`) and assembled into 2-frame GIFs with PIL. To regenerate after a deploy, see [docs/demo/captures/](docs/demo/captures/).
+
 ## Canton owns
 
 - Shared multi-party truth (Daml contracts on a synchronizer)
@@ -136,3 +154,19 @@ Tracked in [PRD-v2 §14](docs/prd-v2.md). Each blocker has a draft response in `
 - Q7 — pricing model — 4 candidates, hybrid recommended
 
 All four require external action to actually unblock.
+
+## Canton interview deck
+
+Nine slides covering the architecture story. Source: [docs/demo/canton-interview.html](docs/demo/canton-interview.html) — open it for the keyboard-navigable deck (←/→/space/PgUp/PgDn/Home/End, mouse-wheel paging, IntersectionObserver reveal, `prefers-reduced-motion` respected). Hero imagery below is the per-slide ambient backdrop generated via `/nano-banana`; provenance is in [docs/demo/assets/assets-meta.json](docs/demo/assets/assets-meta.json).
+
+| # | Title | Hero |
+|---|---|---|
+| 0 | Canton Network + the layer above it | ![slide-0](docs/demo/assets/slide-0-stack.jpg) |
+| 1 | Canton owns the rails. We own the layer above. | ![slide-1](docs/demo/assets/slide-1-thesis-split.jpg) |
+| 2 | Canton in three primitives | ![slide-2](docs/demo/assets/slide-2-three-primitives.jpg) |
+| 3 | How Canton is wired | ![slide-3](docs/demo/assets/slide-3-canton-wiring.jpg) |
+| 4 | Where Canton stops vs what the app must do | ![slide-4](docs/demo/assets/slide-4-where-canton-stops.jpg) |
+| 5 | Three planes above the rails | ![slide-5](docs/demo/assets/slide-5-three-planes.jpg) |
+| 6 | One workflow across three planes | ![slide-6](docs/demo/assets/slide-6-one-workflow.jpg) |
+| 7 | Status, grounded in commits | ![slide-7](docs/demo/assets/slide-7-status.jpg) |
+| 8 | Trade-offs now, roadmap next | ![slide-8](docs/demo/assets/slide-8-tradeoffs-roadmap.jpg) |
