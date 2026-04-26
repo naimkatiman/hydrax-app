@@ -10,8 +10,9 @@ This is a single-page index for the homework. The substantive material lives in 
 
 | Artifact | What it is |
 |---|---|
-| [docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) | **Primary deck** — 14 slides structured to answer the homework's three sections (§1 Conceptual Overview, §2 Building on Canton, §3 Technical Deep Dive). Deployed at `hydrax-context/deck`. |
+| [docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) | **Primary deck** — 18 slides structured to answer the homework's three sections (§1 Conceptual Overview, §2 Building on Canton, §3 Technical Deep Dive), with slides 14–17 as a deep-dive appendix (tokenization, composability, infrastructure, data sync) each mirrored by a live portal surface. Deployed at `hydrax-context/deck`. |
 | [docs/demo/canton-interview.html](docs/demo/canton-interview.html) | Alternate deck — 9-slide architecture-positioning narrative (slide-0 cover → slide-8 trade-offs). The earlier framing, kept for reference. |
+| [docs/demo/deep-dive-qa-prep.md](docs/demo/deep-dive-qa-prep.md) | Q&A prep for the four deep-dive topics — pitch + slide pointer + portal demo path + likely follow-up + honest deferral, per topic |
 | [docs/demo/script-5min.md](docs/demo/script-5min.md) | 5-minute walkthrough script + [shot-list.md](docs/demo/shot-list.md) |
 | [docs/prd.md](docs/prd.md) | 24-section PRD for the platform built above the rails |
 | [hydrax-app/](hydrax-app/) repo | 8 backend services + 5 white-label portals; the "build above Canton" answer expressed as code, not prose |
@@ -72,6 +73,22 @@ The default mistake is treating "the app" as a thin wrapper around Daml choices.
 Daml upgrade paths are real, but the operational question is harder than the technical one. When entitlements change — a distributor loses a licence, a regulator's reporting party rotates — *what happens to in-flight contracts*? The honest answer is: Daml gives you the upgrade primitive (interfaces, package versioning), but you still need (a) a deterministic projection of "what's in flight at cutover", (b) a migration plan per contract template, (c) a fallback for participants who haven't accepted the new package, (d) an audit trail that proves no economic state changed during the swap. [PRD §10–§15](docs/prd.md) is where this becomes concrete; [slide-8](docs/demo/canton-interview.html) frames the deferrals honestly. We don't claim to have solved this — we've architected so that the lifecycle decisions are isolated in the rails-plane adapters, where they belong.
 
 ---
+
+## 3.5 Deep-Dive Coverage Across All Seven Topics (April 2026)
+
+The homework deck originally answered §1–§3 in slides 0–13. Four additional slides (14–17) plus four matching portal surfaces were added in a later pass to give defensible Q&A coverage on every Canton topic an interviewer is likely to probe. Pairing each with a live surface — not just slideware — was the point.
+
+| Topic | Slide | Portal surface | Pre-existing slide if asked |
+|---|---|---|---|
+| Tokenization & tokenomics design | [slide-14](canton-homework-deck.html#slide-14) "Tokens are Daml templates" | issuer-portal `/products/<id>` → **Token Model** card | — |
+| DeFi composability under privacy | [slide-15](canton-homework-deck.html#slide-15) "Composability moves up the stack" | admin `/composability` — 3 contract templates with stakeholder rosters + workflow attribution | — |
+| Infrastructure & operational setup | [slide-16](canton-homework-deck.html#slide-16) "8 services, 5 portals, one Railway project" | ops-console `/health` polling bff `/healthz/composite` | — |
+| Data management & sync across domains | [slide-17](canton-homework-deck.html#slide-17) "Ledger truth, read-model speed" | admin `/projections` — read-model lag table with stale-row flagging | [slide-11](canton-homework-deck.html#slide-11) "single sync vs Global Synchronizer" still covers the multi-domain decision |
+| Web2 vs Web3 architectural considerations | [slide-8](canton-homework-deck.html#slide-8) "Where Canton stops, where Web2 takes over" | All five portals demonstrate the Web2 plane | reinforced by [slide-5](canton-homework-deck.html#slide-5) Canton vs L1 vs DLT |
+| Privacy and security model | [slide-10](canton-homework-deck.html#slide-10) "Privacy & security model" | Tenant theming + role-aware shells visible across portals | reinforced by [slide-3](canton-homework-deck.html#slide-3) primitives |
+| Smart contract design and lifecycle | [slide-12](canton-homework-deck.html#slide-12) "Daml choices as state transitions" | issuer-portal product detail shows the choice surface (Approve / Activate / Mark as matured / Cancel) | — |
+
+For interview-day Q&A: see [deep-dive-qa-prep.md](deep-dive-qa-prep.md). It gives a 30-second pitch, the slide and portal route to flip to, the likely follow-up question, and the honest deferral for each of the four reinforced topics.
 
 ## 4. What's Deliberately Not Here
 
