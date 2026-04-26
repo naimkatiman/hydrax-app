@@ -10,6 +10,7 @@ export function DistributorTopBar({ userName }: DistributorTopBarProps) {
     <Stack direction="row" align="center" gap="md" style={{ flex: 1 }}>
       <div
         role="search"
+        data-mobile-collapse="search-label"
         style={{
           flex: 1,
           maxWidth: 480,

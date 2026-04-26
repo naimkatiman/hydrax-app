@@ -106,7 +106,7 @@ export function PersonaSwitcher({ current, personas = DEFAULT_PERSONAS }: Person
         style={triggerStyle}
       >
         <Icon icon={currentPersona.icon} label={currentPersona.label} size={14} />
-        <span>{currentPersona.label}</span>
+        <span data-mobile-collapse="persona-label">{currentPersona.label}</span>
         <Icon icon={ChevronDown} label="Open menu" size={12} />
       </button>
       {open ? (
