@@ -87,6 +87,21 @@ Slice 2c (email transport) and slice 2d (portal UI) will add: SMTP / SES / Resen
 
 If OIDC is later chosen as a complementary auth path: `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` will be added then.
 
+### Auth Slice 2b — Magic-Link Enrollment (server substrate + console transport)
+
+| Var | Service | Default | Purpose |
+|---|---|---|---|
+| `MAGIC_LINK_TTL_SECONDS` | integration-svc | `900` (15 min) | TTL for magic-link tokens. Range 60-3600. |
+| `MAGIC_LINK_RATE_LIMIT_PER_WINDOW` | integration-svc | `3` | Max magic-link requests per (tenant_slug, email) per window. Range 1-10. |
+| `MAGIC_LINK_RATE_LIMIT_WINDOW_SECONDS` | integration-svc | `900` (15 min) | Rate-limit window. Range 60-3600. |
+| `MAGIC_LINK_BASE_URL` | integration-svc | `http://localhost:5173/auth/magic-link` | URL the email points at. The `?token=...` query param is appended. Production: must match the slice 2d portal route. |
+| `EMAIL_TRANSPORT` | notify-svc | `console` | Email transport. Slice 2b ships `console` (logs to stdout) and `noop` (silently drops). Slice 2c will add `smtp` / `ses` / `resend`. |
+| `NOTIFY_SVC_URL` | integration-svc | `http://localhost:7101` | Where integration-svc POSTs `/v1/notifications/email`. |
+
+**Slice 2b is server-side substrate + console-transport only.** Magic-link URLs are printed to `notify-svc` stdout when `EMAIL_TRANSPORT=console`; nothing reaches a real inbox. Production-ready bootstrap requires slice 2c (real email transport via SMTP / SES / Resend) before `AUTH_DEV_LOGIN=1` can come down (slice 2e).
+
+**Email enumeration safety:** `POST /v1/auth/magic-link/request` always returns 202 regardless of whether the user exists. Send failures are swallowed and logged via `console.error` — they never surface to the requester. Rate-limit responses (HTTP 429) are the only non-202 success-path response.
+
 ### Deferred
 
 `MONGODB_URI`, KYC/SSO/CRM provider credentials, HydraX rails credentials — all deferred until the corresponding domain logic lands. Document each here at the same commit that introduces the dependency.
