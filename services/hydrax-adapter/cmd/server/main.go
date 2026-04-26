@@ -29,6 +29,10 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handlers.Health(serviceName))
 	mux.HandleFunc("POST /v1/issue", handlers.Issue(rails))
+	mux.HandleFunc("POST /v1/subscribe", handlers.Subscribe(rails))
+	mux.HandleFunc("POST /v1/custody/transfer", handlers.Custody(rails))
+	mux.HandleFunc("POST /v1/settle", handlers.Settle(rails))
+	mux.HandleFunc("GET /v1/nav/{product_id}", handlers.NAV(rails))
 
 	srv := &http.Server{Addr: ":" + port, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	go func() {
