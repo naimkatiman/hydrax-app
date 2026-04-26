@@ -14,29 +14,6 @@ function memoryStorage(): TokenStorage {
 afterEach(() => vi.restoreAllMocks());
 
 describe("createAuthClient", () => {
-  it("login POSTs body and stores token on success", async () => {
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
-      token: "T", session: { id: "s", user_id: "U", tenant_id: "X", role: "admin", expires_at: "2030-01-01T00:00:00Z" },
-    }), { status: 200, headers: { "content-type": "application/json" } }));
-    const storage = memoryStorage();
-    const client = createAuthClient({ bffUrl: "http://bff", storage, fetch: fetchMock as unknown as typeof fetch });
-    const result = await client.login({ tenantSlug: "t", email: "e@x.test" });
-    expect(fetchMock).toHaveBeenCalledWith(
-      "http://bff/v1/auth/dev/login",
-      expect.objectContaining({ method: "POST" }),
-    );
-    expect(storage.get()).toBe("T");
-    expect(result.session.user_id).toBe("U");
-  });
-
-  it("login throws on non-2xx and does NOT store token", async () => {
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ error: "x" }), { status: 401 }));
-    const storage = memoryStorage();
-    const client = createAuthClient({ bffUrl: "http://bff", storage, fetch: fetchMock as unknown as typeof fetch });
-    await expect(client.login({ tenantSlug: "t", email: "e@x.test" })).rejects.toThrow();
-    expect(storage.get()).toBeNull();
-  });
-
   it("whoami sends Authorization header from storage", async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
       session_id: "s", user_id: "U", tenant_id: "T", tenant_slug: "t", email: "e", role: "admin",

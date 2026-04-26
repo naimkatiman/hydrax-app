@@ -10,22 +10,6 @@ export interface AuthClientOptions {
   fetch?: typeof fetch;
 }
 
-export interface LoginInput {
-  tenantSlug: string;
-  email: string;
-}
-
-export interface LoginResult {
-  token: string;
-  session: {
-    id: string;
-    user_id: string;
-    tenant_id: string;
-    role: string;
-    expires_at: string;
-  };
-}
-
 export interface WhoamiResult {
   session_id: string;
   user_id: string;
@@ -44,7 +28,6 @@ export class AuthClientError extends Error {
 }
 
 export interface AuthClient {
-  login(input: LoginInput): Promise<LoginResult>;
   whoami(): Promise<WhoamiResult>;
   logout(): Promise<void>;
   fetch(path: string, init?: RequestInit): Promise<Response>;
@@ -57,17 +40,6 @@ export function createAuthClient(opts: AuthClientOptions): AuthClient {
 
   return {
     storage: opts.storage,
-    async login(input) {
-      const res = await f(url("/v1/auth/dev/login"), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ tenant_slug: input.tenantSlug, email: input.email }),
-      });
-      if (!res.ok) throw new AuthClientError(`login failed: ${res.status}`, res.status);
-      const result = (await res.json()) as LoginResult;
-      opts.storage.set(result.token);
-      return result;
-    },
     async whoami() {
       const token = opts.storage.get();
       if (!token) throw new AuthClientError("no token in storage");
