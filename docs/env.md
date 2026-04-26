@@ -103,12 +103,34 @@ If OIDC is later chosen as a complementary auth path: `OIDC_ISSUER_URL`, `OIDC_C
 | `MAGIC_LINK_RATE_LIMIT_PER_WINDOW` | integration-svc | `3` | Max magic-link requests per (tenant_slug, email) per window. Range 1-10. |
 | `MAGIC_LINK_RATE_LIMIT_WINDOW_SECONDS` | integration-svc | `900` (15 min) | Rate-limit window. Range 60-3600. |
 | `MAGIC_LINK_BASE_URL` | integration-svc | `http://localhost:5173/auth/magic-link` | URL the email points at. The `?token=...` query param is appended. Production: must match the slice 2d portal route. |
-| `EMAIL_TRANSPORT` | notify-svc | `console` | Email transport. Slice 2b ships `console` (logs to stdout) and `noop` (silently drops). Slice 2c will add `smtp` / `ses` / `resend`. |
+| `EMAIL_TRANSPORT` | notify-svc | `console` | Email transport. Slice 2b ships `console` (logs to stdout) and `noop` (silently drops). **Slice 2c adds `smtp`** (raw SMTP via nodemailer; covers MailHog locally and AWS SES / SendGrid / Resend / Postmark via their SMTP endpoints). |
 | `NOTIFY_SVC_URL` | integration-svc | `http://localhost:7101` | Where integration-svc POSTs `/v1/notifications/email`. |
 
-**Slice 2b is server-side substrate + console-transport only.** Magic-link URLs are printed to `notify-svc` stdout when `EMAIL_TRANSPORT=console`; nothing reaches a real inbox. Production-ready bootstrap requires slice 2c (real email transport via SMTP / SES / Resend) before `AUTH_DEV_LOGIN=1` can come down (slice 2e).
+**Slice 2b is server-side substrate + console-transport only.** Magic-link URLs are printed to `notify-svc` stdout when `EMAIL_TRANSPORT=console`; nothing reaches a real inbox. Production-ready bootstrap pairs slice 2b's substrate with slice 2c's real email transport before `AUTH_DEV_LOGIN=1` can come down (slice 2e).
 
 **Email enumeration safety:** `POST /v1/auth/magic-link/request` always returns 202 regardless of whether the user exists. Send failures are swallowed and logged via `console.error` — they never surface to the requester. Rate-limit responses (HTTP 429) are the only non-202 success-path response.
+
+### Auth Slice 2c — SMTP Transport (real email out)
+
+Activated when `EMAIL_TRANSPORT=smtp`. Raw SMTP via nodemailer 8 — one transport, four production options without per-vendor adapters in the codebase.
+
+| Var | Service | Default | Purpose |
+|---|---|---|---|
+| `SMTP_HOST` | notify-svc | — | SMTP server hostname. **Required** when `EMAIL_TRANSPORT=smtp`; missing host crashes the process at boot (fail-closed). |
+| `SMTP_PORT` | notify-svc | `587` | Range 1-65535. Common: 25 (plain), 465 (TLS implicit), 587 (STARTTLS, vendor default). |
+| `SMTP_USER` | notify-svc | — | SMTP auth username. Optional (some local dev SMTPs accept anonymous). **Must be paired with `SMTP_PASS`** if set; mismatched pair crashes at boot. |
+| `SMTP_PASS` | notify-svc | — | SMTP auth password. Optional, paired with `SMTP_USER`. |
+| `SMTP_SECURE` | notify-svc | auto | `true`/`1` forces TLS implicit (port 465 default); `false`/`0` forces STARTTLS-or-plain; unset = auto-detect from port (465 ⇒ true). |
+| `SMTP_FROM` | notify-svc | `noreply@hydrax.local` | `From:` header value on outbound mail. |
+
+**Vendor mapping:**
+- AWS SES: `SMTP_HOST=email-smtp.<region>.amazonaws.com`, `SMTP_PORT=587`, IAM-derived SMTP creds.
+- SendGrid: `SMTP_HOST=smtp.sendgrid.net`, `SMTP_PORT=587`, `SMTP_USER=apikey`, `SMTP_PASS=<api-key>`.
+- Resend: `SMTP_HOST=smtp.resend.com`, `SMTP_PORT=465`, `SMTP_USER=resend`, `SMTP_PASS=<api-key>`.
+- Postmark: `SMTP_HOST=smtp.postmarkapp.com`, `SMTP_PORT=587`, `SMTP_USER=<server-token>`, `SMTP_PASS=<server-token>`.
+- Local dev (MailHog): `SMTP_HOST=localhost`, `SMTP_PORT=1025`, no auth. Inspect at `http://localhost:8025`.
+
+Transport-level rejection (refused connection, 5xx SMTP, TLS handshake failure) → notify-svc returns `502 transport_failed` so callers can distinguish accept-but-drop from real reject. integration-svc's magic-link handler still swallows the error per slice 2b's no-leak policy.
 
 ### Deferred
 
