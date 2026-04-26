@@ -44,7 +44,7 @@ Each service binary listens on `PORT` (defaulted per service below). All service
 | Env var | Default | Points at |
 |---|---|---|
 | `WORKFLOW_SVC_URL` | `http://localhost:7001` | workflow-svc |
-| `APPROVAL_SVC_URL` | `http://localhost:7002` | approval-svc — consumed by bff `/v1/approvals` proxy (`services/bff/src/approvals/proxy.ts`); approval-svc is in-memory in v1 (persistence deferred) |
+| `APPROVAL_SVC_URL` | `http://localhost:7002` | approval-svc — consumed by bff `/v1/approvals` proxy (`services/bff/src/approvals/proxy.ts`); approval-svc uses Postgres when `DATABASE_URL` is set, in-memory MemRepo otherwise |
 | `AUDIT_SVC_URL` | `http://localhost:7003` | audit-svc — consumed by bff `/v1/audit/events` proxy (`services/bff/src/audit/proxy.ts`) **and** by workflow-svc to emit `product.transitioned` events on successful lifecycle transitions (`services/workflow-svc/internal/auditclient`). When unset on workflow-svc, emission is a no-op (best-effort, never blocks the 200). |
 | `HYDRAX_ADAPTER_URL` | `http://localhost:7004` | hydrax-adapter |
 | `NOTIFY_SVC_URL` | `http://localhost:7101` | notify-svc |
@@ -62,6 +62,14 @@ fast at boot rather than at first query.
   (start the stack with `docker compose -f db/postgres/docker-compose.test.yml up -d`)
 - **Railway:** the Postgres addon injects `DATABASE_URL` automatically once provisioned.
   See "Railway provisioning runbook" in `docs/plans/2026-04-25-persistence-foundation.md`.
+
+### `DATABASE_URL` (approval-svc)
+
+Same DSN as workflow-svc. When set, approval-svc uses the Postgres
+`approvals` table (migration `0005_approvals.sql`); when unset it
+falls back to the in-memory `MemRepo` and logs that persistence is
+disabled. Process restart wipes MemRepo state — do not run a multi-day
+local validation against the in-memory backend.
 
 ### Auth Foundation (Slice 1)
 
