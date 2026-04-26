@@ -1,5 +1,5 @@
 import { Search, Bell } from "lucide-react";
-import { Avatar, Icon, Stack } from "@hydrax/ui";
+import { Avatar, Icon, PersonaSwitcher, Stack } from "@hydrax/ui";
 
 interface InvestorTopBarProps {
   readonly userName: string;
@@ -47,6 +47,7 @@ export function InvestorTopBar({ userName }: InvestorTopBarProps) {
       >
         <Icon icon={Bell} label="Notifications" size={16} />
       </button>
+      <PersonaSwitcher current="investor" />
       <Avatar name={userName} />
     </Stack>
   );

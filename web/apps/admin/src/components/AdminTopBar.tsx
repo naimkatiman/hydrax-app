@@ -1,5 +1,5 @@
 import { Search, Bell } from "lucide-react";
-import { Avatar, Icon, Stack } from "@hydrax/ui";
+import { Avatar, Icon, PersonaSwitcher, Stack } from "@hydrax/ui";
 
 interface AdminTopBarProps {
   readonly userName: string;
@@ -47,6 +47,7 @@ export function AdminTopBar({ userName }: AdminTopBarProps) {
       >
         <Icon icon={Bell} label="Notifications" size={16} />
       </button>
+      <PersonaSwitcher current="admin" />
       <Avatar name={userName} />
     </Stack>
   );
