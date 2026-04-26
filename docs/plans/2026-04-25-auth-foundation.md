@@ -425,7 +425,7 @@ describe("Sessions repo", () => {
 
 Run from `services/integration-svc/`:
 ```bash
-INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax_dev?sslmode=disable" \
+INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax?sslmode=disable" \
   pnpm test -- --run src/auth/repo.test.ts
 ```
 Expected: FAIL — module not found.
@@ -556,7 +556,7 @@ export class Sessions {
 
 Run:
 ```bash
-INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax_dev?sslmode=disable" \
+INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax?sslmode=disable" \
   pnpm test -- --run src/auth/repo.test.ts
 ```
 Expected: 7/7 pass.
@@ -786,7 +786,7 @@ describe("auth handlers", () => {
 
 Run from `services/integration-svc/`:
 ```bash
-INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax_dev?sslmode=disable" \
+INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax?sslmode=disable" \
   pnpm test -- --run src/auth/handlers.test.ts
 ```
 Expected: FAIL — module not found.
@@ -991,7 +991,7 @@ async function handleLogout(
 
 Run:
 ```bash
-INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax_dev?sslmode=disable" \
+INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax?sslmode=disable" \
   pnpm test -- --run src/auth/handlers.test.ts
 ```
 Expected: 10/10 pass.
@@ -1091,7 +1091,7 @@ Read `services/integration-svc/src/server.test.ts` first to check what's asserte
 Run from `services/integration-svc/`:
 ```bash
 pnpm typecheck && \
-INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax_dev?sslmode=disable" \
+INTEGRATION_SVC_DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax?sslmode=disable" \
   pnpm test -- --run
 ```
 Expected: typecheck clean; all tests pass (token + repo + handlers + existing server).
@@ -1100,7 +1100,7 @@ Expected: typecheck clean; all tests pass (token + repo + handlers + existing se
 
 Start the service in one terminal:
 ```bash
-DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax_dev?sslmode=disable" \
+DATABASE_URL="postgresql://hydrax:hydrax@localhost:5433/hydrax?sslmode=disable" \
 AUTH_DEV_LOGIN=1 \
   pnpm --filter @hydrax/integration-svc dev
 ```

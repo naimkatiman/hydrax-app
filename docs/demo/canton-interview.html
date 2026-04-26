@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Canton Network — Building Above It</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif;
+      color: #ECF3F6;
+      background:
+        radial-gradient(circle at top left, rgba(65, 200, 149, 0.12), transparent 28%),
+        radial-gradient(circle at right, rgba(76, 135, 255, 0.12), transparent 24%),
+        linear-gradient(180deg, #07131A 0%, #091A22 45%, #071219 100%);
+      min-height: 100vh;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      padding: 56px 16px 96px;
+    }
+
+    .slide-container {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      background: #07131A;
+      border: 1px solid rgba(156, 183, 197, 0.16);
+      border-radius: 12px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
+      flex-shrink: 0;
+    }
+
+    .slide-page {
+      scroll-margin-top: 24px;
+    }
+
+    .slide-nav {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(8, 21, 29, 0.86);
+      border: 1px solid rgba(156, 183, 197, 0.28);
+      font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;
+      font-size: 13px;
+      color: #ECF3F6;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      user-select: none;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .slide-nav b {
+      color: #41C895;
+      font-weight: 600;
+    }
+
+    .slide-nav small {
+      color: #8FA6B1;
+    }
+
+    .slide-nav button {
+      background: transparent;
+      border: 1px solid rgba(156, 183, 197, 0.28);
+      color: #ECF3F6;
+      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .slide-nav button:hover {
+      border-color: #41C895;
+      color: #41C895;
+    }
+
+    .accent {
+      color: #41C895;
+    }
+
+    .bg-accent {
+      background: #41C895;
+    }
+
+    .text-muted {
+      color: #8FA6B1;
+    }
+
+    .text-dim {
+      color: #5C6F78;
+    }
+
+    .mono {
+      font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;
+    }
+
+    .title-font {
+      font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif;
+    }
+
+    @media print {
+      .slide-nav {
+        display: none;
+      }
+
+      .deck {
+        padding: 0;
+        gap: 0;
+      }
+
+      .slide-container {
+        page-break-after: always;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="slide-nav" aria-label="Slide navigation">
+    <button type="button" data-nav="prev" aria-label="Previous slide">&larr;</button>
+    Slide <b id="slide-num">1</b> <small>/ 9</small>
+    <button type="button" data-nav="next" aria-label="Next slide">&rarr;</button>
+  </div>
+  <div class="deck">
+    <div class="slide-container slide-page" id="slide-0" style="background: #07131A;">
+      <!-- Slide Number Overlay -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; top: 40px; right: 80px; width: 120px; height: 80px; text-align: right; z-index: 10;">
+        <p
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 56px; font-weight: 900; color: rgba(65,200,149,0.15); line-height: 1.1; margin: 0;">
+          00</p>
+      </div>
+      <!-- Left Content -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 80px; top: 120px; width: 620px; height: 560px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <p
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895; margin: 0;">
+            homework / interview demo</p>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 72px; font-weight: 800; line-height: 1.05; letter-spacing: -0.04em; margin: 0 0 24px 0; color: #ECF3F6;">
+          Canton Network<br />
+          <span style="color: #41C895; font-weight: 700;">+ the layer above it</span>
+        </h1>
+        <p style="font-size: 20px; line-height: 1.5; color: #8FA6B1; margin: 0 0 40px 0; max-width: 580px;">
+          A workflow platform for institutional tokenisation, built on top of HydraX's regulated rails. Canton owns the
+          shared truth. We own the path that gets there.
+        </p>
+        <div style="display: flex; gap: 32px; align-items: center; margin-bottom: 60px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div
+              style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-user" style="color: #41C895; font-size: 16px;"></i>
+            </div>
+            <p style="font-size: 18px; color: #ECF3F6; font-weight: 500; margin: 0;">Naim Katiman</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div
+              style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-building" style="color: #41C895; font-size: 16px;"></i>
+            </div>
+            <p style="font-size: 18px; color: #ECF3F6; font-weight: 500; margin: 0;">HydraX / 2026</p>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 10px; height: 10px; background: #41C895; border-radius: 50%;"></div>
+            <p style="font-size: 14px; color: #8FA6B1; font-weight: 500; margin: 0;">Live on Railway</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 10px; height: 10px; background: #41C895; border-radius: 50%;"></div>
+            <p style="font-size: 14px; color: #8FA6B1; font-weight: 500; margin: 0;">5 Daml Scripts Green</p>
+          </div>
+        </div>
+      </div>
+      <!-- Right Visual - Layered Architecture -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 760px; top: 120px; width: 440px; height: 520px; z-index: 10;">
+        <div
+          style="background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-radius: 16px; padding: 32px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+          <!-- Layer 3 -->
+          <div
+            style="background: rgba(65,200,149,0.08); border: 1px solid rgba(65,200,149,0.3); border-radius: 10px; padding: 16px 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+              <p
+                style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; color: #41C895; margin: 0;">
+                P3</p>
+              <p style="font-size: 16px; font-weight: 600; color: #ECF3F6; margin: 0 0 0 8px;">UX Layer</p>
+              <p style="margin: 0 0 0 auto; font-size: 12px; color: #5C6F78;">5 portals</p>
+            </div>
+            <p style="margin: 10px 0 0 0; font-size: 13px; color: #8FA6B1;">Issuer, Distributor, Investor, Ops, Admin
+            </p>
+          </div>
+          <div style="text-align: center;">
+            <p
+              style="color: #5C6F78; font-size: 12px; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; margin: 4px 0;">
+              ↓ HTTPS / RTK Query</p>
+          </div>
+          <!-- Layer 2 -->
+          <div
+            style="background: rgba(65,200,149,0.04); border: 1px solid rgba(65,200,149,0.15); border-radius: 10px; padding: 16px 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%; opacity: 0.8;"></div>
+              <p
+                style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; color: #41C895; margin: 0; opacity: 0.8;">
+                P2</p>
+              <p style="font-size: 16px; font-weight: 600; color: #ECF3F6; margin: 0 0 0 8px;">Orchestration</p>
+              <p style="margin: 0 0 0 auto; font-size: 12px; color: #5C6F78;">7 services</p>
+            </div>
+            <p style="margin: 10px 0 0 0; font-size: 13px; color: #8FA6B1;">workflow, approval, audit, notify</p>
+          </div>
+          <div style="text-align: center;">
+            <p
+              style="color: #5C6F78; font-size: 12px; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; margin: 4px 0;">
+              ↓ Daml command / event</p>
+          </div>
+          <!-- Layer 1 -->
+          <div
+            style="background: rgba(65,200,149,0.02); border: 1px solid rgba(65,200,149,0.1); border-radius: 10px; padding: 16px 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%; opacity: 0.6;"></div>
+              <p
+                style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; color: #41C895; margin: 0; opacity: 0.6;">
+                P1</p>
+              <p style="font-size: 16px; font-weight: 600; color: #ECF3F6; margin: 0 0 0 8px;">Rails</p>
+              <p style="margin: 0 0 0 auto; font-size: 12px; color: #5C6F78;">2 adapters</p>
+            </div>
+            <p style="margin: 10px 0 0 0; font-size: 13px; color: #8FA6B1;">hydrax-adapter + canton-adapter</p>
+          </div>
+          <!-- Status Indicator -->
+          <div
+            style="position: absolute; top: 16px; right: 16px; width: 10px; height: 10px; background: #41C895; border-radius: 50%; box-shadow: 0 0 12px rgba(65, 200, 149, 0.6);">
+          </div>
+        </div>
+      </div>
+      <!-- Bottom Status Bar -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; top: 650px; left: 80px; width: 1120px; height: 30px; z-index: 10;">
+        <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%;">
+          <p
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #5C6F78; margin: 0;">
+            docs/architecture.md
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-1">
+      <!-- Slide Number Overlay -->
+      <!-- Fixed: Reduced font-size and adjusted top/height to prevent clipping and overlap -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; top: 30px; left: 1120px; width: 100px; height: 100px; text-align: right; z-index: 10;">
+        <p
+          style="margin: 0; font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 72px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 1;">
+          01</p>
+      </div>
+      <!-- Left Content Header -->
+      <!-- Fixed: Increased height from 160 to 220 to prevent text overflow and clipping -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 40px; width: 1000px; height: 220px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <p
+            style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895;">
+            the thesis</p>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 52px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 12px 0; color: #ECF3F6;">
+          Canton owns the rails. <span style="color: #41C895; font-weight: 700;">We own the layer above.</span>
+        </h1>
+        <p style="font-size: 18px; line-height: 1.5; color: #8FA6B1; margin: 0; max-width: 900px;">
+          A clear boundary between the distributed ledger infrastructure and the application layer that manages
+          workflows, approvals, and user experience.
+        </p>
+      </div>
+      <!-- Left Side: Canton / Rails -->
+      <!-- Fixed: Adjusted top to 270px to give header more room -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 270px; width: 540px; height: 380px; z-index: 10;">
+        <div
+          style="height: 100%; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 16px; padding: 20px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <div style="width: 10px; height: 10px; background: #41C895; border-radius: 50%;"></div>
+            <p
+              style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: #41C895;">
+              CANTON / RAILS</p>
+            <p style="margin: 0; margin-left: auto; font-size: 12px; color: #5C6F78;">Infrastructure</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-users" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Multi-party truth</p>
+                <p style="margin: 0; margin-left: auto; font-size: 12px; color: #5C6F78;">Daml</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">Daml on synchronizer, sub-transaction
+                privacy</p>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-eye-slash" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Selective privacy</p>
+                <p style="margin: 0; margin-left: auto; font-size: 12px; color: #5C6F78;">Signatories</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">Only controllers see full contract</p>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-sync-alt" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Atomic commits</p>
+                <p style="margin: 0; margin-left: auto; font-size: 12px; color: #5C6F78;">Cross-institution</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">Atomic state transitions</p>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-globe" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Cross-domain composition</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">Controlled interop</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Center: Trust Boundary -->
+      <!-- Fixed: Adjusted width/padding to prevent label text exceeding border -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 600px; top: 270px; width: 80px; height: 380px; z-index: 10;">
+        <div
+          style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <div style="width: 2px; height: 90%; background: #41C895; opacity: 0.3;"></div>
+          <div
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #07131A; padding: 6px 16px; border-radius: 4px; border: 1px solid rgba(65,200,149,0.4); z-index: 20;">
+            <p
+              style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 600; color: #41C895;">
+              TRUST</p>
+          </div>
+        </div>
+      </div>
+      <!-- Right Side: HydraX App Layer -->
+      <!-- Fixed: Adjusted top to match left side and ensure vertical alignment -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 680px; top: 270px; width: 540px; height: 380px; z-index: 10;">
+        <div
+          style="height: 100%; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 16px; padding: 20px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <div style="width: 10px; height: 10px; background: #41C895; border-radius: 50%;"></div>
+            <p
+              style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: #41C895;">
+              HYDRAX / APP LAYER</p>
+            <p style="margin: 0; margin-left: auto; font-size: 12px; color: #5C6F78;">Application</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-desktop" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Operator UX</p>
+                <p style="margin: 0; margin-left: auto; font-size: 12px; color: #5C6F78;">5 portals</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">Role-scoped React portals</p>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-cogs" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Workflow state machines</p>
+                <p style="margin: 0; margin-left: auto; font-size: 12px; color: #5C6F78;">SLA</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">SLA timers, retries, approvals</p>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-check-circle" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Approval ceremonies</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">Gate on-chain commands</p>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-bell" style="color: #41C895; font-size: 14px;"></i>
+                <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ECF3F6;">Notifications/KYC</p>
+              </div>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #8FA6B1;">Email, webhook, audit</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Bottom Caption -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center; height: 100%;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-shield-alt" style="color: #41C895; font-size: 14px;"></i>
+            <p style="margin: 0; font-size: 14px; color: #8FA6B1;">Browser never holds rails credentials</p>
+          </div>
+          <p
+            style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #5C6F78;">
+            docs/architecture.md</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-2">
+      <!-- Background Grid -->
+      <div
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none;">
+      </div>
+      <div
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.5; pointer-events: none;">
+      </div>
+      <!-- Slide Number Overlay -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 40px; right: 60px; width: 100px; height: 100px; text-align: right; z-index: 1;">
+        <div
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 80px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 1;">
+          02</div>
+      </div>
+      <!-- Header -->
+      <div data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 50px; width: 1160px; height: 120px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <span
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895;">conceptual
+            overview</span>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 52px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 12px 0; color: #ECF3F6;">
+          Canton in <span style="color: #41C895; font-weight: 700;">three primitives</span>
+        </h1>
+        <p style="font-size: 18px; line-height: 1.5; color: #8FA6B1; margin: 0; max-width: 900px;">
+          Three core capabilities that make Canton suitable for regulated institutional finance.
+        </p>
+      </div>
+      <!-- Three Pillar Diagram -->
+      <div data-object-type="graphic"
+        style="position: absolute; left: 60px; top: 195px; width: 1160px; height: 440px; z-index: 10;">
+        <!-- Connecting Baseline -->
+        <div
+          style="position: absolute; bottom: 0px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(65,200,149,0.3) 10%, rgba(65,200,149,0.3) 90%, transparent 100%);">
+        </div>
+        <div style="display: flex; gap: 24px; height: 100%;">
+          <!-- Pillar 1: Selective Disclosure -->
+          <div style="flex: 1; display: flex; flex-direction: column;">
+            <div
+              style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 16px; padding: 24px; height: 410px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+              <div
+                style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #41C895, #6EE5B7);">
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <i class="fas fa-eye-slash" style="color: #41C895; font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 700; color: #ECF3F6; line-height: 1.2;">Selective Disclosure
+                  </div>
+                  <div
+                    style="font-size: 12px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; margin-top: 4px;">
+                    PRIVACY</div>
+                </div>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Signatories</strong> see
+                    full state</div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">Controllers see contract details</div>
+                </div>
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Observers</strong> get
+                    scoped views</div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">Limited data exposure</div>
+                </div>
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>No global state</strong>
+                  </div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">Privacy by design</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 11px; color: #5C6F78; text-align: center;">Need-to-know model</div>
+          </div>
+          <!-- Pillar 2: Atomic Interoperability -->
+          <div style="flex: 1; display: flex; flex-direction: column;">
+            <div
+              style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 16px; padding: 24px; height: 410px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+              <div
+                style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #41C895, #6EE5B7);">
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <i class="fas fa-sync-alt" style="color: #41C895; font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 700; color: #ECF3F6; line-height: 1.2;">Atomic Interop</div>
+                  <div
+                    style="font-size: 12px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; margin-top: 4px;">
+                    ATOMICITY</div>
+                </div>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Trade + Settlement</strong>
+                    commit together</div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">Atomic across institutions</div>
+                </div>
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Cross-domain</strong> flows
+                  </div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">No reconciliation needed</div>
+                </div>
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Rollback</strong> on failure
+                  </div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">All-or-nothing semantics</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 11px; color: #5C6F78; text-align: center;">2PC coordination</div>
+          </div>
+          <!-- Pillar 3: Multi-party Coordination -->
+          <div style="flex: 1; display: flex; flex-direction: column;">
+            <div
+              style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 16px; padding: 24px; height: 410px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+              <div
+                style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #41C895, #6EE5B7);">
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <i class="fas fa-users" style="color: #41C895; font-size: 18px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 700; color: #ECF3F6; line-height: 1.2;">Multi-party</div>
+                  <div
+                    style="font-size: 12px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; margin-top: 4px;">
+                    COORDINATION</div>
+                </div>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Issuer</strong> authorises
+                    creation</div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">Distributor, custodian</div>
+                </div>
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Regulator</strong> oversight
+                  </div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">Authorisation per role</div>
+                </div>
+                <div
+                  style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.1); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                  <div style="font-size: 13px; color: #ECF3F6; margin-bottom: 4px;"><strong>Workflow</strong>
+                    enforcement</div>
+                  <div style="font-size: 12px; color: #8FA6B1; line-height: 1.4;">Rules per party</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 11px; color: #5C6F78; text-align: center;">Role-based auth</div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Note -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle" style="color: #41C895; font-size: 14px;"></i>
+          <span style="font-size: 14px; color: #8FA6B1;">Built for regulated finance constraints, not public-chain
+            transparency.</span>
+        </div>
+        <div
+          style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #5C6F78;">
+          docs/architecture.md
+        </div>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-3">
+      <!-- Background Grid -->
+      <div data-object="true" data-object-type="shape"
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none; z-index: 1;">
+      </div>
+      <div data-object="true" data-object-type="shape"
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.5; pointer-events: none; z-index: 1;">
+      </div>
+      <!-- Slide Number Overlay -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; top: 40px; right: 60px; width: 110px; height: 100px; text-align: right; z-index: 10;">
+        <div
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 80px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 1;">
+          03</div>
+      </div>
+      <!-- Header -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 40px; width: 1160px; height: 160px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <span
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895;">core
+            architecture</span>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 52px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 10px 0; color: #ECF3F6;">
+          How Canton is <span style="color: #41C895; font-weight: 700;">wired</span>
+        </h1>
+        <p style="font-size: 18px; line-height: 1.4; color: #8FA6B1; margin: 0; max-width: 900px;">
+          Four-layer architecture showing the flow from applications down to the ledger, with participant nodes and
+          synchronizers.
+        </p>
+      </div>
+      <!-- Architecture Diagram Container -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 195px; width: 1160px; height: 440px; z-index: 10;">
+        <!-- Layer 1: Applications -->
+        <div
+          style="position: absolute; top: 0; left: 0; right: 0; height: 70px; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.3); border-radius: 12px; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div
+              style="width: 36px; height: 36px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-laptop-code" style="color: #41C895; font-size: 16px;"></i>
+            </div>
+            <div>
+              <div style="font-size: 15px; font-weight: 600; color: #ECF3F6;">Applications</div>
+              <div style="font-size: 11px; color: #8FA6B1;">gRPC / Daml JSON API</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div
+              style="background: rgba(65,200,149,0.1); border: 1px solid rgba(65,200,149,0.2); border-radius: 6px; padding: 6px 12px;">
+              <span
+                style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">Daml
+                Templates</span>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.1); border: 1px solid rgba(65,200,149,0.2); border-radius: 6px; padding: 6px 12px;">
+              <span
+                style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">Choices</span>
+            </div>
+            <div
+              style="background: rgba(65,200,149,0.1); border: 1px solid rgba(65,200,149,0.2); border-radius: 6px; padding: 6px 12px;">
+              <span
+                style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">Parties</span>
+            </div>
+          </div>
+        </div>
+        <!-- Arrow Down -->
+        <div
+          style="position: absolute; top: 72px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 2px; height: 12px; background: rgba(65,200,149,0.3);"></div>
+          <div
+            style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid rgba(65,200,149,0.3);">
+          </div>
+        </div>
+        <!-- Layer 2: Participant Nodes -->
+        <div
+          style="position: absolute; top: 95px; left: 0; right: 0; height: 110px; background: rgba(8,21,29,0.86); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div
+                style="width: 30px; height: 30px; background: rgba(65,200,149,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-users" style="color: #41C895; font-size: 13px;"></i>
+              </div>
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: #ECF3F6;">Participant Nodes</div>
+                <div style="font-size: 11px; color: #8FA6B1;">Per-institution ledger view</div>
+              </div>
+            </div>
+            <div style="font-size: 11px; color: #5C6F78;">Private Contract Store + Auth</div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <div
+              style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 7px; height: 7px; background: #41C895; border-radius: 50%;"></div>
+                <span style="font-size: 11px; font-weight: 600; color: #ECF3F6;">Issuer</span>
+              </div>
+              <div style="margin-top: 1px; font-size: 10px; color: #8FA6B1;">Asset creation</div>
+            </div>
+            <div
+              style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 7px; height: 7px; background: #41C895; border-radius: 50%;"></div>
+                <span style="font-size: 11px; font-weight: 600; color: #ECF3F6;">Distributor</span>
+              </div>
+              <div style="margin-top: 1px; font-size: 10px; color: #8FA6B1;">Asset distribution</div>
+            </div>
+            <div
+              style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 7px; height: 7px; background: #41C895; border-radius: 50%;"></div>
+                <span style="font-size: 11px; font-weight: 600; color: #ECF3F6;">Custodian</span>
+              </div>
+              <div style="margin-top: 1px; font-size: 10px; color: #8FA6B1;">Asset custody</div>
+            </div>
+            <div
+              style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 7px; height: 7px; background: #41C895; border-radius: 50%;"></div>
+                <span style="font-size: 11px; font-weight: 600; color: #ECF3F6;">Regulator</span>
+              </div>
+              <div style="margin-top: 1px; font-size: 10px; color: #8FA6B1;">Oversight</div>
+            </div>
+          </div>
+        </div>
+        <!-- Arrow Down -->
+        <div
+          style="position: absolute; top: 207px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 2px; height: 12px; background: rgba(65,200,149,0.3);"></div>
+          <div
+            style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid rgba(65,200,149,0.3);">
+          </div>
+        </div>
+        <!-- Layer 3: Synchronizer -->
+        <div
+          style="position: absolute; top: 230px; left: 0; right: 0; height: 75px; background: rgba(8,21,29,0.86); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div
+                style="width: 36px; height: 36px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-sync-alt" style="color: #41C895; font-size: 16px;"></i>
+              </div>
+              <div>
+                <div style="font-size: 15px; font-weight: 600; color: #ECF3F6;">Synchronizer / Domain</div>
+                <div style="font-size: 11px; color: #8FA6B1;">Per-domain ordering &amp; atomic commit service</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 12px;">
+                <span
+                  style="font-size: 11px; color: #8FA6B1; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">Ordering</span>
+              </div>
+              <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 12px;">
+                <span
+                  style="font-size: 11px; color: #8FA6B1; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">Atomic
+                  Commit</span>
+              </div>
+            </div>
+          </div>
+          <!-- Global Synchronizer Connector -->
+          <div
+            style="position: absolute; top: 315px; left: 50%; transform: translateX(-50%); width: 220px; height: 55px; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.3); border-radius: 12px; padding: 8px 16px; display: flex; align-items: center; gap: 12px;">
+            <div
+              style="width: 28px; height: 28px; background: rgba(65,200,149,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-globe" style="color: #41C895; font-size: 13px;"></i>
+            </div>
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: #ECF3F6;">Global Synchronizer</div>
+              <div style="font-size: 10px; color: #8FA6B1;">Cross-domain interop</div>
+            </div>
+          </div>
+          <!-- Arrow Up -->
+          <div
+            style="position: absolute; top: 375px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;">
+            <div
+              style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 8px solid rgba(65,200,149,0.3);">
+            </div>
+            <div style="width: 2px; height: 12px; background: rgba(65,200,149,0.3);"></div>
+          </div>
+          <!-- Layer 4: Ledger -->
+          <div
+            style="position: absolute; top: 395px; left: 0; right: 0; height: 75px; background: rgba(8,21,29,0.86); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div
+                style="width: 36px; height: 36px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-database" style="color: #41C895; font-size: 16px;"></i>
+              </div>
+              <div>
+                <div style="font-size: 15px; font-weight: 600; color: #ECF3F6;">Canton Ledger</div>
+                <div style="font-size: 11px; color: #8FA6B1;">Multi-party truth</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 12px;">
+                <span
+                  style="font-size: 11px; color: #8FA6B1; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">View-based
+                  Privacy</span>
+              </div>
+              <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 12px;">
+                <span
+                  style="font-size: 11px; color: #8FA6B1; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">Transaction
+                  Views</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Footer Note -->
+        <div data-object="true" data-object-type="textbox"
+          style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-info-circle" style="color: #41C895; font-size: 14px;"></i>
+            <span style="font-size: 14px; color: #8FA6B1;">Apps run off-ledger. The chain stores only what must be
+              multi-party-authorised.</span>
+          </div>
+          <div
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: #5C6F78;">
+            docs/architecture.md
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-4">
+      <!-- Background Grid -->
+      <div
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none;">
+      </div>
+      <div
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.5; pointer-events: none;">
+      </div>
+      <!-- Slide Number Overlay -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 40px; right: 60px; width: 100px; height: 60px; text-align: right; z-index: 1;">
+        <div
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 80px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 0.8;">
+          04</div>
+      </div>
+      <!-- Header -->
+      <div data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 60px; width: 1160px; height: 160px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <span
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895;">the
+            gap</span>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 52px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 16px 0; color: #ECF3F6;">
+          Where Canton <span style="color: #41C895; font-weight: 700;">stops</span> vs what the app must do
+        </h1>
+        <p style="font-size: 18px; line-height: 1.5; color: #8FA6B1; margin: 0; max-width: 900px;">
+          A clear boundary between what the ledger handles and what the application layer must provide.
+        </p>
+      </div>
+      <!-- Comparison Layout -->
+      <div data-object-type="graphic"
+        style="position: absolute; left: 60px; top: 250px; width: 1160px; height: 380px; z-index: 10;">
+        <div style="display: flex; height: 100%; gap: 0; position: relative;">
+          <!-- Left Column: Canton does not do -->
+          <div
+            style="flex: 1; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 16px 0 0 16px; padding: 20px 24px; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+              <div style="width: 10px; height: 10px; background: #41C895; border-radius: 50%;"></div>
+              <span
+                style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: #41C895; font-weight: 600;">CANTON
+                DOES NOT DO</span>
+              <div style="margin-left: auto; font-size: 11px; color: #5C6F78;">Infrastructure limitations</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 20px; flex: 1; display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <i class="fas fa-clock" style="color: #41C895; font-size: 16px; width: 20px; text-align: center;"></i>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #ECF3F6; margin-bottom: 1px;">SLA timers &amp;
+                      retries</div>
+                    <div style="font-size: 11px; color: #8FA6B1;">No workflow state management</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 20px; flex: 1; display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <i class="fas fa-file-alt"
+                    style="color: #41C895; font-size: 16px; width: 20px; text-align: center;"></i>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #ECF3F6; margin-bottom: 1px;">Document
+                      collection &amp; KYC</div>
+                    <div style="font-size: 11px; color: #8FA6B1;">No off-ledger data handling</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 20px; flex: 1; display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <i class="fas fa-bell" style="color: #41C895; font-size: 16px; width: 20px; text-align: center;"></i>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #ECF3F6; margin-bottom: 1px;">
+                      Email/webhook/in-app notifications</div>
+                    <div style="font-size: 11px; color: #8FA6B1;">No notification system</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 20px; flex: 1; display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <i class="fas fa-user-friends"
+                    style="color: #41C895; font-size: 16px; width: 20px; text-align: center;"></i>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #ECF3F6; margin-bottom: 1px;">Tenant-themed
+                      role UIs</div>
+                    <div style="font-size: 11px; color: #8FA6B1;">No user interface layer</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 10px 20px; flex: 1; display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <i class="fas fa-history"
+                    style="color: #41C895; font-size: 16px; width: 20px; text-align: center;"></i>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #ECF3F6; margin-bottom: 1px;">Off-ledger human
+                      audit trail</div>
+                    <div style="font-size: 11px; color: #8FA6B1;">No human context tracking</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Center Divider -->
+          <div
+            style="width: 2px; background: linear-gradient(180deg, transparent 0%, rgba(65,200,149,0.4) 15%, rgba(65,200,149,0.4) 85%, transparent 100%); position: relative;">
+            <div
+              style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #07131A; padding: 8px 4px; border-radius: 4px; z-index: 15;">
+              <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+            </div>
+          </div>
+          <!-- Right Column: App layer provides -->
+          <div
+            style="flex: 1; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 0 16px 16px 0; padding: 20px 24px; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+              <div style="width: 10px; height: 10px; background: #41C895; border-radius: 50%;"></div>
+              <span
+                style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: #41C895; font-weight: 600;">APP
+                LAYER PROVIDES</span>
+              <div style="margin-left: auto; font-size: 11px; color: #5C6F78;">Service solutions</div>
+            </div>
+            <div
+              style="display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; flex: 1;">
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <i class="fas fa-cogs" style="color: #ECF3F6; font-size: 14px;"></i>
+                  <span style="font-size: 14px; font-weight: 600; color: #ECF3F6;">workflow-svc</span>
+                </div>
+                <div style="font-size: 12px; line-height: 1.3; color: #8FA6B1;">SLA &amp; state machines</div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <i class="fas fa-check-circle" style="color: #ECF3F6; font-size: 14px;"></i>
+                  <span style="font-size: 14px; font-weight: 600; color: #ECF3F6;">approval-svc</span>
+                </div>
+                <div style="font-size: 12px; line-height: 1.3; color: #8FA6B1;">Escalation &amp; timeouts</div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <i class="fas fa-bell" style="color: #ECF3F6; font-size: 14px;"></i>
+                  <span style="font-size: 14px; font-weight: 600; color: #ECF3F6;">notify-svc</span>
+                </div>
+                <div style="font-size: 12px; line-height: 1.3; color: #8FA6B1;">Email &amp; webhook</div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <i class="fas fa-plug" style="color: #ECF3F6; font-size: 14px;"></i>
+                  <span style="font-size: 14px; font-weight: 600; color: #ECF3F6;">integration-svc</span>
+                </div>
+                <div style="font-size: 12px; line-height: 1.3; color: #8FA6B1;">KYC &amp; SSO</div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <i class="fas fa-file-contract" style="color: #ECF3F6; font-size: 14px;"></i>
+                  <span style="font-size: 14px; font-weight: 600; color: #ECF3F6;">audit-svc</span>
+                </div>
+                <div style="font-size: 12px; line-height: 1.3; color: #8FA6B1;">Event logging</div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <i class="fas fa-server" style="color: #ECF3F6; font-size: 14px;"></i>
+                  <span style="font-size: 14px; font-weight: 600; color: #ECF3F6;">BFF</span>
+                </div>
+                <div style="font-size: 12px; line-height: 1.3; color: #8FA6B1;">Backend for Frontend</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Bottom Caption -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 650px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle" style="color: #41C895; font-size: 14px;"></i>
+          <span style="font-size: 14px; color: #8FA6B1;">Each gap justifies a service.</span>
+        </div>
+        <div
+          style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #5C6F78;">
+          docs/architecture.md
+        </div>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-5">
+      <!-- Background Grid -->
+      <div data-object-type="shape"
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none; z-index: 1;">
+      </div>
+      <div data-object-type="shape"
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.5; pointer-events: none; z-index: 1;">
+      </div>
+      <!-- Slide Number Overlay -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 40px; right: 60px; width: 120px; height: 100px; text-align: right; z-index: 10;">
+        <div
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 110px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 0.8;">
+          06</div>
+      </div>
+      <!-- Header -->
+      <div data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 40px; width: 1160px; height: 140px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <span
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895;">building
+            on canton</span>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 56px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 12px 0; color: #ECF3F6;">
+          Three planes <span style="color: #41C895; font-weight: 700;">above the rails</span>
+        </h1>
+        <p style="font-size: 18px; line-height: 1.5; color: #8FA6B1; margin: 0; max-width: 900px;">
+          A vertical stack architecture showing the separation of concerns between UX, orchestration, and rails.
+        </p>
+      </div>
+      <!-- P3 UX Layer -->
+      <div data-object-type="shape"
+        style="position: absolute; left: 60px; top: 195px; width: 1160px; height: 105px; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; z-index: 1;">
+      </div>
+      <div data-object-type="textbox"
+        style="position: absolute; left: 84px; top: 212px; width: 1112px; height: 70px; display: flex; align-items: center; justify-content: space-between; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div
+            style="width: 48px; height: 48px; background: rgba(65,200,149,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-desktop" style="color: #41C895; font-size: 20px;"></i>
+          </div>
+          <div>
+            <div
+              style="font-size: 18px; font-weight: 700; color: #ECF3F6; display: flex; align-items: center; gap: 8px;">
+              <span
+                style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895; font-size: 16px;">P3</span>
+              <span>UX Layer</span>
+              <span style="margin-left: 8px; font-size: 12px; color: #5C6F78; font-weight: 400;">5 portals</span>
+            </div>
+            <div style="font-size: 13px; color: #8FA6B1; margin-top: 4px;">Browser never holds rails credentials /
+              tenant-themed</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.3); border-radius: 6px; padding: 6px 14px;">
+            <span
+              style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-weight: 600;">Issuer</span>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.3); border-radius: 6px; padding: 6px 14px;">
+            <span
+              style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-weight: 600;">Distributor</span>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.3); border-radius: 6px; padding: 6px 14px;">
+            <span
+              style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-weight: 600;">Investor</span>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.3); border-radius: 6px; padding: 6px 14px;">
+            <span
+              style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-weight: 600;">Ops</span>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.3); border-radius: 6px; padding: 6px 14px;">
+            <span
+              style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-weight: 600;">Admin</span>
+          </div>
+        </div>
+      </div>
+      <!-- Connector 1 -->
+      <div data-object-type="shape"
+        style="position: absolute; top: 300px; left: 639px; width: 2px; height: 30px; background: rgba(65,200,149,0.3); z-index: 1;">
+      </div>
+      <div data-object-type="shape"
+        style="position: absolute; top: 322px; left: 634px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid rgba(65,200,149,0.3); z-index: 1;">
+      </div>
+      <div data-object-type="textbox"
+        style="position: absolute; top: 307px; left: 650px; width: 200px; height: 20px; font-size: 11px; color: #5C6F78; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; text-transform: uppercase; letter-spacing: 0.05em; z-index: 10;">
+        HTTPS / RTK Query</div>
+      <!-- P2 Orchestration Layer -->
+      <div data-object-type="shape"
+        style="position: absolute; left: 60px; top: 330px; width: 1160px; height: 190px; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; z-index: 1;">
+      </div>
+      <div data-object-type="textbox"
+        style="position: absolute; left: 84px; top: 350px; width: 1112px; height: 150px; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div
+              style="width: 48px; height: 48px; background: rgba(65,200,149,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-cogs" style="color: #41C895; font-size: 20px;"></i>
+            </div>
+            <div>
+              <div
+                style="font-size: 18px; font-weight: 700; color: #ECF3F6; display: flex; align-items: center; gap: 8px;">
+                <span
+                  style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895; font-size: 16px;">P2</span>
+                <span>Orchestration</span>
+                <span style="margin-left: 8px; font-size: 12px; color: #5C6F78; font-weight: 400;">7 services</span>
+              </div>
+              <div style="font-size: 13px; color: #8FA6B1; margin-top: 4px;">State machines, SLA, KYC, notifications,
+                fan-out</div>
+            </div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;">
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i class="fas fa-sync-alt"
+                style="color: #41C895; font-size: 11px;"></i><span
+                style="font-size: 11px; font-weight: 700; color: #ECF3F6; white-space: nowrap;">workflow-svc</span>
+            </div>
+            <div style="font-size: 10px; color: #8FA6B1;">State machines</div>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i
+                class="fas fa-check-circle" style="color: #41C895; font-size: 11px;"></i><span
+                style="font-size: 11px; font-weight: 700; color: #ECF3F6; white-space: nowrap;">approval-svc</span>
+            </div>
+            <div style="font-size: 10px; color: #8FA6B1;">Escalation</div>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i
+                class="fas fa-file-contract" style="color: #41C895; font-size: 11px;"></i><span
+                style="font-size: 11px; font-weight: 700; color: #ECF3F6; white-space: nowrap;">audit-svc</span></div>
+            <div style="font-size: 10px; color: #8FA6B1;">Event logging</div>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i class="fas fa-bell"
+                style="color: #41C895; font-size: 11px;"></i><span
+                style="font-size: 11px; font-weight: 700; color: #ECF3F6; white-space: nowrap;">notify-svc</span></div>
+            <div style="font-size: 10px; color: #8FA6B1;">Notifications</div>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i class="fas fa-plug"
+                style="color: #41C895; font-size: 11px;"></i><span
+                style="font-size: 11px; font-weight: 700; color: #ECF3F6; white-space: nowrap;">integration-svc</span>
+            </div>
+            <div style="font-size: 10px; color: #8FA6B1;">KYC/SSO</div>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i class="fas fa-chart-line"
+                style="color: #41C895; font-size: 11px;"></i><span
+                style="font-size: 11px; font-weight: 700; color: #ECF3F6; white-space: nowrap;">market-data-svc</span>
+            </div>
+            <div style="font-size: 10px; color: #8FA6B1;">Data feed</div>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 12px 10px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i class="fas fa-server"
+                style="color: #41C895; font-size: 11px;"></i><span
+                style="font-size: 11px; font-weight: 700; color: #ECF3F6; white-space: nowrap;">BFF</span></div>
+            <div style="font-size: 10px; color: #8FA6B1;">Backend</div>
+          </div>
+        </div>
+      </div>
+      <!-- Connector 2 -->
+      <div data-object-type="shape"
+        style="position: absolute; top: 520px; left: 639px; width: 2px; height: 30px; background: rgba(65,200,149,0.3); z-index: 1;">
+      </div>
+      <div data-object-type="shape"
+        style="position: absolute; top: 542px; left: 634px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid rgba(65,200,149,0.3); z-index: 1;">
+      </div>
+      <div data-object-type="textbox"
+        style="position: absolute; top: 527px; left: 650px; width: 200px; height: 20px; font-size: 11px; color: #5C6F78; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; text-transform: uppercase; letter-spacing: 0.05em; z-index: 10;">
+        Daml command / event</div>
+      <!-- P1 Rails Layer -->
+      <div data-object-type="shape"
+        style="position: absolute; left: 60px; top: 550px; width: 1160px; height: 110px; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; z-index: 1;">
+      </div>
+      <div data-object-type="textbox"
+        style="position: absolute; left: 84px; top: 570px; width: 1112px; height: 70px; display: flex; align-items: center; justify-content: space-between; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div
+            style="width: 48px; height: 48px; background: rgba(65,200,149,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-database" style="color: #41C895; font-size: 20px;"></i>
+          </div>
+          <div>
+            <div
+              style="font-size: 18px; font-weight: 700; color: #ECF3F6; display: flex; align-items: center; gap: 8px;">
+              <span
+                style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895; font-size: 16px;">P1</span>
+              <span>Rails</span>
+              <span style="margin-left: 8px; font-size: 12px; color: #5C6F78; font-weight: 400;">2 adapters</span>
+            </div>
+            <div style="font-size: 13px; color: #8FA6B1; margin-top: 4px;">Holds Daml party tokens + HydraX keys only
+              here</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <div
+            style="background: rgba(65,200,149,0.1); border: 1px solid rgba(65,200,149,0.4); border-radius: 8px; padding: 12px 24px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-link" style="color: #41C895; font-size: 14px;"></i>
+            <span
+              style="font-size: 14px; font-weight: 600; color: #ECF3F6; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">hydrax-adapter</span>
+          </div>
+          <div
+            style="background: rgba(65,200,149,0.1); border: 1px solid rgba(65,200,149,0.4); border-radius: 8px; padding: 12px 24px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-link" style="color: #41C895; font-size: 14px;"></i>
+            <span
+              style="font-size: 14px; font-weight: 600; color: #ECF3F6; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">canton-adapter</span>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div data-object-type="textbox"
+        style="position: absolute; bottom: 30px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle" style="color: #41C895; font-size: 14px;"></i>
+          <span style="font-size: 14px; color: #8FA6B1;">Each layer has a specific responsibility. P3 for UX, P2 for
+            orchestration, P1 for rails.</span>
+        </div>
+        <div
+          style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #5C6F78; letter-spacing: 0.05em;">
+          docs/architecture.md
+        </div>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-6">
+      <!-- Background Grid Layers -->
+      <div data-object="true" data-object-type="shape"
+        style="position: absolute; left: 0px; top: 0px; width: 1280px; height: 720px; background-image: linear-gradient(rgba(65,200,149,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none; z-index: 1;">
+      </div>
+      <div data-object="true" data-object-type="shape"
+        style="position: absolute; left: 0px; top: 0px; width: 1280px; height: 720px; background-image: linear-gradient(rgba(65,200,149,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.5; pointer-events: none; z-index: 1;">
+      </div>
+      <!-- Slide Number Overlay - Fixed clipping/overflow -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 1080px; top: 20px; width: 160px; height: 100px; text-align: right; z-index: 10;">
+        <p
+          style="margin: 0; font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 80px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 1;">
+          07</p>
+      </div>
+      <!-- Header - Fixed height for multi-line content -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 50px; width: 1000px; height: 160px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <p
+            style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895; font-weight: 600;">
+            end-to-end flow</p>
+        </div>
+        <p
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 52px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 12px 0; color: #ECF3F6;">
+          One workflow <span style="color: #41C895;">across three planes</span></p>
+        <p style="font-size: 18px; line-height: 1.5; color: #8FA6B1; margin: 0; max-width: 900px;">A complete
+          subscription workflow from investor portal to ledger commitment and back.</p>
+      </div>
+      <!-- LANE 1: P3 UX -->
+      <div data-object="true" data-object-type="shape"
+        style="position: absolute; left: 60px; top: 210px; width: 1160px; height: 130px; background: rgba(8,21,29,0.72); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; z-index: 1;">
+        <div
+          style="position: absolute; left: 0; top: 0; width: 160px; height: 100%; background: rgba(65,200,149,0.03); border-right: 1px solid rgba(65,200,149,0.15); border-radius: 8px 0 0 8px;">
+        </div>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 80px; top: 251px; width: 140px; height: 48px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <p
+          style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #41C895; font-weight: 600; margin-bottom: 4px;">
+          P3</p>
+        <p
+          style="margin: 0; font-size: 14px; color: #ECF3F6; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+          UX</p>
+      </div>
+      <!-- Card 01 -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 236px; top: 235px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            01</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">Investor</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">Submits<br />subscription</p>
+      </div>
+      <!-- Card 08 -->
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 1070px; top: 235px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            08</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">audit-svc</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">Event back &amp;<br />UI refresh</p>
+      </div>
+      <!-- LANE 2: P2 Orchestration -->
+      <div data-object="true" data-object-type="shape"
+        style="position: absolute; left: 60px; top: 350px; width: 1160px; height: 130px; background: rgba(8,21,29,0.72); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; z-index: 1;">
+        <div
+          style="position: absolute; left: 0; top: 0; width: 160px; height: 100%; background: rgba(65,200,149,0.03); border-right: 1px solid rgba(65,200,149,0.15); border-radius: 8px 0 0 8px;">
+        </div>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 80px; top: 391px; width: 140px; height: 48px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <p
+          style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #41C895; font-weight: 600; margin-bottom: 4px;">
+          P2</p>
+        <p
+          style="margin: 0; font-size: 14px; color: #ECF3F6; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+          ORCHESTRATION</p>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 378px; top: 375px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            02</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">BFF</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">Validates &amp;<br />forwards</p>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 520px; top: 375px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            03</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">workflow-svc</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">Reads lifecycle<br />(Pending)</p>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 662px; top: 375px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            04</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">approval-svc</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">Ceremony<br />SLA + escalate</p>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 804px; top: 375px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            05</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">notify-svc</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">Fans out<br />email + toast</p>
+      </div>
+      <!-- LANE 3: P1 Rails -->
+      <div data-object="true" data-object-type="shape"
+        style="position: absolute; left: 60px; top: 490px; width: 1160px; height: 130px; background: rgba(8,21,29,0.72); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; z-index: 1;">
+        <div
+          style="position: absolute; left: 0; top: 0; width: 160px; height: 100%; background: rgba(65,200,149,0.03); border-right: 1px solid rgba(65,200,149,0.15); border-radius: 8px 0 0 8px;">
+        </div>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 80px; top: 531px; width: 140px; height: 48px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <p
+          style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #41C895; font-weight: 600; margin-bottom: 4px;">
+          P1</p>
+        <p
+          style="margin: 0; font-size: 14px; color: #ECF3F6; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+          RAILS</p>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 804px; top: 515px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            06</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">workflow-svc</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">POST /v1/issue<br />to hydrax</p>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 946px; top: 515px; width: 130px; height: 80px; background: #0D222D; border: 1px solid rgba(65,200,149,0.2); border-left: 3px solid #41C895; border-radius: 6px; padding: 10px; z-index: 10; display: flex; flex-direction: column; justify-content: center;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <p
+            style="margin: 0; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 11px; font-weight: 700;">
+            07</p>
+          <p style="margin: 0; color: #ECF3F6; font-size: 11px; font-weight: 600;">canton-adapt</p>
+        </div>
+        <p style="margin: 0; color: #8FA6B1; font-size: 10px; line-height: 1.3;">Daml command<br />commits</p>
+      </div>
+      <!-- Footer -->
+      <div data-object="true" data-object-type="icon"
+        style="position: absolute; left: 60px; top: 668px; width: 14px; height: 14px; z-index: 10;">
+        <i class="fas fa-info-circle" style="color: #41C895; font-size: 14px;"></i>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 82px; top: 660px; width: 800px; height: 30px; display: flex; align-items: center; z-index: 10;">
+        <p style="margin: 0; font-size: 14px; color: #8FA6B1;">Complete end-to-end flow from submission to ledger
+          commitment.</p>
+      </div>
+      <div data-object="true" data-object-type="textbox"
+        style="position: absolute; left: 1020px; top: 660px; width: 200px; height: 30px; display: flex; justify-content: flex-end; align-items: center; z-index: 10;">
+        <p
+          style="margin: 0; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #5C6F78;">
+          docs/architecture.md</p>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-7">
+      <!-- Background Grid -->
+      <div data-object-type="shape"
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none; z-index: 1;">
+      </div>
+      <div data-object-type="shape"
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.5; pointer-events: none; z-index: 1;">
+      </div>
+      <!-- Slide Number Overlay -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 40px; right: 60px; width: 120px; height: 80px; text-align: right; z-index: 10;">
+        <div
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 100px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 0.8;">
+          08</div>
+      </div>
+      <!-- Header -->
+      <div data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 50px; width: 1160px; height: 130px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <span
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895;">status</span>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 64px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 12px 0; color: #ECF3F6;">
+          Status, <span style="color: #41C895; font-weight: 700;">grounded in commits</span>
+        </h1>
+        <p style="font-size: 20px; line-height: 1.5; color: #8FA6B1; margin: 0; max-width: 900px;">
+          Current operational status of the Canton Network implementation and service integrations.
+        </p>
+      </div>
+      <!-- Status Grid -->
+      <div data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 210px; width: 1160px; height: 440px; z-index: 10;">
+        <div
+          style="display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 32px; height: 100%;">
+          <!-- Card 1: Live now -->
+          <div
+            style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #41C895;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-server" style="color: #41C895; font-size: 20px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 700; color: #ECF3F6;">Live now</div>
+                  <div style="font-size: 13px; color: #41C895; letter-spacing: 0.05em; font-weight: 600;">DEPLOYED</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+                <span
+                  style="font-size: 13px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">HEALTHY</span>
+              </div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <i class="fas fa-terminal" style="color: #41C895; font-size: 14px;"></i>
+                  <span style="font-size: 15px; font-weight: 600; color: #ECF3F6;">Operator console prototype</span>
+                </div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                  <i class="fas fa-chart-line" style="color: #41C895; font-size: 14px;"></i>
+                  <span style="font-size: 15px; font-weight: 600; color: #ECF3F6;">market-data-svc</span>
+                </div>
+                <div style="font-size: 13px; color: #8FA6B1;">/metrics + /healthz endpoints</div>
+              </div>
+            </div>
+          </div>
+          <!-- Card 2: Cross-service wires -->
+          <div
+            style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #41C895;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-network-wired" style="color: #41C895; font-size: 20px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 700; color: #ECF3F6;">Cross-service wires</div>
+                  <div style="font-size: 13px; color: #41C895; letter-spacing: 0.05em; font-weight: 600;">CONNECTED
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+                <span
+                  style="font-size: 13px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">3/3</span>
+              </div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 10px;">
+              <div style="display: flex; align-items: center; gap: 14px; font-size: 15px; color: #8FA6B1;">
+                <span
+                  style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895;">bff</span>
+                <i class="fas fa-arrows-alt-h" style="color: #5C6F78; font-size: 12px;"></i>
+                <span
+                  style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895;">workflow-svc</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 14px; font-size: 15px; color: #8FA6B1;">
+                <span
+                  style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895;">bff</span>
+                <i class="fas fa-arrows-alt-h" style="color: #5C6F78; font-size: 12px;"></i>
+                <span
+                  style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895;">audit-svc
+                  &amp; approval-svc</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 14px; font-size: 15px; color: #8FA6B1;">
+                <span
+                  style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895;">workflow-svc</span>
+                <i class="fas fa-arrows-alt-h" style="color: #5C6F78; font-size: 12px;"></i>
+                <span
+                  style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; color: #41C895;">hydrax-adapter</span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 3: Postgres-backed -->
+          <div
+            style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #41C895;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-database" style="color: #41C895; font-size: 20px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 700; color: #ECF3F6;">Postgres-backed</div>
+                  <div style="font-size: 13px; color: #41C895; letter-spacing: 0.05em; font-weight: 600;">PERSISTENT
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+                <span
+                  style="font-size: 13px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">ONLINE</span>
+              </div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <i class="fas fa-table" style="color: #41C895; font-size: 14px;"></i>
+                  <span style="font-size: 15px; font-weight: 600; color: #ECF3F6;">workflow-svc products</span>
+                </div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                  <i class="fas fa-history" style="color: #41C895; font-size: 14px;"></i>
+                  <span style="font-size: 15px; font-weight: 600; color: #ECF3F6;">audit-svc events</span>
+                </div>
+                <div style="font-size: 13px; color: #8FA6B1;">Append-only event log</div>
+              </div>
+            </div>
+          </div>
+          <!-- Card 4: Daml spike -->
+          <div
+            style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #41C895;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                  style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-code-branch" style="color: #41C895; font-size: 20px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 700; color: #ECF3F6;">Daml spike</div>
+                  <div style="font-size: 13px; color: #41C895; letter-spacing: 0.05em; font-weight: 600;">VALIDATED
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+                <span
+                  style="font-size: 13px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">5/5</span>
+              </div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                  <i class="fas fa-check-circle" style="color: #41C895; font-size: 14px;"></i>
+                  <span style="font-size: 15px; font-weight: 600; color: #ECF3F6;">hydrax-governance package
+                    green</span>
+                </div>
+                <div style="font-size: 13px; color: #8FA6B1;">5 scripts pass on --ide-ledger</div>
+              </div>
+              <div
+                style="background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <i class="fas fa-laptop-code" style="color: #41C895; font-size: 14px;"></i>
+                  <span style="font-size: 15px; font-weight: 600; color: #ECF3F6;">5 portals at uniform polish</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Note -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 665px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-info-circle" style="color: #41C895; font-size: 16px;"></i>
+          <span style="font-size: 15px; color: #8FA6B1; font-weight: 500;">All services operational and
+            connected.</span>
+        </div>
+        <div
+          style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 15px; color: #5C6F78;">
+          docs/architecture.md
+        </div>
+      </div>
+    </div>
+    <div class="slide-container slide-page" id="slide-8">
+      <!-- Background Grid -->
+      <div
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none;">
+      </div>
+      <div
+        style="position: absolute; inset: 0; background-image: linear-gradient(rgba(65,200,149,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,200,149,0.03) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.5; pointer-events: none;">
+      </div>
+      <!-- Slide Number Overlay -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 40px; right: 60px; width: 100px; height: 70px; text-align: right; z-index: 1;">
+        <div
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 80px; font-weight: 900; color: rgba(65,200,149,0.08); line-height: 0.8;">
+          08</div>
+      </div>
+      <!-- Header -->
+      <div data-object-type="textbox"
+        style="position: absolute; left: 60px; top: 50px; width: 1160px; height: 130px; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="width: 8px; height: 8px; background: #41C895; border-radius: 50%;"></div>
+          <span
+            style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: #41C895;">deliberate
+            deferrals</span>
+        </div>
+        <h1
+          style="font-family: 'IBM Plex Sans', 'Aptos', 'Avenir Next', 'Segoe UI', sans-serif; font-size: 52px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 12px 0; color: #ECF3F6;">
+          Trade-offs <span style="color: #41C895; font-weight: 700;">now</span>, roadmap <span
+            style="color: #41C895; font-weight: 700;">next</span>
+        </h1>
+        <p style="font-size: 18px; line-height: 1.5; color: #8FA6B1; margin: 0; max-width: 900px;">
+          Disciplined scope choices today versus execution path for tomorrow.
+        </p>
+      </div>
+      <!-- Main Content -->
+      <div data-object-type="graphic"
+        style="position: absolute; left: 60px; top: 195px; width: 1160px; height: 460px; z-index: 10;">
+        <div style="display: flex; gap: 24px; height: 100%;">
+          <!-- Left Column: Trade-offs -->
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+            <div
+              style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 20px; display: flex; align-items: flex-start; gap: 16px; flex: 1;">
+              <div
+                style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-server" style="color: #41C895; font-size: 18px;"></i>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 600; color: #ECF3F6; margin-bottom: 4px;">Single synchronizer
+                  first</div>
+                <div style="font-size: 14px; color: #8FA6B1; line-height: 1.4;">Multi-domain Canton when cross-network
+                  atomic flows justify it. Not day-1.</div>
+              </div>
+            </div>
+            <div
+              style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 20px; display: flex; align-items: flex-start; gap: 16px; flex: 1;">
+              <div
+                style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-plug" style="color: #41C895; font-size: 18px;"></i>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 600; color: #ECF3F6; margin-bottom: 4px;">Mock rails behind
+                  stable interface</div>
+                <div style="font-size: 14px; color: #8FA6B1; line-height: 1.4;">HydraX rails behind a stable interface.
+                  Real integration gated on engagement.</div>
+              </div>
+            </div>
+            <div
+              style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 20px; display: flex; align-items: flex-start; gap: 16px; flex: 1;">
+              <div
+                style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-user-lock" style="color: #41C895; font-size: 18px;"></i>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 600; color: #ECF3F6; margin-bottom: 4px;">Web2 IdP off-ledger
+                </div>
+                <div style="font-size: 14px; color: #8FA6B1; line-height: 1.4;">Identity stays in integration-svc.
+                  On-chain identity not a v1 problem.</div>
+              </div>
+            </div>
+            <div
+              style="background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 20px; display: flex; align-items: flex-start; gap: 16px; flex: 1;">
+              <div
+                style="width: 40px; height: 40px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-database" style="color: #41C895; font-size: 18px;"></i>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 600; color: #ECF3F6; margin-bottom: 4px;">Postgres FSM</div>
+                <div style="font-size: 14px; color: #8FA6B1; line-height: 1.4;">SLA timers can't run on a Daml contract.
+                  State machine lives where time lives.</div>
+              </div>
+            </div>
+          </div>
+          <!-- Right Column: Roadmap -->
+          <div
+            style="flex: 1; background: rgba(8,21,29,0.86); border: 1px solid rgba(65,200,149,0.2); border-radius: 12px; padding: 24px; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                  style="width: 36px; height: 36px; background: rgba(65,200,149,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas fa-road" style="color: #41C895; font-size: 16px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 16px; font-weight: 700; color: #ECF3F6;">Execution Roadmap</div>
+                  <div style="font-size: 12px; color: #41C895;">5 milestones</div>
+                </div>
+              </div>
+              <div style="font-size: 12px; color: #5C6F78;">Next 6 months</div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+              <!-- Milestone 1 -->
+              <div
+                style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; flex: 1;">
+                <div
+                  style="width: 32px; height: 32px; background: rgba(65,200,149,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span
+                    style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; font-weight: 600; color: #41C895;">01</span>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 14px; font-weight: 600; color: #ECF3F6;">Real synchronizer + party allocation
+                  </div>
+                  <div style="font-size: 11px; color: #8FA6B1;">Replace --ide-ledger with running participant</div>
+                </div>
+                <div
+                  style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">
+                  Q1</div>
+              </div>
+              <!-- Milestone 2 -->
+              <div
+                style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; flex: 1;">
+                <div
+                  style="width: 32px; height: 32px; background: rgba(65,200,149,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span
+                    style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; font-weight: 600; color: #41C895;">02</span>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 14px; font-weight: 600; color: #ECF3F6;">Real HydraX rails</div>
+                  <div style="font-size: 11px; color: #8FA6B1;">Swap MockRails for live integration</div>
+                </div>
+                <div
+                  style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">
+                  Q1</div>
+              </div>
+              <!-- Milestone 3 -->
+              <div
+                style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; flex: 1;">
+                <div
+                  style="width: 32px; height: 32px; background: rgba(65,200,149,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span
+                    style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; font-weight: 600; color: #41C895;">03</span>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 14px; font-weight: 600; color: #ECF3F6;">Notifications fan-out</div>
+                  <div style="font-size: 11px; color: #8FA6B1;">Email + webhook + in-app toast routing</div>
+                </div>
+                <div
+                  style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">
+                  Q2</div>
+              </div>
+              <!-- Milestone 4 -->
+              <div
+                style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; flex: 1;">
+                <div
+                  style="width: 32px; height: 32px; background: rgba(65,200,149,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span
+                    style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; font-weight: 600; color: #41C895;">04</span>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 14px; font-weight: 600; color: #ECF3F6;">KYC + SSO</div>
+                  <div style="font-size: 11px; color: #8FA6B1;">integration-svc with passkeys → OIDC</div>
+                </div>
+                <div
+                  style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">
+                  Q2</div>
+              </div>
+              <!-- Milestone 5 -->
+              <div
+                style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(65,200,149,0.05); border: 1px solid rgba(65,200,149,0.15); border-radius: 8px; flex: 1;">
+                <div
+                  style="width: 32px; height: 32px; background: rgba(65,200,149,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span
+                    style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 12px; font-weight: 600; color: #41C895;">05</span>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 14px; font-weight: 600; color: #ECF3F6;">Multi-domain Canton</div>
+                  <div style="font-size: 11px; color: #8FA6B1;">When cross-network atomic flows justify it</div>
+                </div>
+                <div
+                  style="font-size: 11px; color: #41C895; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">
+                  Q3</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Note -->
+      <div data-object-type="textbox"
+        style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle" style="color: #41C895; font-size: 14px;"></i>
+          <span style="font-size: 14px; color: #8FA6B1;">Disciplined scope now, progressive rollout next.</span>
+        </div>
+        <div
+          style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; color: #5C6F78;">
+          docs/architecture.md
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide-page'));
+      var label = document.getElementById('slide-num');
+      var current = 0;
+      function update(i) {
+        current = Math.max(0, Math.min(slides.length - 1, i));
+        if (label) label.textContent = String(current + 1);
+        slides[current].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); update(current + 1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); update(current - 1); }
+        else if (e.key === 'Home') { e.preventDefault(); update(0); }
+        else if (e.key === 'End') { e.preventDefault(); update(slides.length - 1); }
+      });
+      document.querySelectorAll('.slide-nav [data-nav]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          update(current + (btn.dataset.nav === 'next' ? 1 : -1));
+        });
+      });
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              var idx = slides.indexOf(entry.target);
+              if (idx >= 0 && label) { current = idx; label.textContent = String(idx + 1); }
+            }
+          });
+        }, { threshold: 0.55 });
+        slides.forEach(function (s) { io.observe(s); });
+      }
+    })();
+  </script>
+</body>
+
+</html>

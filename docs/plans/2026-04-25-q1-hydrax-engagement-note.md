@@ -100,3 +100,40 @@ If §3 returns "not yet defined" on more than half the items, we shrink v1 to th
 3. Forward (verbatim or rewritten) and CC anyone HydraX-side who needs to be looped in.
 4. Track the reply. When §3 answers come back, paste them into this file under a new `## 10. HydraX response` section and re-run `/proceed-with-claude-recommendation` on the resulting deltas.
 5. Q1 is unblocked when sandbox access (§3.7) is in our hands.
+
+## 11. Cover email (paste-ready)
+
+Paste this in front of (or as a link wrapper around) the §3 question list. Edit names/honorifics to taste.
+
+```
+Subject: HydraX rails — workflow-layer integration questions (30-min ask)
+
+Hi <name>,
+
+We're standing up hydrax-app — a workflow control plane that sits above
+HydraX's tokenisation, custody, and trading rails. The v1 wedge is
+institutional onboarding, issuance, and subscription servicing for the
+first tokenised product (proposed: short-duration credit). It is not a
+competing exchange / custody / tokenisation product.
+
+To finalise v1 scope I need a confirmed read on the HydraX API surface
+we'll be calling. Specifically: integration protocol, endpoints for
+issuance / custody / settlement, event-stream semantics, the Daml/Canton
+boundary, sandbox + auth, and the SLA we should design against.
+
+The eight questions are in the attached note (one paragraph each). Asking
+for a 30-minute working session and a written response in any form —
+Notion page, doc, or email reply.
+
+Outcome we need: enough confirmed surface to delete `MockRails` from
+`services/hydrax-adapter` and replace it with a real client.
+
+What we have built that this unblocks, and what stays moving while we
+wait, is in §4–§5 of this note. Worst-case fallback in §7 means we will
+not block v1 launch on rails — we ship the workflow stack and integrate
+as the surface lands.
+
+Happy to walk through live if easier.
+
+Naim
+```
