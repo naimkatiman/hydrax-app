@@ -8,6 +8,11 @@ import { Passkeys } from "./auth/passkey-repo.js";
 import { createChallengeStore } from "./auth/challenge-store.js";
 import { loadPasskeyConfig } from "./auth/passkey-config.js";
 import { mountPasskeyRoutes, type PasskeyHandlerOptions } from "./auth/passkey-handlers.js";
+import { MagicLinks } from "./auth/magic-link-repo.js";
+import { createRateLimit } from "./auth/magic-link-rate-limit.js";
+import { loadMagicLinkConfig } from "./auth/magic-link-config.js";
+import { sendEmail } from "./auth/notify-client.js";
+import { mountMagicLinkRoutes, type MagicLinkHandlerOptions } from "./auth/magic-link-handlers.js";
 
 export interface StartOptions {
   port: number;
@@ -15,7 +20,9 @@ export interface StartOptions {
   pool?: Pool;
   devLoginEnabled?: boolean;
   ttlSeconds?: number;
-  passkeyEnv?: Record<string, string | undefined>;  // override for tests
+  passkeyEnv?: Record<string, string | undefined>;
+  magicLinkEnv?: Record<string, string | undefined>;
+  notifySvcUrl?: string;
 }
 
 export interface StartResult {
@@ -40,6 +47,25 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
       }
     : null;
 
+  const magicLinkOpts: MagicLinkHandlerOptions | null = opts.pool
+    ? (() => {
+        const cfg = loadMagicLinkConfig(opts.magicLinkEnv ?? process.env);
+        return {
+          sessions: new Sessions(opts.pool!),
+          magicLinks: new MagicLinks(opts.pool!),
+          rateLimit: createRateLimit({
+            max: cfg.rateLimitMax,
+            windowSeconds: cfg.rateLimitWindowSeconds,
+            maxBuckets: 10_000,
+          }),
+          notifyClient: { sendEmail },
+          notifyConfig: { notifySvcUrl: opts.notifySvcUrl ?? process.env.NOTIFY_SVC_URL ?? "http://localhost:7101" },
+          config: cfg,
+          sessionTtlSeconds: ttlSeconds,
+        };
+      })()
+    : null;
+
   const server = http.createServer((req, res) => {
     if (req.url === "/healthz" && req.method === "GET") {
       res.writeHead(200, { "Content-Type": "application/json" });
@@ -48,6 +74,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
     }
     if (authOpts && mountAuthRoutes(req, res, authOpts)) return;
     if (passkeyOpts && mountPasskeyRoutes(req, res, passkeyOpts)) return;
+    if (magicLinkOpts && mountMagicLinkRoutes(req, res, magicLinkOpts)) return;
 
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "not_found" }));
@@ -71,15 +98,18 @@ if (isMain) {
   const pool = dsn ? openPool({ connectionString: dsn }) : undefined;
   if (!dsn) {
     console.warn(
-      "integration-svc: INTEGRATION_SVC_DATABASE_URL/DATABASE_URL unset — auth routes disabled, only /healthz served",
+      "integration-svc: INTEGRATION_SVC_DATABASE_URL/DATABASE_URL unset — auth + magic-link routes disabled, only /healthz served",
     );
   } else {
     console.log(`integration-svc: DB pool ready (${redactDsn(dsn)})`);
     if (!devLoginEnabled) {
       console.log("integration-svc: AUTH_DEV_LOGIN!=1 — dev/login disabled (returns 404)");
     }
-    const cfg = loadPasskeyConfig(process.env);
-    console.log(`integration-svc: passkey RP=${cfg.rpID}, origin=${cfg.origin}`);
+    const passkey = loadPasskeyConfig(process.env);
+    console.log(`integration-svc: passkey RP=${passkey.rpID}, origin=${passkey.origin}`);
+    const ml = loadMagicLinkConfig(process.env);
+    console.log(`integration-svc: magic-link TTL=${ml.ttlSeconds}s, rate=${ml.rateLimitMax}/${ml.rateLimitWindowSeconds}s, baseUrl=${ml.baseUrl}`);
+    console.log(`integration-svc: notify-svc URL = ${process.env.NOTIFY_SVC_URL ?? "http://localhost:7101"}`);
   }
 
   startServer({ port, service: "integration-svc", pool, devLoginEnabled, ttlSeconds }).then(
