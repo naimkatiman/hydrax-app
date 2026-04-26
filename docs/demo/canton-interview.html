@@ -13,6 +13,60 @@
     rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
+    /* Portal token mirror — kept in sync with web/packages/tenant-theme/src/default-theme.ts.
+       When that file changes, re-mirror this block. See docs/plans/2026-04-26-deck-brand-alignment.md. */
+    :root {
+      --hydrax-color-bg: hsl(0, 0%, 8%);
+      --hydrax-color-bg-raised: hsl(0, 0%, 14%);
+      --hydrax-color-surface: hsl(0, 0%, 12%);
+      --hydrax-color-text: hsl(0, 0%, 92%);
+      --hydrax-color-text-strong: hsl(0, 0%, 98%);
+      --hydrax-color-text-muted: hsl(0, 0%, 64%);
+      --hydrax-color-border: hsl(0, 0%, 22%);
+      --hydrax-color-accent: hsl(30, 8%, 72%);
+      --hydrax-color-accent-soft: hsla(30, 8%, 72%, 0.12);
+      --hydrax-color-focus-ring: hsla(30, 8%, 72%, 0.55);
+      --hydrax-color-danger: hsl(0, 72%, 58%);
+      --hydrax-color-success: hsl(140, 60%, 50%);
+
+      --hydrax-font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+      --hydrax-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+      --hydrax-type-display-size: 32px;
+      --hydrax-type-display-line-height: 40px;
+      --hydrax-type-display-weight: 600;
+      --hydrax-type-h1-size: 22px;
+      --hydrax-type-h1-line-height: 28px;
+      --hydrax-type-h1-weight: 600;
+      --hydrax-type-h2-size: 16px;
+      --hydrax-type-h2-line-height: 22px;
+      --hydrax-type-h2-weight: 600;
+      --hydrax-type-body-size: 13px;
+      --hydrax-type-body-line-height: 20px;
+      --hydrax-type-body-sm-size: 12px;
+      --hydrax-type-body-sm-line-height: 18px;
+      --hydrax-type-mono-size: 13px;
+
+      --hydrax-space-unit: 4px;
+      --hydrax-space-xs: 4px;
+      --hydrax-space-sm: 8px;
+      --hydrax-space-md: 12px;
+      --hydrax-space-lg: 16px;
+      --hydrax-space-xl: 24px;
+      --hydrax-space-2xl: 32px;
+
+      --hydrax-radius-sm: 4px;
+      --hydrax-radius-md: 8px;
+      --hydrax-radius-lg: 12px;
+
+      --hydrax-shadow-sm: 0 1px 2px hsla(0, 0%, 0%, 0.45);
+      --hydrax-shadow-md: 0 6px 16px hsla(0, 0%, 0%, 0.5);
+
+      --hydrax-motion-fast: 150ms;
+      --hydrax-motion-medium: 250ms;
+      --hydrax-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
     :root {
       /* Teal highlight system — image overlays + interactive accents.
          Warm grey #CDC8C2 stays the body accent; teal is reserved for
