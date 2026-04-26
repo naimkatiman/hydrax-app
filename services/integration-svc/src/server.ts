@@ -18,7 +18,6 @@ export interface StartOptions {
   port: number;
   service: string;
   pool?: Pool;
-  devLoginEnabled?: boolean;
   ttlSeconds?: number;
   passkeyEnv?: Record<string, string | undefined>;
   magicLinkEnv?: Record<string, string | undefined>;
@@ -34,7 +33,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
   const ttlSeconds = opts.ttlSeconds ?? 60 * 60 * 12;
 
   const authOpts: AuthHandlerOptions | null = opts.pool
-    ? { repo: new Sessions(opts.pool), ttlSeconds, devLoginEnabled: opts.devLoginEnabled ?? false }
+    ? { repo: new Sessions(opts.pool), ttlSeconds }
     : null;
 
   const passkeyOpts: PasskeyHandlerOptions | null = opts.pool
@@ -92,7 +91,6 @@ const isMain = import.meta.url === `file://${process.argv[1]}`;
 if (isMain) {
   const port = Number(process.env.PORT ?? 7102);
   const dsn = process.env.INTEGRATION_SVC_DATABASE_URL ?? process.env.DATABASE_URL ?? "";
-  const devLoginEnabled = process.env.AUTH_DEV_LOGIN === "1";
   const ttlSeconds = Number(process.env.SESSION_TTL_SECONDS ?? 60 * 60 * 12);
 
   const pool = dsn ? openPool({ connectionString: dsn }) : undefined;
@@ -102,9 +100,6 @@ if (isMain) {
     );
   } else {
     console.log(`integration-svc: DB pool ready (${redactDsn(dsn)})`);
-    if (!devLoginEnabled) {
-      console.log("integration-svc: AUTH_DEV_LOGIN!=1 — dev/login disabled (returns 404)");
-    }
     const passkey = loadPasskeyConfig(process.env);
     console.log(`integration-svc: passkey RP=${passkey.rpID}, origin=${passkey.origin}`);
     const ml = loadMagicLinkConfig(process.env);
@@ -112,7 +107,7 @@ if (isMain) {
     console.log(`integration-svc: notify-svc URL = ${process.env.NOTIFY_SVC_URL ?? "http://localhost:7101"}`);
   }
 
-  startServer({ port, service: "integration-svc", pool, devLoginEnabled, ttlSeconds }).then(
+  startServer({ port, service: "integration-svc", pool, ttlSeconds }).then(
     ({ baseUrl }) => {
       console.log(`integration-svc listening on ${baseUrl}`);
     },

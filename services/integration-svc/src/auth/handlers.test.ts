@@ -6,6 +6,7 @@ import type { AddressInfo } from "node:net";
 import { openPool, type Pool } from "../db.js";
 import { mountAuthRoutes, type AuthHandlerOptions } from "./handlers.js";
 import { Sessions } from "./repo.js";
+import { generateToken, hashToken } from "./token.js";
 
 const dsn = process.env.INTEGRATION_SVC_DATABASE_URL ?? process.env.DATABASE_URL;
 if (!dsn) {
@@ -16,11 +17,23 @@ let pool: Pool;
 let server: http.Server;
 let baseUrl: string;
 let opts: AuthHandlerOptions;
+let repo: Sessions;
 
 const tenantSlug = `t-${randomBytes(8).toString("hex")}`;
 const email = `u-${randomBytes(8).toString("hex")}@example.test`;
 let tenantId: string;
 let userId: string;
+
+async function mintSession(): Promise<string> {
+  const token = generateToken();
+  await repo.createSession({
+    userId,
+    tenantId,
+    tokenHash: hashToken(token),
+    ttlSeconds: opts.ttlSeconds,
+  });
+  return token;
+}
 
 beforeAll(async () => {
   pool = openPool({ connectionString: dsn! });
@@ -40,8 +53,8 @@ beforeAll(async () => {
     c.release();
   }
 
-  const repo = new Sessions(pool);
-  opts = { repo, ttlSeconds: 60, devLoginEnabled: true };
+  repo = new Sessions(pool);
+  opts = { repo, ttlSeconds: 60 };
   server = http.createServer((req, res) => {
     if (!mountAuthRoutes(req, res, opts)) {
       res.writeHead(404).end();
@@ -72,74 +85,8 @@ afterEach(async () => {
 });
 
 describe("auth handlers", () => {
-  it("POST /v1/auth/dev/login returns 200 + token for known user", async () => {
-    const res = await fetch(`${baseUrl}/v1/auth/dev/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ tenant_slug: tenantSlug, email }),
-    });
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { token: string; session: { user_id: string; tenant_id: string; role: string; expires_at: string } };
-    expect(body.token).toMatch(/^[A-Za-z0-9_-]{43}$/);
-    expect(body.session.user_id).toBe(userId);
-    expect(body.session.tenant_id).toBe(tenantId);
-    expect(body.session.role).toBe("admin");
-    expect(typeof body.session.expires_at).toBe("string");
-  });
-
-  it("POST /v1/auth/dev/login returns 404 when devLoginEnabled=false", async () => {
-    opts.devLoginEnabled = false;
-    try {
-      const res = await fetch(`${baseUrl}/v1/auth/dev/login`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ tenant_slug: tenantSlug, email }),
-      });
-      expect(res.status).toBe(404);
-    } finally {
-      opts.devLoginEnabled = true;
-    }
-  });
-
-  it("POST /v1/auth/dev/login returns 401 for unknown tenant", async () => {
-    const res = await fetch(`${baseUrl}/v1/auth/dev/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ tenant_slug: "nope", email }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("POST /v1/auth/dev/login returns 400 for malformed body", async () => {
-    const res = await fetch(`${baseUrl}/v1/auth/dev/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: "not json",
-    });
-    expect(res.status).toBe(400);
-  });
-
-  it("POST /v1/auth/dev/login returns 400 for missing fields", async () => {
-    const res = await fetch(`${baseUrl}/v1/auth/dev/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    expect(res.status).toBe(400);
-  });
-
-  it("POST /v1/auth/dev/login returns 405 for GET", async () => {
-    const res = await fetch(`${baseUrl}/v1/auth/dev/login`, { method: "GET" });
-    expect(res.status).toBe(405);
-  });
-
   it("GET /v1/auth/whoami returns 200 + session for valid bearer", async () => {
-    const login = await fetch(`${baseUrl}/v1/auth/dev/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ tenant_slug: tenantSlug, email }),
-    });
-    const { token } = (await login.json()) as { token: string };
+    const token = await mintSession();
     const me = await fetch(`${baseUrl}/v1/auth/whoami`, {
       headers: { authorization: `Bearer ${token}` },
     });
@@ -164,12 +111,7 @@ describe("auth handlers", () => {
   });
 
   it("POST /v1/auth/logout revokes session and subsequent whoami returns 401", async () => {
-    const login = await fetch(`${baseUrl}/v1/auth/dev/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ tenant_slug: tenantSlug, email }),
-    });
-    const { token } = (await login.json()) as { token: string };
+    const token = await mintSession();
     const out = await fetch(`${baseUrl}/v1/auth/logout`, {
       method: "POST",
       headers: { authorization: `Bearer ${token}` },
