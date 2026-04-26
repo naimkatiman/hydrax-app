@@ -10,6 +10,7 @@ import { HomeRoute } from "./routes/HomeRoute";
 import { HealthRoute } from "./routes/HealthRoute";
 import { SubscriptionsRoute } from "./routes/SubscriptionsRoute";
 import { ProductsListRoute } from "./routes/ProductsListRoute";
+import { ProductDetailRoute } from "./routes/ProductDetailRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -30,6 +31,7 @@ function ShellContents() {
         <Route path="/health" element={<HealthRoute />} />
         <Route path="/subscriptions" element={<SubscriptionsRoute />} />
         <Route path="/products" element={<ProductsListRoute />} />
+        <Route path="/products/:id" element={<ProductDetailRoute />} />
       </Routes>
     </AppShell>
   );
