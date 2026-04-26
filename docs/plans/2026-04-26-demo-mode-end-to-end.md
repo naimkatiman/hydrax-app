@@ -546,23 +546,29 @@ function readPortalUrl(envKey: string, fallback: string): string {
   return fallback;
 }
 
+// Default URLs are RELATIVE so they work for both:
+//  - local dev (each portal on its own Vite port; cross-portal links open
+//    a new origin which is fine for the local demo)
+//  - combined Railway deploy at web/portal-deploy/ where all 5 portals
+//    live under one origin at /investor, /distributor, /ops, etc.
+// Override per env if a portal needs to point somewhere else.
 export const DEFAULT_PERSONAS: ReadonlyArray<Persona> = [
   {
     id: "investor",
     label: "Investor",
-    url: readPortalUrl("VITE_INVESTOR_URL", "http://localhost:5175/products"),
+    url: readPortalUrl("VITE_INVESTOR_URL", "/investor/products"),
     icon: Briefcase,
   },
   {
     id: "distributor",
     label: "Distributor",
-    url: readPortalUrl("VITE_DISTRIBUTOR_URL", "http://localhost:5174/approvals"),
+    url: readPortalUrl("VITE_DISTRIBUTOR_URL", "/distributor/approvals"),
     icon: Handshake,
   },
   {
     id: "ops",
     label: "Operator",
-    url: readPortalUrl("VITE_OPS_URL", "http://localhost:5176/audit"),
+    url: readPortalUrl("VITE_OPS_URL", "/ops/audit"),
     icon: ShieldCheck,
   },
 ];
