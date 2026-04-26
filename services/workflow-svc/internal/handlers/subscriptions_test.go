@@ -242,3 +242,189 @@ func TestGetSubscriptionMethodNotAllowed(t *testing.T) {
 		t.Fatalf("status: got %d want 405; body=%s", rr.Code, rr.Body.String())
 	}
 }
+
+func TestSubscriptionResponseCarriesAllowedNext(t *testing.T) {
+	repo, tx := txSubsHarness(t)
+	tenantID := seedTenantSubH(t, tx)
+	userID := seedUserSubH(t, tx, tenantID)
+	productID := seedProductSubH(t, tx, tenantID)
+
+	created, err := repo.Insert(context.Background(), subscriptions.SubscriptionInput{
+		ProductID: productID, InvestorUserID: userID, AmountMinor: 100, Currency: "USD",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/subscriptions/"+created.ID, nil)
+	req.SetPathValue("id", created.ID)
+	rr := httptest.NewRecorder()
+	GetSubscription(repo)(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var got subscriptionResponse
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	want := []string{"approved", "cancelled"}
+	if len(got.AllowedNext) != len(want) {
+		t.Fatalf("AllowedNext: got %v, want %v", got.AllowedNext, want)
+	}
+	for i := range want {
+		if got.AllowedNext[i] != want[i] {
+			t.Errorf("AllowedNext[%d] = %q, want %q", i, got.AllowedNext[i], want[i])
+		}
+	}
+}
+
+func TestTransitionSubscriptionHappyPendingToApproved(t *testing.T) {
+	repo, tx := txSubsHarness(t)
+	tenantID := seedTenantSubH(t, tx)
+	userID := seedUserSubH(t, tx, tenantID)
+	productID := seedProductSubH(t, tx, tenantID)
+
+	created, err := repo.Insert(context.Background(), subscriptions.SubscriptionInput{
+		ProductID: productID, InvestorUserID: userID, AmountMinor: 100, Currency: "USD",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	body, _ := json.Marshal(map[string]any{"to": "approved"})
+	req := httptest.NewRequest(http.MethodPost, "/v1/subscriptions/"+created.ID+"/transition", bytes.NewReader(body))
+	req.SetPathValue("id", created.ID)
+	rr := httptest.NewRecorder()
+	TransitionSubscription(repo)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status: got %d want 200; body=%s", rr.Code, rr.Body.String())
+	}
+	var got subscriptionResponse
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got.Status != "approved" {
+		t.Errorf("status: got %q want approved", got.Status)
+	}
+	wantNext := []string{"allocated", "cancelled"}
+	if len(got.AllowedNext) != 2 || got.AllowedNext[0] != wantNext[0] || got.AllowedNext[1] != wantNext[1] {
+		t.Errorf("AllowedNext = %v, want %v", got.AllowedNext, wantNext)
+	}
+}
+
+func TestTransitionSubscriptionInvalidTransitionReturns422(t *testing.T) {
+	repo, tx := txSubsHarness(t)
+	tenantID := seedTenantSubH(t, tx)
+	userID := seedUserSubH(t, tx, tenantID)
+	productID := seedProductSubH(t, tx, tenantID)
+
+	created, err := repo.Insert(context.Background(), subscriptions.SubscriptionInput{
+		ProductID: productID, InvestorUserID: userID, AmountMinor: 100, Currency: "USD",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	// pending -> allocated is not a legal edge (must approve first)
+	body, _ := json.Marshal(map[string]any{"to": "allocated"})
+	req := httptest.NewRequest(http.MethodPost, "/v1/subscriptions/"+created.ID+"/transition", bytes.NewReader(body))
+	req.SetPathValue("id", created.ID)
+	rr := httptest.NewRecorder()
+	TransitionSubscription(repo)(rr, req)
+
+	if rr.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("status: got %d want 422; body=%s", rr.Code, rr.Body.String())
+	}
+	var got map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got["error"] != "invalid_transition" {
+		t.Errorf("error code: got %q want invalid_transition", got["error"])
+	}
+}
+
+func TestTransitionSubscriptionNotFoundReturns404(t *testing.T) {
+	repo, _ := txSubsHarness(t)
+	id := "00000000-0000-0000-0000-000000000000"
+	body, _ := json.Marshal(map[string]any{"to": "approved"})
+	req := httptest.NewRequest(http.MethodPost, "/v1/subscriptions/"+id+"/transition", bytes.NewReader(body))
+	req.SetPathValue("id", id)
+	rr := httptest.NewRecorder()
+	TransitionSubscription(repo)(rr, req)
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("status: got %d want 404; body=%s", rr.Code, rr.Body.String())
+	}
+}
+
+func TestTransitionSubscriptionMethodNotAllowed(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/v1/subscriptions/abc/transition", nil)
+	req.SetPathValue("id", "abc")
+	rr := httptest.NewRecorder()
+	TransitionSubscription(nil)(rr, req)
+	if rr.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("status: got %d want 405; body=%s", rr.Code, rr.Body.String())
+	}
+}
+
+func TestTransitionSubscriptionMissingTo(t *testing.T) {
+	body := bytes.NewReader([]byte(`{}`))
+	req := httptest.NewRequest(http.MethodPost, "/v1/subscriptions/abc/transition", body)
+	req.SetPathValue("id", "abc")
+	rr := httptest.NewRecorder()
+	TransitionSubscription(nil)(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("status: got %d want 400; body=%s", rr.Code, rr.Body.String())
+	}
+	var got map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if got["error"] != "missing_to" {
+		t.Errorf("error: got %q want missing_to", got["error"])
+	}
+}
+
+func TestTransitionSubscriptionFullPathPendingToSettled(t *testing.T) {
+	repo, tx := txSubsHarness(t)
+	tenantID := seedTenantSubH(t, tx)
+	userID := seedUserSubH(t, tx, tenantID)
+	productID := seedProductSubH(t, tx, tenantID)
+
+	created, err := repo.Insert(context.Background(), subscriptions.SubscriptionInput{
+		ProductID: productID, InvestorUserID: userID, AmountMinor: 100, Currency: "USD",
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	steps := []struct {
+		to       string
+		wantNext []string
+	}{
+		{"approved", []string{"allocated", "cancelled"}},
+		{"allocated", []string{"settled"}},
+		{"settled", []string{}},
+	}
+	for _, step := range steps {
+		body, _ := json.Marshal(map[string]any{"to": step.to})
+		req := httptest.NewRequest(http.MethodPost, "/v1/subscriptions/"+created.ID+"/transition", bytes.NewReader(body))
+		req.SetPathValue("id", created.ID)
+		rr := httptest.NewRecorder()
+		TransitionSubscription(repo)(rr, req)
+		if rr.Code != http.StatusOK {
+			t.Fatalf("step to=%s: status %d, body=%s", step.to, rr.Code, rr.Body.String())
+		}
+		var got subscriptionResponse
+		if err := json.NewDecoder(rr.Body).Decode(&got); err != nil {
+			t.Fatalf("step to=%s: decode: %v", step.to, err)
+		}
+		if got.Status != step.to {
+			t.Errorf("step to=%s: status got %q", step.to, got.Status)
+		}
+		if len(got.AllowedNext) != len(step.wantNext) {
+			t.Errorf("step to=%s: AllowedNext got %v want %v", step.to, got.AllowedNext, step.wantNext)
+		}
+	}
+}
