@@ -280,7 +280,6 @@ ul { list-style: none; }
     radial-gradient(ellipse at 80% 60%, hsla(0, 0%, 96%, 0.06), transparent 60%),
     url("assets/hero-bg.jpg");
   background-size: cover; background-position: center;
-  filter: grayscale(1) contrast(1.05);
 }
 .hero__copy { display: flex; flex-direction: column; gap: var(--hx-space-3); max-width: 620px; }
 .hero__eyebrow {
@@ -420,21 +419,20 @@ ul { list-style: none; }
 .solution-card__media[data-img="distribution"],
 .solution-card__media[data-img="servicing"] {
   background-size: cover; background-position: center;
-  filter: grayscale(1) contrast(1.05);
 }
 .solution-card__media[data-img="issuance"] {
   background-image:
-    linear-gradient(180deg, hsla(0, 0%, 8%, 0.35), hsla(0, 0%, 8%, 0.65)),
+    linear-gradient(180deg, hsla(0, 0%, 8%, 0.20), hsla(0, 0%, 8%, 0.45)),
     url("assets/solutions-issuance.jpg");
 }
 .solution-card__media[data-img="distribution"] {
   background-image:
-    linear-gradient(180deg, hsla(0, 0%, 8%, 0.35), hsla(0, 0%, 8%, 0.65)),
+    linear-gradient(180deg, hsla(0, 0%, 8%, 0.20), hsla(0, 0%, 8%, 0.45)),
     url("assets/solutions-distribution.jpg");
 }
 .solution-card__media[data-img="servicing"] {
   background-image:
-    linear-gradient(180deg, hsla(0, 0%, 8%, 0.35), hsla(0, 0%, 8%, 0.65)),
+    linear-gradient(180deg, hsla(0, 0%, 8%, 0.20), hsla(0, 0%, 8%, 0.45)),
     url("assets/solutions-servicing.jpg");
 }
 .solution-card__body {
