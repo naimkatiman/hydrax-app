@@ -80,7 +80,7 @@ export function ProductDetailRoute() {
             gap: 8,
             padding: "10px 16px",
             background: "var(--hydrax-color-accent)",
-            color: "var(--hydrax-color-on-accent)",
+            color: "var(--hydrax-color-bg)",
             borderRadius: "var(--hydrax-radius-sm)",
             textDecoration: "none",
             fontFamily: "var(--hydrax-font-sans)",

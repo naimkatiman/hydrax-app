@@ -206,7 +206,7 @@ export function ProductsListRoute() {
                 gap: 8,
                 padding: "8px 14px",
                 background: "var(--hydrax-color-accent)",
-                color: "var(--hydrax-color-on-accent)",
+                color: "var(--hydrax-color-bg)",
                 borderRadius: "var(--hydrax-radius-sm)",
                 textDecoration: "none",
                 fontFamily: "var(--hydrax-font-sans)",
