@@ -40,7 +40,7 @@ export function App() {
     <Provider store={store}>
       <ThemeProvider theme={DEFAULT_TENANT_THEME}>
         <ToastProvider>
-          <BrowserRouter>
+          <BrowserRouter basename={import.meta.env.BASE_URL}>
             <ShellContents />
           </BrowserRouter>
         </ToastProvider>

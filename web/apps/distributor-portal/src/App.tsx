@@ -35,7 +35,7 @@ export function App() {
   return (
     <Provider store={store}>
       <ThemeProvider theme={DEFAULT_TENANT_THEME}>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <ShellContents />
         </BrowserRouter>
       </ThemeProvider>
