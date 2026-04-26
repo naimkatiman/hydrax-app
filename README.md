@@ -8,11 +8,11 @@ For the load-bearing operating rules see [CLAUDE.md](CLAUDE.md). For the product
 
 ## Live preview
 
-The static prototype operator console (`index.html` + `app.js` + `styles.css`), deployed at [hydrax-prototype-production.up.railway.app](https://hydrax-prototype-production.up.railway.app/):
+Landing page deployed at [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — institutional-grade entry surface that routes operators into the five role-scoped portals below.
 
-![HydraX operator console prototype](docs/demo/captures/prototype.png)
+![HydraX landing page](docs/demo/captures/landing.png)
 
-The five role-scoped React portals served from a single static deploy at [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — one persona each. Each GIF below cycles between the home route and the portal's primary work surface.
+The five role-scoped React portals are served from the same static deploy under per-persona base paths. Each GIF below cycles between the home route and the portal's primary work surface.
 
 | Portal | Routes shown | Live |
 |---|---|---|
