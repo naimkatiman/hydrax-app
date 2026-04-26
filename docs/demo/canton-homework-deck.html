@@ -263,6 +263,35 @@
       font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif;
     }
 
+    /* Alignment normalizers: keep corner page number, title block, and info bar at the same y across slides 1-13.
+       Inline-styled positions on each slide drifted by 4-18px; these classes lock them in one place. */
+    .deck .slide-container .page-num {
+      position: absolute !important;
+      top: 36px !important;
+      right: 60px !important;
+      width: 110px !important;
+      height: 80px !important;
+      text-align: right !important;
+    }
+
+    .deck .slide-container .slide-title {
+      position: absolute !important;
+      left: 60px !important;
+      top: 50px !important;
+      width: 1160px !important;
+    }
+
+    .deck .slide-container .slide-info {
+      position: absolute !important;
+      top: 670px !important;
+      left: 60px !important;
+      width: 1160px !important;
+      height: 30px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+
     /* Section watermark — shows §1 / §2 / §3 in the corner of section openers. */
     .section-num {
       position: absolute;
@@ -389,13 +418,13 @@
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-1">
       <div class="section-num">&sect;1</div>
-      <div data-object="true" data-object-type="textbox"
+      <div data-object="true" data-object-type="textbox" class="page-num"
         style="position: absolute; top: 30px; right: 60px; width: 110px; height: 100px; text-align: right; z-index: 10;">
         <p
           style="margin: 0; font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           01</p>
       </div>
-      <div data-object="true" data-object-type="textbox"
+      <div data-object="true" data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 60px; width: 1160px; height: 180px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -455,7 +484,7 @@
           </div>
         </div>
       </div>
-      <div data-object="true" data-object-type="textbox"
+      <div data-object="true" data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; z-index: 10; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -473,13 +502,13 @@
       <div
         style="position: absolute; inset: 0; background-image: linear-gradient(rgba(205,200,194,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(205,200,194,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none;">
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 100px; height: 100px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           02</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 50px; width: 1160px; height: 120px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -617,7 +646,7 @@
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -637,13 +666,13 @@
       <div data-object="true" data-object-type="shape"
         style="position: absolute; inset: 0; background-image: linear-gradient(rgba(205,200,194,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(205,200,194,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none; z-index: 1;">
       </div>
-      <div data-object="true" data-object-type="textbox"
+      <div data-object="true" data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 110px; height: 100px; text-align: right; z-index: 10;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           03</div>
       </div>
-      <div data-object="true" data-object-type="textbox"
+      <div data-object="true" data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; height: 160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -831,7 +860,7 @@
           </div>
         </div>
       </div>
-      <div data-object="true" data-object-type="textbox"
+      <div data-object="true" data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 678px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -851,13 +880,13 @@
       <div
         style="position: absolute; inset: 0; background-image: linear-gradient(rgba(205,200,194,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(205,200,194,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none;">
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 30px; right: 60px; width: 100px; height: 100px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           04</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -959,7 +988,7 @@
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 668px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -977,13 +1006,13 @@
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-5">
       <div class="section-num">&sect;2</div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 100px; height: 100px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           05</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1081,7 +1110,7 @@ $ daml codegen ts &amp;&amp; daml codegen java
           <span style="font-size: 13px; color: #BCBCBC;">IDE-ledger runs in-process, no Docker, no synchroniser. You write a template, save, watch a Daml Script re-run; the rest of the slide is what happens once you graduate.</span>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1098,13 +1127,13 @@ $ daml codegen ts &amp;&amp; daml codegen java
     <!-- SLIDE 6 — §2 — DEPLOY PATH local -> testnet -> mainnet          -->
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-6">
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 100px; height: 100px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           06</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1227,7 +1256,7 @@ $ daml codegen ts &amp;&amp; daml codegen java
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1247,13 +1276,13 @@ $ daml codegen ts &amp;&amp; daml codegen java
       <div
         style="position: absolute; inset: 0; background-image: linear-gradient(rgba(205,200,194,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(205,200,194,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none;">
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 100px; height: 70px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           07</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 50px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1379,7 +1408,7 @@ $ daml codegen ts &amp;&amp; daml codegen java
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1396,13 +1425,13 @@ $ daml codegen ts &amp;&amp; daml codegen java
     <!-- SLIDE 8 — §2 — PRACTICAL ASSUMPTIONS                            -->
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-8">
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 100px; height: 70px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           08</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 50px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1495,7 +1524,7 @@ $ daml codegen ts &amp;&amp; daml codegen java
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1513,13 +1542,13 @@ $ daml codegen ts &amp;&amp; daml codegen java
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-9">
       <div class="section-num">&sect;3</div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 30px; right: 60px; width: 100px; height: 100px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           09</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1614,7 +1643,7 @@ template Subscription
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1631,13 +1660,13 @@ template Subscription
     <!-- SLIDE 10 — §3 — MULTI-DOMAIN COORDINATION                       -->
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-10">
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 110px; height: 100px; text-align: right; z-index: 10;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           10</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1729,7 +1758,7 @@ template Subscription
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1746,13 +1775,13 @@ template Subscription
     <!-- SLIDE 11 — §3 — TOKENIZATION & CONTRACT LIFECYCLE                -->
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-11">
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 110px; height: 100px; text-align: right; z-index: 10;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           11</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1842,7 +1871,7 @@ template Subscription
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1859,13 +1888,13 @@ template Subscription
     <!-- SLIDE 12 — §3 — WHAT I BUILT ABOVE CANTON                       -->
     <!-- ============================================================ -->
     <div class="slide-container slide-page" id="slide-12">
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 120px; height: 80px; text-align: right; z-index: 10;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           12</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -1962,7 +1991,7 @@ template Subscription
           </div>
         </div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
@@ -1982,13 +2011,13 @@ template Subscription
       <div
         style="position: absolute; inset: 0; background-image: linear-gradient(rgba(205,200,194,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(205,200,194,0.02) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; pointer-events: none;">
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="page-num"
         style="position: absolute; top: 40px; right: 60px; width: 110px; height: 70px; text-align: right; z-index: 1;">
         <div
           style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
           13</div>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-title"
         style="position: absolute; left: 60px; top: 50px; width: 1160px; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
           <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
@@ -2136,16 +2165,16 @@ template Subscription
           </div>
         </div>
       </div>
-      <!-- Author footer -->
+      <!-- Author footer (sits 8px above the normalized .slide-info bar at top:670) -->
       <div data-object-type="textbox"
-        style="position: absolute; top: 640px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+        style="position: absolute; top: 632px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 14px;">
           <i class="fas fa-user" style="color: #CDC8C2; font-size: 13px;"></i>
           <span style="font-size: 13px; color: #F5F5F5; font-weight: 600;">Naim Katiman &middot; April 2026</span>
         </div>
         <span class="mono" style="font-size: 12px; color: #929292;">homework submission &middot; April 2026 &middot; hydrax-context-production.up.railway.app</span>
       </div>
-      <div data-object-type="textbox"
+      <div data-object-type="textbox" class="slide-info"
         style="position: absolute; top: 678px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <i class="fas fa-info-circle" style="color: #CDC8C2; font-size: 14px;"></i>
