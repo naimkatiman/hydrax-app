@@ -2,6 +2,7 @@ import http from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { loadUpstreamConfig, type UpstreamConfig } from "./bff/bff.js";
+import { loadCorsConfig, applyCorsHeaders, handlePreflight } from "./cors.js";
 import { aggregateHealth } from "./healthz/aggregate.js";
 import { fetchQuote, MarketDataUpstreamError } from "./marketdata/proxy.js";
 import {
@@ -46,8 +47,12 @@ export interface StartResult {
 
 export function startServer(opts: StartOptions): Promise<StartResult> {
   const upstreamConfig = opts.upstreamConfig ?? loadUpstreamConfig(process.env);
+  const corsConfig = loadCorsConfig(process.env);
 
   const server = http.createServer(async (req, res) => {
+    applyCorsHeaders(res, corsConfig);
+    if (handlePreflight(req, res, corsConfig)) return;
+
     // ── Auth routes (unprotected) ───────────────────────────────────────────
     if (req.url === "/v1/auth/whoami" && req.method === "GET") {
       const session = await requireSession(req, res, { integrationSvcUrl: upstreamConfig.integrationSvcUrl });
