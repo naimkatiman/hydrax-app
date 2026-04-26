@@ -1,5 +1,5 @@
 import { CheckSquare } from "lucide-react";
-import { Card, EmptyState, Heading, Stack, Text, Button, Skeleton } from "@hydrax/ui";
+import { Card, EmptyState, Heading, Stack, Text, Button, Skeleton, useToast } from "@hydrax/ui";
 import { useListPendingApprovalsQuery, useDecideApprovalMutation } from "@hydrax/api-client";
 
 const HARDCODED_DECIDER = "distributor-operator-1";
@@ -7,9 +7,18 @@ const HARDCODED_DECIDER = "distributor-operator-1";
 export function ApprovalsRoute() {
   const { data, isFetching, error, refetch } = useListPendingApprovalsQuery();
   const [decide, { isLoading: deciding }] = useDecideApprovalMutation();
+  const { showToast } = useToast();
 
   const onDecide = async (id: string, status: "approved" | "rejected") => {
-    await decide({ id, status, decided_by_user_id: HARDCODED_DECIDER });
+    const result = await decide({ id, status, decided_by_user_id: HARDCODED_DECIDER });
+    if ("data" in result) {
+      showToast({
+        tone: status === "approved" ? "success" : "info",
+        message: status === "approved" ? "Approval granted" : "Approval rejected",
+      });
+    } else {
+      showToast({ tone: "danger", message: "Decision failed" });
+    }
     refetch();
   };
 

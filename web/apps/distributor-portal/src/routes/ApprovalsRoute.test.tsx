@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
+import { ToastProvider } from "@hydrax/ui";
 import { ApprovalsRoute } from "./ApprovalsRoute";
 
 function withProviders(node: React.ReactNode) {
@@ -13,7 +14,9 @@ function withProviders(node: React.ReactNode) {
   });
   return (
     <Provider store={store}>
-      <ThemeProvider theme={DEFAULT_TENANT_THEME}>{node}</ThemeProvider>
+      <ThemeProvider theme={DEFAULT_TENANT_THEME}>
+        <ToastProvider>{node}</ToastProvider>
+      </ThemeProvider>
     </Provider>
   );
 }

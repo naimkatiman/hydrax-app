@@ -3,7 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
-import { AppShell } from "@hydrax/ui";
+import { AppShell, ToastProvider } from "@hydrax/ui";
 import { DistributorSidebar, DistributorBrand } from "./components/DistributorSidebar";
 import { DistributorTopBar } from "./components/DistributorTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
@@ -35,9 +35,11 @@ export function App() {
   return (
     <Provider store={store}>
       <ThemeProvider theme={DEFAULT_TENANT_THEME}>
-        <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <ShellContents />
-        </BrowserRouter>
+        <ToastProvider>
+          <BrowserRouter basename={import.meta.env.BASE_URL}>
+            <ShellContents />
+          </BrowserRouter>
+        </ToastProvider>
       </ThemeProvider>
     </Provider>
   );
