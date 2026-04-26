@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    { "source": "/issuer", "destination": "/issuer/index.html" },
+    { "source": "/issuer/", "destination": "/issuer/index.html" },
+    { "source": "/issuer/**", "destination": "/issuer/index.html" },
+    { "source": "/distributor", "destination": "/distributor/index.html" },
+    { "source": "/distributor/", "destination": "/distributor/index.html" },
+    { "source": "/distributor/**", "destination": "/distributor/index.html" },
+    { "source": "/investor", "destination": "/investor/index.html" },
+    { "source": "/investor/", "destination": "/investor/index.html" },
+    { "source": "/investor/**", "destination": "/investor/index.html" },
+    { "source": "/ops", "destination": "/ops/index.html" },
+    { "source": "/ops/", "destination": "/ops/index.html" },
+    { "source": "/ops/**", "destination": "/ops/index.html" },
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/", "destination": "/admin/index.html" },
+    { "source": "/admin/**", "destination": "/admin/index.html" }
+  ]
+}

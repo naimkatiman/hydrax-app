@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hydrax — Portals</title>
+  <style>
+    :root {
+      --bg: hsl(220, 16%, 8%);
+      --bg-raised: hsl(220, 14%, 14%);
+      --surface: hsl(220, 14%, 12%);
+      --text: hsl(220, 12%, 92%);
+      --text-strong: hsl(220, 12%, 98%);
+      --text-muted: hsl(220, 8%, 64%);
+      --border: hsl(220, 10%, 22%);
+      --accent: hsl(190, 90%, 55%);
+      --accent-soft: hsla(190, 90%, 55%, 0.12);
+      --focus: hsla(190, 90%, 55%, 0.45);
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      line-height: 20px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+    .eyebrow {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+    h1 {
+      color: var(--text-strong);
+      font-size: 32px;
+      line-height: 40px;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+    .lede {
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 0 32px;
+    }
+    .demo-banner {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin: 0 0 40px;
+      font-size: 12px;
+      line-height: 18px;
+      color: var(--text);
+    }
+    .demo-banner strong { color: var(--accent); font-weight: 600; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+      display: block;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .card:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+    .card-eyebrow {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 0 0 6px;
+    }
+    .card-title {
+      color: var(--text-strong);
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 18px;
+      margin: 0;
+    }
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 18px;
+    }
+    .footer code {
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">Hydrax / Workflow Platform</p>
+    <h1>Portals</h1>
+    <p class="lede">
+      White-label institutional workflow platform above HydraX's regulated tokenisation,
+      trading, and custody rails. Five role-aware portals share one design system.
+    </p>
+
+    <div class="demo-banner">
+      <strong>Demo mode.</strong> All five portals are running with canned fixtures
+      (<code>VITE_DEMO_MODE=true</code>); no live BFF backend. Mutations don't round-trip.
+      Real bootstrap pairs slice 2b magic-link with slice 2c SMTP transport — see
+      <code>docs/architecture.md</code> in the repo.
+    </div>
+
+    <nav class="grid">
+      <a class="card" href="/issuer/">
+        <p class="card-eyebrow">Issuer</p>
+        <h2 class="card-title">issuer-portal</h2>
+        <p class="card-desc">Tokenized-product workbench — create, approve, transition lifecycle states.</p>
+      </a>
+      <a class="card" href="/distributor/">
+        <p class="card-eyebrow">Distributor</p>
+        <h2 class="card-title">distributor-portal</h2>
+        <p class="card-desc">Approval queue + decision UI for product launch and subscription approvals.</p>
+      </a>
+      <a class="card" href="/investor/">
+        <p class="card-eyebrow">Investor</p>
+        <h2 class="card-title">investor-portal</h2>
+        <p class="card-desc">Subscription lookup + upstream-health visibility into the platform.</p>
+      </a>
+      <a class="card" href="/ops/">
+        <p class="card-eyebrow">Ops</p>
+        <h2 class="card-title">ops-console</h2>
+        <p class="card-desc">Audit-event search; SLA + incident surface placeholders for ops teams.</p>
+      </a>
+      <a class="card" href="/admin/">
+        <p class="card-eyebrow">Admin</p>
+        <h2 class="card-title">admin</h2>
+        <p class="card-desc">Tenant + user + role + integrations management for platform administrators.</p>
+      </a>
+    </nav>
+
+    <div class="footer">
+      Source: <a href="https://github.com/naimkatiman/hydrax-app">github.com/naimkatiman/hydrax-app</a>.
+      Each portal is a Vite + React + Redux Toolkit static bundle. Shared primitives live in
+      <code>web/packages/ui</code> + <code>web/packages/tenant-theme</code>.
+    </div>
+  </div>
+</body>
+</html>
