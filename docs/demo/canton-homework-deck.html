@@ -361,7 +361,7 @@
 <body>
   <div class="slide-nav" aria-label="Slide navigation">
     <button type="button" data-nav="prev" aria-label="Previous slide">&larr;</button>
-    Slide <b id="slide-num">1</b> <small>/ 14</small>
+    Slide <b id="slide-num">1</b> <small>/ 18</small>
     <button type="button" data-nav="next" aria-label="Next slide">&rarr;</button>
   </div>
   <div class="deck">
@@ -2197,6 +2197,103 @@ template Subscription
         </div>
       </div>
     </div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 14 — DEEP DIVE — TOKENIZATION STANCE                   -->
+<!-- ============================================================ -->
+<div class="slide-container slide-page" id="slide-14">
+  <div data-object-type="textbox" class="page-num"
+    style="position: absolute; top: 40px; right: 60px; width: 110px; height: 100px; text-align: right; z-index: 10;">
+    <div
+      style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 80px; font-weight: 900; color: rgba(205,200,194,0.08); line-height: 1;">
+      14</div>
+  </div>
+  <div data-object-type="textbox" class="slide-title"
+    style="position: absolute; left: 60px; top: 40px; width: 1160px; z-index: 10;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <div style="width: 8px; height: 8px; background: var(--hydrax-color-accent); border-radius: 50%;"></div>
+      <span
+        style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--hydrax-color-accent);">deep dive &middot; tokenization</span>
+    </div>
+    <h1
+      style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 50px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 10px 0; color: var(--hydrax-color-text-strong);">
+      Tokens are <span style="color: var(--hydrax-color-accent); font-weight: 700;">Daml templates</span>, not new primitives
+    </h1>
+    <p style="font-size: 17px; line-height: 1.4; color: var(--hydrax-color-text-muted); margin: 0; max-width: 1080px;">
+      The interesting design choice isn't the asset model. It's who is on the contract, what choices they can make, and what off-ledger systems own which fields.
+    </p>
+  </div>
+  <div data-object-type="graphic"
+    style="position: absolute; left: 60px; top: 210px; width: 1160px; height: 320px; z-index: 10;">
+    <div style="display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 24px; height: 100%;">
+      <!-- LEFT: Token-as-template anatomy -->
+      <div
+        style="background: rgba(36,36,36,0.78); border: 1px solid var(--hydrax-color-accent-soft); border-radius: 14px; padding: 22px 26px; display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+          <div
+            style="width: 38px; height: 38px; background: rgba(205,200,194,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--hydrax-color-text-strong);">Token = Daml template instance</div>
+            <div style="font-size: 12px; color: var(--hydrax-color-accent);">stakeholders, fields, choices</div>
+          </div>
+        </div>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Stakeholder set</strong> declared at template definition &mdash; privacy boundary, not a network policy</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Lifecycle</strong> as enumerated `choice` transitions, not free-form mutations</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Issuer holds the original</strong>; distributors and investors are explicitly added at issuance</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Off-ledger fields</strong> (KYC docs, marketing, fee schedules) live in Postgres &mdash; ledger keeps only the truth that needs multi-party signing</li>
+        </ul>
+      </div>
+      <!-- RIGHT: Stance + deferrals -->
+      <div
+        style="background: rgba(36,36,36,0.78); border: 1px solid rgba(205,200,194,0.25); border-radius: 14px; padding: 22px 26px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--hydrax-color-accent), #EEEAE6);"></div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+          <div
+            style="width: 38px; height: 38px; background: rgba(205,200,194,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--hydrax-color-text-strong);">v1 stance &mdash; honest deferrals</div>
+            <div style="font-size: 12px; color: var(--hydrax-color-accent);">what's intentionally not solved</div>
+          </div>
+        </div>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>HydraX rails mocked</strong> behind <code style="font-family: 'IBM Plex Mono', monospace; color: var(--hydrax-color-accent);">hydrax-adapter</code> &mdash; workflow stack unblocked while engagement settles (PRD &sect;14 Q1)</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Product type open</strong> (PRD &sect;14 Q3); current proposal: short-duration credit, 30&ndash;180d institutional tenor</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>No native tokenomics layer</strong> &mdash; supply, distribution, fees are operational fields, not protocol-level economics</li>
+          <li style="font-size: 13px; color: var(--hydrax-color-text-strong); line-height: 1.45;"><span style="color: var(--hydrax-color-accent); margin-right: 6px;">&bull;</span><strong>Upgrade story</strong>: Daml package versioning + interfaces &mdash; isolated in rails-plane adapters</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div data-object-type="textbox"
+    style="position: absolute; left: 60px; top: 545px; width: 1160px; height: 110px; z-index: 10;">
+    <div
+      style="background: rgba(205,200,194,0.04); border: 1px solid var(--hydrax-color-accent-soft); border-radius: 12px; padding: 16px 22px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <span class="mono" style="font-size: 11px; color: var(--hydrax-color-accent); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;">where it lands in the portal</span>
+      </div>
+      <p style="font-size: 13px; color: var(--hydrax-color-text-strong); margin: 0; line-height: 1.5;">
+        Issuer portal &rarr; Product detail &rarr; <strong style="color: var(--hydrax-color-accent);">Token Model</strong> section. Renders the template name, the stakeholder set, the lifecycle states allowed by the contract, and the off-ledger fields the workflow service owns. Demo data today; same surface when rails go live.
+      </p>
+    </div>
+  </div>
+  <div data-object-type="textbox" class="slide-info"
+    style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Composability moves up the stack: orchestration plane, not the asset itself.</span>
+    </div>
+    <div
+      style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
+      docs/canton-homework.md &middot; PRD &sect;14
+    </div>
+  </div>
+</div>
 
   </div>
   <script>

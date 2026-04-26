@@ -83,6 +83,14 @@
       "consumed_by": "#slide-8 { background-image }",
       "role": "Slide 8 (Trade-offs & Roadmap) ambient hero — a single path forking into multiple trajectories with waypoint markers, evoking decision branches.",
       "prompt": "A single path forking into multiple distinct trajectories, viewed from above as thin warm-grey lines on a dark textured plane, each fork tagged with a small circular waypoint marker, suggests roadmap decisions and trade-offs, monochrome warm-grey palette: deep charcoal #141414 background plane, warm-grey #CDC8C2 path lines, soft #F5F5F5 waypoint highlights, panel #242424 textural undertones, editorial diagrammatic render style, ultra-clean institutional aesthetic, no text, no labels, no logos, 16:9 widescreen, suggests trade-offs and roadmap"
+    },
+    {
+      "file": "slide-14-tokenization.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-14 { background-image }",
+      "role": "Slide 14 (Tokenization stance) ambient hero — nested template/instance framing with stakeholder satellites, evoking token-as-Daml-template.",
+      "prompt": "Two architectural strata visualized as nested frames: an outer monolithic structure (the Daml template) containing a smaller framed inner element (the contract instance), with thin warm-grey lines connecting four smaller satellite nodes (stakeholders) to the inner frame, monochrome warm-grey palette: charcoal #141414 background, panel #242424 frame bodies, warm-grey #CDC8C2 accent edges, off-white #F5F5F5 highlights, editorial 3D render at slight isometric angle, ultra-clean institutional finance aesthetic, museum-quality minimalism, no text, no labels, no logos, no people, 16:9 widescreen, 1376x768"
     }
   ],
   "wiring_notes": [
