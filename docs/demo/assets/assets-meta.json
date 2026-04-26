@@ -21,6 +21,22 @@
       "prompt": "Three-tier architectural stack visualization, three horizontal floating glass-like slabs stacked vertically with subtle space between, monochrome warm-grey palette: charcoal #141414 background, panel grey #242424 slab bodies, off-white #F5F5F5 highlights, warm-grey #CDC8C2 edge accents, very thin vertical connection lines between tiers suggesting data flow, viewed at slight isometric angle, editorial 3D render, ultra-clean institutional finance aesthetic, no text, no labels, no logos, no people, square 1:1 composition, museum-quality minimalism"
     },
     {
+      "file": "slide-1-thesis-split.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-1 { background-image }",
+      "role": "Slide 1 (Thesis Split) ambient hero — two architectural strata separated by a sharp horizon, suggesting Canton-as-rails below and the workflow layer above.",
+      "prompt": "Two distinct architectural strata visualized as a clean horizontal split: lower stratum a deep solid bedrock of dark warm-grey (#141414) suggesting infrastructure and rails, upper stratum a translucent floating glass deck (#242424 with #CDC8C2 edges) suggesting orchestration and experience layers, separated by a thin sharp horizon line of soft #F5F5F5 light, monochrome warm-grey palette only (no chroma), editorial render style, ultra-minimal institutional finance aesthetic, no text, no labels, no logos, no people, 16:9 widescreen, designed as ambient backdrop for foreground content"
+    },
+    {
+      "file": "slide-2-three-primitives.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-2 { background-image }",
+      "role": "Slide 2 (Three Primitives) ambient hero — three monolithic columns suggesting Daml multi-party truth, selective privacy, atomic commits.",
+      "prompt": "Three vertical monolithic columns standing in a row at slight perspective, each column a tall slender warm-grey monolith with subtle distinct surface treatments (smooth, faceted, woven) suggesting Daml multi-party truth, selective privacy, atomic commits, monochrome warm-grey palette: charcoal #141414 background with diffuse light gradient, panel #242424 column bodies, warm-grey #CDC8C2 column edges, off-white #F5F5F5 ambient highlights, museum-quality minimalism, editorial 3D render, no text, no labels, no logos, 16:9 widescreen composition, institutional finance aesthetic"
+    },
+    {
       "file": "slide-3-canton-wiring.jpg",
       "dimensions": "1200x896",
       "aspect": "4:3",
@@ -29,18 +45,51 @@
       "prompt": "Abstract distributed network topology, three large hexagonal participant nodes arranged in equilateral triangle formation around a central glowing synchronizer hub, thin warm-grey connection lines between all nodes with subtle directional indicators, monochrome warm-grey palette on near-black background (#141414 base, #242424 nodes, #CDC8C2 connection lines, #F5F5F5 hub highlight), minimal flat editorial style with depth, no text, no labels, no logos, ultra-clean institutional aesthetic, 4:3 composition, suggests multi-party consensus and shared truth"
     },
     {
+      "file": "slide-4-where-canton-stops.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-4 { background-image }",
+      "role": "Slide 4 (Where Canton Stops) ambient hero — a quiet horizon with a single sharp boundary line, evoking the trust/responsibility threshold.",
+      "prompt": "Vast quiet horizon at dusk, a single thin sharp boundary line cutting horizontally across the frame, representing where one system ends and another begins, lower half a dense textured warm-grey concrete plain, upper half soft volumetric warm-grey atmospheric haze, monochrome warm-grey palette only (deep #141414 ground, #242424 mid-tones, #CDC8C2 horizon glow, #F5F5F5 sky highlight), editorial photography mood, ultra-minimal institutional aesthetic, no text, no labels, no logos, no people, no buildings, 16:9 widescreen, suggests trust boundary"
+    },
+    {
       "file": "slide-5-three-planes.jpg",
       "dimensions": "1376x768",
       "aspect": "16:9",
       "consumed_by": "#slide-5 { background-image }",
       "role": "Slide 5 (Three Planes Above the Rails) ambient hero — three parallel floating planes in 3D, used as atmospheric backdrop for the foreground three-plane explanation.",
       "prompt": "Three parallel horizontal planes floating in 3D space at slight angle, viewed from front-low perspective, monochrome dark warm-grey palette: deep charcoal #141414 background, panel #242424 plane bodies, warm-grey #CDC8C2 plane edges, off-white #F5F5F5 highlights, wireframe-meets-glass aesthetic, very thin vertical connecting columns between the three planes, faint volumetric light from below each plane, editorial 3D render, no text, no labels, no logos, institutional finance design language, 16:9 widescreen composition"
+    },
+    {
+      "file": "slide-6-one-workflow.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-6 { background-image }",
+      "role": "Slide 6 (One Workflow Across Three Planes) ambient hero — a single ribbon of light threading through three layered planes, suggesting continuity of one workflow across the stack.",
+      "prompt": "A single flowing ribbon of soft warm-grey light traveling left to right, threading through three parallel horizontal floating planes at slight angle, the ribbon weaving gracefully above, between, and below the planes to suggest a continuous workflow across multiple layers, monochrome warm-grey palette: deep charcoal #141414 background, panel #242424 plane bodies, warm-grey #CDC8C2 ribbon and plane edges, off-white #F5F5F5 ribbon highlights, editorial 3D render, ultra-clean minimalism, no text, no labels, no logos, 16:9 widescreen, suggests one workflow across three planes"
+    },
+    {
+      "file": "slide-7-status.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-7 { background-image }",
+      "role": "Slide 7 (Status) ambient hero — minimalist instrumentation panel with neat indicator-dot grid, evoking telemetry without rendering numbers/labels.",
+      "prompt": "Minimalist instrumentation panel viewed straight-on, a clean grid of small circular indicator dots arranged in neat rows, each dot a soft warm-grey #CDC8C2 with faint inner glow against a brushed dark warm-grey #242424 panel surface, the entire panel set against a near-black #141414 background, suggests system status and operational telemetry, monochrome warm-grey palette only, editorial product render, ultra-clean institutional aesthetic, no text, no numbers, no labels, no logos, 16:9 widescreen composition"
+    },
+    {
+      "file": "slide-8-tradeoffs-roadmap.jpg",
+      "dimensions": "1376x768",
+      "aspect": "16:9",
+      "consumed_by": "#slide-8 { background-image }",
+      "role": "Slide 8 (Trade-offs & Roadmap) ambient hero — a single path forking into multiple trajectories with waypoint markers, evoking decision branches.",
+      "prompt": "A single path forking into multiple distinct trajectories, viewed from above as thin warm-grey lines on a dark textured plane, each fork tagged with a small circular waypoint marker, suggests roadmap decisions and trade-offs, monochrome warm-grey palette: deep charcoal #141414 background plane, warm-grey #CDC8C2 path lines, soft #F5F5F5 waypoint highlights, panel #242424 textural undertones, editorial diagrammatic render style, ultra-clean institutional aesthetic, no text, no labels, no logos, 16:9 widescreen, suggests trade-offs and roadmap"
     }
   ],
   "wiring_notes": [
     "Body background uses linear-gradient overlay (rgba(20,20,20,0.78 → 0.86)) atop deck-bg.jpg with background-attachment: fixed.",
-    "#slide-0, #slide-3, #slide-5 share base bg behaviors via grouped selector (background-color, repeat, position, size, blend-mode), each then declares its own background-image stack.",
+    "All 9 #slide-N selectors share base bg behaviors via grouped selector (background-color, repeat, position, size, blend-mode), each then declares its own background-image stack.",
     "background-blend-mode: luminosity strips remaining hue from any image residue, locking everything to greyscale even if a future regen drifts off-palette.",
+    "Per-slide gradient overlay opacity tuned per image: stronger top/bottom dimming on slides with brighter source imagery (#slide-7 0.84/0.7/0.9), lighter on more atmospheric ones (#slide-4 0.6/0.78/0.9 because the source has its own dusk gradient).",
     "Inline style=\"background: #141414;\" was removed from #slide-0 because the shorthand was resetting background-image to none."
   ]
 }

@@ -13,6 +13,17 @@
     rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet" />
   <style>
+    :root {
+      /* Teal highlight system — image overlays + interactive accents.
+         Warm grey #CDC8C2 stays the body accent; teal is reserved for
+         live-status indicators, slide-nav focus, and hero image tinting. */
+      --canton-teal: hsl(178, 64%, 48%);
+      --canton-teal-strong: hsl(178, 60%, 56%);
+      --canton-teal-soft: hsla(178, 64%, 48%, 0.14);
+      --canton-teal-glow: hsla(178, 64%, 48%, 0.30);
+      --canton-teal-image: hsla(178, 64%, 48%, 0.18);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -48,7 +59,9 @@
       background: #141414;
       border: 1px solid rgba(245, 245, 245, 0.16);
       border-radius: 12px;
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
+      box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.34),
+        inset 0 0 160px 50px rgba(20, 20, 20, 0.55);
       flex-shrink: 0;
     }
 
@@ -58,8 +71,14 @@
 
     /* Per-slide ambient hero backgrounds — generated via /nano-banana, see assets-meta.json */
     #slide-0,
+    #slide-1,
+    #slide-2,
     #slide-3,
-    #slide-5 {
+    #slide-4,
+    #slide-5,
+    #slide-6,
+    #slide-7,
+    #slide-8 {
       background-color: #141414;
       background-repeat: no-repeat;
       background-position: center center;
@@ -70,19 +89,64 @@
     #slide-0 {
       background-image:
         linear-gradient(135deg, rgba(20, 20, 20, 0.82) 0%, rgba(20, 20, 20, 0.55) 60%, rgba(36, 36, 36, 0.78) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
         url('./assets/slide-0-stack.jpg');
+    }
+
+    #slide-1 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.78) 0%, rgba(20, 20, 20, 0.6) 50%, rgba(20, 20, 20, 0.86) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
+        url('./assets/slide-1-thesis-split.jpg');
+    }
+
+    #slide-2 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.82) 0%, rgba(36, 36, 36, 0.62) 50%, rgba(20, 20, 20, 0.86) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
+        url('./assets/slide-2-three-primitives.jpg');
     }
 
     #slide-3 {
       background-image:
-        linear-gradient(180deg, rgba(20, 20, 20, 0.78) 0%, rgba(20, 20, 20, 0.62) 50%, rgba(20, 20, 20, 0.84) 100%),
+        linear-gradient(180deg, rgba(20, 20, 20, 0.92) 0%, rgba(20, 20, 20, 0.85) 50%, rgba(20, 20, 20, 0.94) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
         url('./assets/slide-3-canton-wiring.jpg');
+    }
+
+    #slide-4 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.6) 0%, rgba(20, 20, 20, 0.78) 50%, rgba(20, 20, 20, 0.9) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
+        url('./assets/slide-4-where-canton-stops.jpg');
     }
 
     #slide-5 {
       background-image:
-        linear-gradient(180deg, rgba(20, 20, 20, 0.82) 0%, rgba(36, 36, 36, 0.6) 50%, rgba(20, 20, 20, 0.88) 100%),
+        linear-gradient(180deg, rgba(20, 20, 20, 0.9) 0%, rgba(20, 20, 20, 0.8) 50%, rgba(20, 20, 20, 0.93) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
         url('./assets/slide-5-three-planes.jpg');
+    }
+
+    #slide-6 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.92) 0%, rgba(20, 20, 20, 0.84) 50%, rgba(20, 20, 20, 0.94) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
+        url('./assets/slide-6-one-workflow.jpg');
+    }
+
+    #slide-7 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.84) 0%, rgba(20, 20, 20, 0.7) 50%, rgba(20, 20, 20, 0.9) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
+        url('./assets/slide-7-status.jpg');
+    }
+
+    #slide-8 {
+      background-image:
+        linear-gradient(180deg, rgba(20, 20, 20, 0.92) 0%, rgba(20, 20, 20, 0.85) 50%, rgba(20, 20, 20, 0.94) 100%),
+        linear-gradient(135deg, var(--canton-teal-image) 0%, hsla(178, 64%, 48%, 0.04) 70%),
+        url('./assets/slide-8-tradeoffs-roadmap.jpg');
     }
 
     .slide-nav {
@@ -130,9 +194,12 @@
       line-height: 1;
     }
 
-    .slide-nav button:hover {
-      border-color: #CDC8C2;
-      color: #CDC8C2;
+    .slide-nav button:hover,
+    .slide-nav button:focus-visible {
+      border-color: var(--canton-teal);
+      color: var(--canton-teal);
+      background: var(--canton-teal-soft);
+      outline: none;
     }
 
     .accent {
@@ -230,11 +297,11 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 10px; height: 10px; background: #CDC8C2; border-radius: 50%;"></div>
+            <div style="width: 10px; height: 10px; background: var(--canton-teal); border-radius: 50%; box-shadow: 0 0 0 4px var(--canton-teal-soft);"></div>
             <p style="font-size: 14px; color: #BCBCBC; font-weight: 500; margin: 0;">Live on Railway</p>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 10px; height: 10px; background: #CDC8C2; border-radius: 50%;"></div>
+            <div style="width: 10px; height: 10px; background: var(--canton-teal); border-radius: 50%; box-shadow: 0 0 0 4px var(--canton-teal-soft);"></div>
             <p style="font-size: 14px; color: #BCBCBC; font-weight: 500; margin: 0;">5 Daml Scripts Green</p>
           </div>
         </div>
@@ -1526,7 +1593,7 @@
           <!-- Card 1: Live now -->
           <div
             style="background: rgba(36,36,36,0.78); border: 1px solid rgba(205,200,194,0.2); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #CDC8C2;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--canton-teal);"></div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div
@@ -1535,13 +1602,13 @@
                 </div>
                 <div>
                   <div style="font-size: 18px; font-weight: 700; color: #F5F5F5;">Live now</div>
-                  <div style="font-size: 13px; color: #CDC8C2; letter-spacing: 0.05em; font-weight: 600;">DEPLOYED</div>
+                  <div style="font-size: 13px; color: var(--canton-teal); letter-spacing: 0.05em; font-weight: 600;">DEPLOYED</div>
                 </div>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 8px; height: 8px; background: #CDC8C2; border-radius: 50%;"></div>
+                <div style="width: 8px; height: 8px; background: var(--canton-teal); border-radius: 50%; box-shadow: 0 0 0 3px var(--canton-teal-soft);"></div>
                 <span
-                  style="font-size: 13px; color: #CDC8C2; font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">HEALTHY</span>
+                  style="font-size: 13px; color: var(--canton-teal); font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;">HEALTHY</span>
               </div>
             </div>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
