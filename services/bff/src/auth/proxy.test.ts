@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
-import { proxyDevLogin, proxyWhoami, proxyLogout, AuthUpstreamError } from "./proxy.js";
+import { proxyWhoami, proxyLogout, AuthUpstreamError } from "./proxy.js";
 
 interface SimpleMock {
   url: string;
@@ -37,56 +37,6 @@ async function startMockIntegrationSvc(): Promise<SimpleMock> {
       ),
   };
 }
-
-describe("proxyDevLogin", () => {
-  it("POSTs credentials and returns DevLoginResult on 200", async () => {
-    const mock = await startMockIntegrationSvc();
-    const expected = {
-      token: "tok_abc123",
-      session: {
-        id: "sess-1",
-        user_id: "user-1",
-        tenant_id: "tenant-1",
-        role: "investor",
-        expires_at: "2026-05-01T00:00:00.000Z",
-      },
-    };
-    mock.setNext({ status: 200, body: expected });
-    try {
-      const result = await proxyDevLogin(
-        { tenant_slug: "acme", email: "alice@example.com" },
-        { integrationSvcUrl: mock.url },
-      );
-      expect(result.token).toBe("tok_abc123");
-      expect(result.session.id).toBe("sess-1");
-      expect(result.session.role).toBe("investor");
-      expect(mock.lastReq?.method).toBe("POST");
-      expect(mock.lastReq?.url).toBe("/v1/auth/dev/login");
-      const parsed = JSON.parse(mock.lastReq?.body ?? "{}") as unknown;
-      expect((parsed as { tenant_slug: string }).tenant_slug).toBe("acme");
-    } finally {
-      await mock.close();
-    }
-  });
-
-  it("throws AuthUpstreamError with httpStatus 401 when upstream returns 401", async () => {
-    const mock = await startMockIntegrationSvc();
-    mock.setNext({ status: 401, body: { error: "dev_login_disabled" } });
-    try {
-      await expect(
-        proxyDevLogin(
-          { tenant_slug: "acme", email: "x@example.com" },
-          { integrationSvcUrl: mock.url },
-        ),
-      ).rejects.toSatisfy(
-        (err: unknown) =>
-          err instanceof AuthUpstreamError && err.httpStatus === 401,
-      );
-    } finally {
-      await mock.close();
-    }
-  });
-});
 
 describe("proxyWhoami", () => {
   it("forwards bearer token and returns WhoamiResult on 200", async () => {

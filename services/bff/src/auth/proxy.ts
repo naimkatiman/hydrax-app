@@ -2,22 +2,6 @@ export interface AuthUpstreamConfig {
   integrationSvcUrl: string;
 }
 
-export interface DevLoginInput {
-  tenant_slug: string;
-  email: string;
-}
-
-export interface DevLoginResult {
-  token: string;
-  session: {
-    id: string;
-    user_id: string;
-    tenant_id: string;
-    role: string;
-    expires_at: string;
-  };
-}
-
 export interface WhoamiResult {
   session_id: string;
   user_id: string;
@@ -49,18 +33,6 @@ async function readJsonOrThrow(res: Response, errLabel: string): Promise<unknown
     );
   }
   return res.json();
-}
-
-export async function proxyDevLogin(
-  input: DevLoginInput,
-  cfg: AuthUpstreamConfig,
-): Promise<DevLoginResult> {
-  const res = await fetch(`${cfg.integrationSvcUrl}/v1/auth/dev/login`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  return (await readJsonOrThrow(res, "dev_login")) as DevLoginResult;
 }
 
 export async function proxyWhoami(
