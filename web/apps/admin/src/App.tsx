@@ -8,6 +8,7 @@ import { AdminSidebar, AdminBrand } from "./components/AdminSidebar";
 import { AdminTopBar } from "./components/AdminTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
 import { ComposabilityRoute } from "./routes/ComposabilityRoute";
+import { ProjectionsRoute } from "./routes/ProjectionsRoute";
 
 const store = configureStore({
   reducer: { [hydraxApi.reducerPath]: hydraxApi.reducer },
@@ -26,6 +27,7 @@ function ShellContents() {
       <Routes>
         <Route path="/" element={<HomeRoute />} />
         <Route path="/composability" element={<ComposabilityRoute />} />
+        <Route path="/projections" element={<ProjectionsRoute />} />
       </Routes>
     </AppShell>
   );

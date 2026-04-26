@@ -8,6 +8,7 @@ import {
   Plug,
   Settings,
   Network,
+  Database,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { NavItem, type NavItemLinkProps } from "@hydrax/ui";
@@ -31,6 +32,7 @@ const NAV: ReadonlyArray<{
 }> = [
   { label: "Home", path: "/", icon: LayoutDashboard },
   { label: "Composability", path: "/composability", icon: Network },
+  { label: "Projections", path: "/projections", icon: Database },
   { label: "Tenants", path: "/tenants", icon: Building2 },
   { label: "Users", path: "/users", icon: Users },
   { label: "Roles", path: "/roles", icon: KeyRound },
