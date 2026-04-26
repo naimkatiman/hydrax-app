@@ -1,0 +1,21 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/deck", "destination": "/deck.html" },
+    { "source": "/script", "destination": "/script.html" }
+  ],
+  "headers": [
+    {
+      "source": "**/*.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }
+      ]
+    },
+    {
+      "source": "**/*.@(css|jpg|jpeg|png|svg|woff|woff2)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    }
+  ]
+}

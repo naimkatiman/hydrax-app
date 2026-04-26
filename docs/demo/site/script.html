@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5-Minute Walkthrough Script · Canton Network · Naim Katiman</title>
+  <meta name="description" content="The 5-minute walkthrough script for the HydraX Canton Network homework — what I would say if I narrated the deck." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ─── Top nav ──────────────────────────────────────────────────────── -->
+<nav class="topnav" aria-label="Primary">
+  <div class="topnav-inner">
+    <a href="/" class="topnav-brand"><span class="dot"></span>HydraX × Canton</a>
+    <div class="topnav-links">
+      <a href="/">Home</a>
+      <a href="/deck">Deck</a>
+      <a href="/script" class="active">Script</a>
+      <a href="https://hydrax-portals-production.up.railway.app/" target="_blank" rel="noopener">Live App <span class="ext-arrow">↗</span></a>
+      <a href="https://github.com/naimkatiman/hydrax-app" target="_blank" rel="noopener">GitHub <span class="ext-arrow">↗</span></a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── Hero ─────────────────────────────────────────────────────────── -->
+<header class="hero">
+  <p class="hero-eyebrow">Appendix B · 5-Minute Walkthrough Script</p>
+  <h1>What I would say <span class="accent">if I narrated the deck.</span></h1>
+  <p class="hero-lede">5:00 runtime at ~150 wpm. Six segments. Recordable as-is. The blockquoted narration is what gets spoken; the meta lines describe what's on screen.</p>
+
+  <div class="hero-status">
+    <span class="status-pill"><span class="dot"></span>5:00 total</span>
+    <span class="status-pill"><span class="dot"></span>527 words narration</span>
+    <span class="status-pill"><span class="dot"></span>6 segments</span>
+  </div>
+</header>
+
+<!-- ─── Segments ─────────────────────────────────────────────────────── -->
+<section class="section" id="segments">
+  <p class="section-eyebrow">The Walkthrough</p>
+  <h2 style="margin-bottom: 8px;">Six segments, one continuous take.</h2>
+
+  <div class="segment">
+    <div class="seg-meta">Segment 01<span class="seg-time">00:00 → 00:30</span></div>
+    <div>
+      <h3>Positioning</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> deck cover + thesis split (slides 0–1).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">HydraX is the regulated rails — tokenization, custody, trading. What's missing above those rails is the institutional workflow layer: onboarding, issuance, subscription, approvals, audit. We are building that layer. Canton-aligned, privacy-preserving, multi-party. Not a competing exchange. Not a custody system. Not another DeFi front end. The control room above the rails.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Segment 02<span class="seg-time">00:30 → 01:15</span></div>
+    <div>
+      <h3>The Wedge</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> three primitives + Canton wiring (slides 2–3).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">The first wedge is institutional onboarding plus issuance plus subscription servicing for tokenized products. One workspace shared across issuer, distributor, investor, and operator — each role sees what their role is allowed to see, and only that. Tenant isolation and least-privilege from day one. Today institutions stitch this workflow across email, spreadsheets, and bilateral PDFs. We replace that surface with a single command-room UI, with a Daml-anchored audit trail underneath, so every state change is provable, attributable, and replayable.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Segment 03<span class="seg-time">01:15 → 03:30</span></div>
+    <div>
+      <h3>Live Walkthrough</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> the operator console (the <a href="https://hydrax-portals-production.up.railway.app/" target="_blank" rel="noopener">live app</a>) — five sub-segments with screen actions.</p>
+
+        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3a · Open the workspace · 01:15 → 01:35</h4>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Here is the operator console. Top — system view, mode, drift, primary venue. Below — the operator workspace. Six lanes: orders, positions, venues, risk, settings, activity. Single surface, role-aware, white-labelable per tenant.</p>
+
+        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3b · Orders + drill-down · 01:35 → 02:05</h4>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Orders panel. Sortable by id, venue, mode, exposure, status. Pick a row — the detail rail opens with the route's venue mix, operator rationale, and fallback sequencing. Every venue name is a cross-link; clicking it jumps to that venue's record. The console is built so an operator can trace any decision in two clicks.</p>
+
+        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3c · Mode change + state cycle · 02:05 → 02:35</h4>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Mode change. Watch the routing posture flip — Balanced Sweep, Latency Shield, Inventory Protect — and the drift recompute. Now state cycle. The same panel handles loading skeletons, the populated ready state, and an empty filtered state, with no layout jump. This is the pattern every workflow surface in HydraX inherits.</p>
+
+        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3d · Cross-panel jump + risk · 02:35 → 03:05</h4>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Cross-panel jump — orders to venues, one click, deep-linked. Risk lane. Operator review queue with severity, venue, time, status. Accept or defer is one keystroke. Every action is logged.</p>
+
+        <h4 style="font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin: 24px 0 8px 0;">3e · Activity persistence · 03:05 → 03:30</h4>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 16px; line-height: 1.7;">Activity log. Every panel switch, every filter change, every risk decision is recorded. Persisted across sessions in versioned local storage during prototype phase, audit-svc-backed in v1. This is the audit trail an institutional ops desk actually needs.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Segment 04<span class="seg-time">03:30 → 04:15</span></div>
+    <div>
+      <h3>Architecture</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> three planes + status (slides 5–7).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Under the surface — eight backend services already scaffolded. Five Go services for performance-critical workflow, approval, audit, HydraX adapter, Canton adapter. Three Node services for notifications, integrations, and a BFF that aggregates for React. Five role-aware portals on top: issuer, distributor, investor, ops console, admin. Tenant theming via CSS variables. Lucide icons only — no emoji, ever. Postgres for relational truth, Mongo for tenant-flexible payloads, Daml as the shared multi-party ledger. Browsers never call Daml directly — adapters mediate.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Segment 05<span class="seg-time">04:15 → 04:45</span></div>
+    <div>
+      <h3>Roadmap &amp; Open Questions</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> trade-offs + roadmap (slide 8).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">Four open questions from the PRD. Q1 — HydraX rails API surface. We run a mocked adapter behind a stable interface, so v1 ships without blocking. Q3 — first product type. Proposal: short-duration credit, 30 to 180 day tenor. Q4 — first tenant persona. Q7 — pricing model. Memos for both are in the repo. None block the workflow stack from shipping.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="seg-meta">Segment 06<span class="seg-time">04:45 → 05:00</span></div>
+    <div>
+      <h3>Close</h3>
+      <div class="prose">
+        <p><strong>On screen:</strong> ask + contact (slide 8 outro).</p>
+        <p style="border-left: 3px solid var(--accent); padding-left: 18px; color: var(--text); font-size: 17px; line-height: 1.7;">What we are asking for: validation of the wedge, alignment on the open questions, and a working session on the HydraX adapter contract. Workflow-layer code is moving. The rails are yours. Let's connect them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Verification footer ──────────────────────────────────────────── -->
+<section class="section" id="verification" style="border-top: 1px solid var(--border-soft);">
+  <p class="section-eyebrow">Verification · Recorded 2026-04-26</p>
+  <h2>Pacing math.</h2>
+  <div class="prose">
+    <ul>
+      <li><strong>Spoken-word count:</strong> 527 words across the narration above.</li>
+      <li><strong>Pacing:</strong> ~95 wpm during demo segments (Segment 3) with screen-action dwells; 105–135 wpm during talking-head segments (1, 2, 4, 5, 6).</li>
+      <li><strong>Timestamp ladder:</strong> monotonic 00:00 → 00:30 → 01:15 → 01:35 → 02:05 → 02:35 → 03:05 → 03:30 → 04:15 → 04:45 → 05:00.</li>
+      <li><strong>Slide refs:</strong> all 9 slide ids in the deep deck resolve.</li>
+      <li><strong>Element refs:</strong> every UI handle named in Segment 3 resolves in the live app.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── Footer ───────────────────────────────────────────────────────── -->
+<footer class="sitefoot">
+  <span>Naim Katiman · April 2026</span>
+  <span>Built for HydraX interview · <a href="https://github.com/naimkatiman/hydrax-app" target="_blank" rel="noopener">naimkatiman/hydrax-app</a></span>
+</footer>
+
+</body>
+</html>
