@@ -1,185 +1,664 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hydrax — Portals</title>
-  <style>
-    :root {
-      --bg: hsl(220, 16%, 8%);
-      --bg-raised: hsl(220, 14%, 14%);
-      --surface: hsl(220, 14%, 12%);
-      --text: hsl(220, 12%, 92%);
-      --text-strong: hsl(220, 12%, 98%);
-      --text-muted: hsl(220, 8%, 64%);
-      --border: hsl(220, 10%, 22%);
-      --accent: hsl(190, 90%, 55%);
-      --accent-soft: hsla(190, 90%, 55%, 0.12);
-      --focus: hsla(190, 90%, 55%, 0.45);
-      --radius: 8px;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
-      font-size: 13px;
-      line-height: 20px;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-    .wrap {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 64px 24px 96px;
-    }
-    .eyebrow {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin: 0 0 12px;
-    }
-    h1 {
-      color: var(--text-strong);
-      font-size: 32px;
-      line-height: 40px;
-      font-weight: 600;
-      margin: 0 0 12px;
-    }
-    .lede {
-      color: var(--text-muted);
-      max-width: 640px;
-      margin: 0 0 32px;
-    }
-    .demo-banner {
-      background: var(--accent-soft);
-      border: 1px solid var(--accent);
-      border-radius: var(--radius);
-      padding: 12px 16px;
-      margin: 0 0 40px;
-      font-size: 12px;
-      line-height: 18px;
-      color: var(--text);
-    }
-    .demo-banner strong { color: var(--accent); font-weight: 600; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
-      display: block;
-    }
-    .card:hover {
-      border-color: var(--accent);
-      transform: translateY(-1px);
-    }
-    .card:focus-visible {
-      outline: 2px solid var(--focus);
-      outline-offset: 2px;
-    }
-    .card-eyebrow {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin: 0 0 6px;
-    }
-    .card-title {
-      color: var(--text-strong);
-      font-size: 16px;
-      line-height: 22px;
-      font-weight: 600;
-      margin: 0 0 4px;
-    }
-    .card-desc {
-      color: var(--text-muted);
-      font-size: 12px;
-      line-height: 18px;
-      margin: 0;
-    }
-    .footer {
-      margin-top: 64px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 12px;
-      line-height: 18px;
-    }
-    .footer code {
-      background: var(--bg-raised);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 6px;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text);
-    }
-    .footer a { color: var(--accent); text-decoration: none; }
-    .footer a:hover { text-decoration: underline; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <p class="eyebrow">Hydrax / Workflow Platform</p>
-    <h1>Portals</h1>
-    <p class="lede">
-      White-label institutional workflow platform above HydraX's regulated tokenisation,
-      trading, and custody rails. Five role-aware portals share one design system.
-    </p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HydraX | Adaptive Liquidity Command</title>
+    <meta
+      name="description"
+      content="HydraX is an adaptive execution layer for multi-venue liquidity, risk visibility, and command-grade routing."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="ambient ambient-a" aria-hidden="true"></div>
+      <div class="ambient ambient-b" aria-hidden="true"></div>
 
-    <div class="demo-banner">
-      <strong>Demo mode.</strong> All five portals are running with canned fixtures
-      (<code>VITE_DEMO_MODE=true</code>); no live BFF backend. Mutations don't round-trip.
-      Real bootstrap pairs slice 2b magic-link with slice 2c SMTP transport — see
-      <code>docs/architecture.md</code> in the repo.
+      <header class="topbar">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div>
+            <p class="eyebrow">HydraX</p>
+            <p class="brand-subtitle">Adaptive Liquidity Command</p>
+          </div>
+        </div>
+
+        <nav class="topnav" aria-label="Primary">
+          <a href="#overview">Overview</a>
+          <a href="#portals">Portals</a>
+          <a href="#signals">Signals</a>
+          <a href="#workspace">Workspace</a>
+          <a href="#mission">Mission</a>
+        </nav>
+
+        <div class="topbar-actions">
+          <button class="button button-ghost" id="openDashboardTop" type="button">Open Workspace</button>
+          <a class="button button-secondary" href="#mission">Request Access</a>
+        </div>
+
+        <button class="topbar-toggle" id="topbarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+          <span class="topbar-toggle-bar"></span>
+          <span class="topbar-toggle-bar"></span>
+          <span class="topbar-toggle-bar"></span>
+        </button>
+      </header>
+
+      <main>
+        <section class="hero section-grid" id="overview">
+          <div class="hero-copy">
+            <p class="eyebrow">Execution fabric for fragmented markets</p>
+            <h1>Route liquidity like a control room, not a spreadsheet.</h1>
+            <p class="hero-text">
+              HydraX unifies venue health, fill quality, and execution posture
+              into one adaptive surface built for fast decisions and disciplined risk.
+            </p>
+
+            <div class="hero-actions">
+              <button class="button button-primary" id="openDashboardHero" type="button">Open System View</button>
+              <a class="button button-secondary" href="#signals">Review Signal Stack</a>
+            </div>
+
+            <dl class="hero-metrics" aria-label="HydraX highlights">
+              <div>
+                <dt>24ms</dt>
+                <dd>Median route recalculation under live load</dd>
+              </div>
+              <div>
+                <dt><span id="heroVenueCount">9</span> venues</dt>
+                <dd>Unified into one execution posture</dd>
+              </div>
+              <div>
+                <dt>3 layers</dt>
+                <dd>Signal, guardrail, and adaptive dispatch</dd>
+              </div>
+            </dl>
+          </div>
+
+          <aside class="hero-console" aria-label="HydraX system preview">
+            <div class="console-card console-frame">
+              <div class="console-header">
+                <div>
+                  <p class="panel-label">System View</p>
+                  <h2>Hydra mesh</h2>
+                </div>
+                <div class="status-chip">
+                  <span class="status-dot" aria-hidden="true"></span>
+                  <span>Stable</span>
+                </div>
+              </div>
+
+              <div class="mesh-grid">
+                <article class="mesh-panel mesh-panel-wide">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-label">Execution spread</p>
+                      <strong>Cross-venue posture</strong>
+                    </div>
+                    <button class="panel-action" id="cycleMode" type="button">Cycle mode</button>
+                  </div>
+
+                  <div class="signal-wave" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                  </div>
+
+                  <div class="route-readout">
+                    <div>
+                      <p>Primary venue</p>
+                      <strong id="primaryVenue">Singapore Nexus</strong>
+                    </div>
+                    <div>
+                      <p>Mode</p>
+                      <strong id="routingMode">Balanced Sweep</strong>
+                    </div>
+                    <div>
+                      <p>Drift</p>
+                      <strong id="driftValue">0.14%</strong>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="mesh-panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-label">Guardrails</p>
+                      <strong>Risk envelope</strong>
+                    </div>
+                  </div>
+                  <div class="bar-stack" aria-hidden="true">
+                    <div><span style="--bar: 86%"></span></div>
+                    <div><span style="--bar: 61%"></span></div>
+                    <div><span style="--bar: 42%"></span></div>
+                  </div>
+                  <ul class="mini-list">
+                    <li>Fill slippage ceiling active</li>
+                    <li>Venue outage fallback armed</li>
+                    <li>Inventory skew tolerance narrowing</li>
+                  </ul>
+                </article>
+
+                <article class="mesh-panel">
+                  <div class="panel-head">
+                    <div>
+                      <p class="panel-label">Live venues</p>
+                      <strong>Health mesh</strong>
+                    </div>
+                  </div>
+                  <ul class="venue-list" id="venueList">
+                    <li><span>Tokyo Arc</span><span class="venue-state venue-state-live">Live</span></li>
+                    <li><span>Frankfurt Loop</span><span class="venue-state venue-state-warm">Warm</span></li>
+                    <li><span>Dubai Harbor</span><span class="venue-state venue-state-live">Live</span></li>
+                  </ul>
+                </article>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="portals-section" id="portals" aria-label="Portal entry points">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Role-aware destinations</p>
+              <h2>Pick your portal</h2>
+            </div>
+            <p class="portals-lede">
+              Five role-scoped workspaces share the operator console. All run in
+              <code>VITE_DEMO_MODE=true</code> with canned fixtures &mdash; mutations
+              don&rsquo;t round-trip to a backend yet.
+            </p>
+          </div>
+          <div class="portals-grid">
+            <a class="portal-card" href="/issuer/">
+              <p class="panel-label">Issuer</p>
+              <h3>issuer-portal</h3>
+              <p class="portal-desc">Tokenised-product workbench &mdash; create, approve, transition lifecycle states.</p>
+              <span class="portal-cta">Enter <span aria-hidden="true">&rarr;</span></span>
+            </a>
+            <a class="portal-card" href="/distributor/">
+              <p class="panel-label">Distributor</p>
+              <h3>distributor-portal</h3>
+              <p class="portal-desc">Approval queue + decision UI for product launch and subscription approvals.</p>
+              <span class="portal-cta">Enter <span aria-hidden="true">&rarr;</span></span>
+            </a>
+            <a class="portal-card" href="/investor/">
+              <p class="panel-label">Investor</p>
+              <h3>investor-portal</h3>
+              <p class="portal-desc">Subscription lookup + upstream-health visibility into the platform.</p>
+              <span class="portal-cta">Enter <span aria-hidden="true">&rarr;</span></span>
+            </a>
+            <a class="portal-card" href="/ops/">
+              <p class="panel-label">Ops</p>
+              <h3>ops-console</h3>
+              <p class="portal-desc">Audit-event search; SLA + incident surface placeholders for ops teams.</p>
+              <span class="portal-cta">Enter <span aria-hidden="true">&rarr;</span></span>
+            </a>
+            <a class="portal-card" href="/admin/">
+              <p class="panel-label">Admin</p>
+              <h3>admin</h3>
+              <p class="portal-desc">Tenant + user + role + integrations management for platform administrators.</p>
+              <span class="portal-cta">Enter <span aria-hidden="true">&rarr;</span></span>
+            </a>
+          </div>
+        </section>
+
+        <section class="signal-band" id="signals" aria-label="HydraX signal stack">
+          <article>
+            <p class="panel-label">Signal layer</p>
+            <h3>Read fragmentation before it becomes drag.</h3>
+            <p>Venue confidence, queue depth, and adverse selection pressure are fused into one route decision loop.</p>
+          </article>
+          <article>
+            <p class="panel-label">Command layer</p>
+            <h3>Every posture change leaves a readable audit trail.</h3>
+            <p>Operators see why HydraX shifted priority, not just that it did.</p>
+          </article>
+          <article>
+            <p class="panel-label">Fallback layer</p>
+            <h3>Graceful degradation, not blind failover.</h3>
+            <p>Recovery states are tuned to preserve quality when venues wobble.</p>
+          </article>
+        </section>
+
+        <section class="workspace-section" id="workspace">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Product slice two</p>
+              <h2>Operational workspace</h2>
+            </div>
+            <div class="workspace-status">
+              <span class="status-pill" id="workspaceLivePill">Orders live</span>
+              <span class="status-pill muted">Scenario states enabled</span>
+            </div>
+          </div>
+
+          <div class="workspace-shell view-shell">
+            <aside class="workspace-sidebar">
+              <div>
+                <p class="panel-label">Workspace</p>
+                <h3>Operator lanes</h3>
+              </div>
+
+              <nav class="workspace-nav" aria-label="Workspace navigation">
+                <button class="workspace-nav-item is-active" type="button" data-panel="orders">
+                  <span>Orders</span>
+                  <small data-nav-count="orders">0 active</small>
+                </button>
+                <button class="workspace-nav-item" type="button" data-panel="positions">
+                  <span>Positions</span>
+                  <small data-nav-count="positions">0 active</small>
+                </button>
+                <button class="workspace-nav-item" type="button" data-panel="venues">
+                  <span>Venues</span>
+                  <small data-nav-count="venues">0 connected</small>
+                </button>
+                <button class="workspace-nav-item" type="button" data-panel="risk">
+                  <span>Risk</span>
+                  <small data-nav-count="risk">2 alerts</small>
+                </button>
+                <button class="workspace-nav-item" type="button" data-panel="settings">
+                  <span>Settings</span>
+                  <small data-nav-count="settings">Profile</small>
+                </button>
+                <button class="workspace-nav-item" type="button" data-panel="activity">
+                  <span>Activity</span>
+                  <small data-nav-count="activity">0 entries</small>
+                </button>
+              </nav>
+
+              <div class="sidebar-card">
+                <p class="panel-label">Execution status</p>
+                <strong>Adaptive mesh healthy</strong>
+                <p class="sidebar-copy">Venue failover, posture history, and operator review notes are available from one surface.</p>
+              </div>
+
+              <div class="shortcut-hint" id="shortcutHint">
+                <p class="panel-label">Keyboard</p>
+                <ul class="shortcut-list">
+                  <li><kbd>1</kbd><span>Orders</span></li>
+                  <li><kbd>2</kbd><span>Positions</span></li>
+                  <li><kbd>3</kbd><span>Venues</span></li>
+                  <li><kbd>4</kbd><span>Risk</span></li>
+                  <li><kbd>5</kbd><span>Settings</span></li>
+                  <li><kbd>6</kbd><span>Activity</span></li>
+                </ul>
+              </div>
+            </aside>
+            <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+            <div class="workspace-main">
+              <div class="workspace-toolbar">
+                <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle sidebar" aria-expanded="false">
+                  <span class="sidebar-toggle-bar"></span>
+                  <span class="sidebar-toggle-bar"></span>
+                  <span class="sidebar-toggle-bar"></span>
+                </button>
+                <div>
+                  <nav class="breadcrumb-trail" id="breadcrumbTrail" aria-label="Breadcrumb navigation">
+                    <span class="crumb-root">Dashboard view</span>
+                    <span class="crumb-sep" aria-hidden="true">›</span>
+                    <span class="crumb-panel">Execution orders</span>
+                  </nav>
+                  <h3 id="panelTitle">Execution orders</h3>
+                </div>
+
+                <div class="toolbar-actions">
+                  <button class="search-toggle" id="searchToggle" type="button" aria-label="Toggle search">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  </button>
+                  <input type="text" class="workspace-search" id="workspaceSearch" placeholder="Filter rows..." aria-label="Filter workspace rows" />
+                  <div class="filter-group" id="filterGroup" aria-label="Panel filters"></div>
+                  <button class="button button-ghost small" id="cycleState" type="button">Cycle state</button>
+                </div>
+              </div>
+
+              <div class="summary-grid">
+                <article class="summary-card">
+                  <p class="panel-label" id="summaryFillLabel">Fill quality</p>
+                  <strong id="summaryFillValue">98.4%</strong>
+                  <span id="summaryFillCaption">Within slippage ceiling over the last 20 route decisions</span>
+                </article>
+                <article class="summary-card">
+                  <p class="panel-label" id="summaryRiskLabel">Risk pressure</p>
+                  <strong id="summaryRiskValue">Contained</strong>
+                  <span id="summaryRiskCaption">Inventory skew cooling across Asia and Europe books</span>
+                </article>
+                <article class="summary-card">
+                  <p class="panel-label" id="summaryFallbackLabel">Fallback posture</p>
+                  <strong id="summaryFallbackValue">Ready</strong>
+                  <span id="summaryFallbackCaption">Frankfurt reroute profile armed with graceful degradation</span>
+                </article>
+              </div>
+
+              <div class="state-banner" id="stateBanner">
+                <div>
+                  <p class="panel-label">Loading state</p>
+                  <strong>HydraX is reconciling venue health and order confidence.</strong>
+                </div>
+                <p>Skeleton rows hold the workspace shape until fresh route telemetry lands.</p>
+              </div>
+
+              <section class="workspace-panel is-visible" id="panel-orders" data-panel-body>
+                <div class="data-card state-loading is-visible" data-state="loading">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Order activity</p>
+                      <strong>Loading execution lanes</strong>
+                    </div>
+                    <span class="status-pill muted">Syncing</span>
+                  </div>
+                  <div class="skeleton-table" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+
+                <div class="data-card" data-state="ready">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Execution orders</p>
+                      <strong>Recent route decisions</strong>
+                    </div>
+                    <span class="status-pill" id="ordersActivePill">0 active orders</span>
+                  </div>
+                  <div class="orders-workbench">
+                    <div class="order-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th class="sortable" data-sort-key="id">Order</th>
+                              <th class="sortable" data-sort-key="venue">Venue</th>
+                              <th class="sortable" data-sort-key="mode">Mode</th>
+                              <th class="sortable" data-sort-key="exposure">Exposure</th>
+                              <th class="sortable" data-sort-key="status">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="ordersTableBody"></tbody>
+                        </table>
+                      </div>
+                      <p class="table-footnote">Select a route to inspect venue mix, operator rationale, and fallback sequencing. Venue names link to the venues panel.</p>
+                    </div>
+
+                    <aside class="detail-rail">
+                      <div class="detail-shell" id="orderDetail" data-detail-for="orders" aria-live="polite"></div>
+                    </aside>
+                  </div>
+                </div>
+
+                <div class="data-card state-empty" data-state="empty">
+                  <div class="empty-state">
+                    <p class="panel-label">No matching orders</p>
+                    <strong>Current filters removed every active route.</strong>
+                    <p>Switch to another execution lane or clear the filter chips to restore the order table.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="workspace-panel" id="panel-positions" data-panel-body>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Position overview</p>
+                      <strong>Book concentration</strong>
+                    </div>
+                    <span class="status-pill" id="positionsActivePill">0 active</span>
+                  </div>
+                  <div class="positions-workbench">
+                    <div class="position-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th class="sortable" data-sort-key="name">Book</th>
+                              <th class="sortable" data-sort-key="exposure">Exposure</th>
+                              <th class="sortable" data-sort-key="pnl">P&amp;L</th>
+                              <th class="sortable numeric" data-sort-key="instruments">Instruments</th>
+                              <th class="sortable" data-sort-key="status">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="positionsTableBody"></tbody>
+                        </table>
+                      </div>
+                      <p class="table-footnote">Select a book to inspect top holdings, venue allocation, and operator rationale. Venue names link to the venues panel.</p>
+                    </div>
+
+                    <aside class="detail-rail">
+                      <div class="detail-shell" id="positionDetail" data-detail-for="positions" aria-live="polite"></div>
+                    </aside>
+
+                    <div class="filter-empty" id="positionsFilterEmpty" aria-live="polite">
+                      <p class="panel-label">No matching positions</p>
+                      <strong>Current filter removed every book from view.</strong>
+                      <p>Switch to another status filter or select All to restore the position table.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="workspace-panel" id="panel-venues" data-panel-body>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Venue health</p>
+                      <strong>Connected cluster</strong>
+                    </div>
+                    <span class="status-pill" id="venuesActivePill">0 live</span>
+                  </div>
+                  <div class="venues-workbench">
+                    <div class="venue-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th class="sortable" data-sort-key="name">Venue</th>
+                              <th class="sortable" data-sort-key="state">State</th>
+                              <th class="sortable" data-sort-key="fillQuality">Load</th>
+                              <th class="sortable numeric" data-sort-key="queueDepth">Queue</th>
+                              <th class="sortable" data-sort-key="routed">Routed</th>
+                              <th class="sortable" data-sort-key="readiness">Failover</th>
+                            </tr>
+                          </thead>
+                          <tbody id="venuesTableBody"></tbody>
+                        </table>
+                      </div>
+                      <p class="table-footnote">Select a venue to inspect load, routed orders, and failover readiness. Routed order ids jump to the orders lane.</p>
+                    </div>
+
+                    <aside class="detail-rail">
+                      <div class="detail-shell" id="venueDetail" data-detail-for="venues" aria-live="polite"></div>
+                    </aside>
+
+                    <div class="filter-empty" id="venuesFilterEmpty" aria-live="polite">
+                      <p class="panel-label">No matching venues</p>
+                      <strong>Current filter removed every venue from view.</strong>
+                      <p>Switch to another state filter or select All to restore the venue table.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="workspace-panel" id="panel-risk" data-panel-body>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Risk review</p>
+                      <strong>Operator review queue</strong>
+                    </div>
+                    <span class="status-pill" id="riskActivePill">0 pending</span>
+                  </div>
+                  <div class="risk-workbench">
+                    <div class="risk-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th class="sortable" data-sort-key="type">Alert</th>
+                              <th class="sortable" data-sort-key="severity">Severity</th>
+                              <th class="sortable" data-sort-key="venue">Venue</th>
+                              <th class="sortable" data-sort-key="timestamp">Time</th>
+                              <th class="sortable" data-sort-key="status">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="riskTableBody"></tbody>
+                        </table>
+                      </div>
+                      <p class="table-footnote">Select an alert to review rationale, recommendation, and take accept or defer action.</p>
+                    </div>
+
+                    <aside class="detail-rail">
+                      <div class="detail-shell" id="riskDetail" data-detail-for="risk" aria-live="polite"></div>
+                    </aside>
+
+                    <div class="filter-empty" id="riskFilterEmpty" aria-live="polite">
+                      <p class="panel-label">No matching alerts</p>
+                      <strong>Current filter removed every alert from the queue.</strong>
+                      <p>Switch to another status filter or select All to restore the risk review table.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="workspace-panel" id="panel-settings" data-panel-body>
+                <div class="dual-grid">
+                  <article class="data-card">
+                    <div class="card-head">
+                      <div>
+                        <p class="panel-label">Workspace profile</p>
+                        <strong>Operator preferences</strong>
+                      </div>
+                      <span class="status-pill" id="settingsSavedPill">Saved</span>
+                    </div>
+                    <div class="settings-form">
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingModeBias">Mode bias</label>
+                        <p class="setting-hint">Default routing posture applied to new orders.</p>
+                        <select class="setting-select" id="settingModeBias">
+                          <option value="Balanced Sweep">Balanced Sweep</option>
+                          <option value="Latency Shield">Latency Shield</option>
+                          <option value="Inventory Protect">Inventory Protect</option>
+                          <option value="Passive Ladder">Passive Ladder</option>
+                          <option value="Fallback Mesh">Fallback Mesh</option>
+                        </select>
+                      </div>
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingAlertCadence">Alert cadence</label>
+                        <p class="setting-hint">How often the adaptive feed pushes new system events.</p>
+                        <select class="setting-select" id="settingAlertCadence">
+                          <option value="5000">Every 5 seconds</option>
+                          <option value="9000" selected>Every 9 seconds</option>
+                          <option value="15000">Every 15 seconds</option>
+                          <option value="30000">Every 30 seconds</option>
+                        </select>
+                      </div>
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingFallbackPolicy">Fallback policy</label>
+                        <p class="setting-hint">How HydraX responds when a venue degrades or goes offline.</p>
+                        <select class="setting-select" id="settingFallbackPolicy">
+                          <option value="graceful">Graceful degrade</option>
+                          <option value="aggressive">Aggressive reroute</option>
+                          <option value="hold">Hold and wait</option>
+                        </select>
+                      </div>
+                      <div class="setting-row">
+                        <label class="setting-label" for="settingTheme">Workspace density</label>
+                        <p class="setting-hint">Controls table row height and panel spacing.</p>
+                        <select class="setting-select" id="settingDensity">
+                          <option value="comfortable">Comfortable</option>
+                          <option value="compact">Compact</option>
+                        </select>
+                      </div>
+                    </div>
+                  </article>
+                  <article class="data-card">
+                    <div class="card-head">
+                      <div>
+                        <p class="panel-label">Active configuration</p>
+                        <strong>Live workspace state</strong>
+                      </div>
+                    </div>
+                    <ul class="insight-list" id="settingsReadout">
+                      <li><span>Mode bias</span><strong id="readoutModeBias">Balanced Sweep</strong></li>
+                      <li><span>Alert cadence</span><strong id="readoutAlertCadence">Every 9 seconds</strong></li>
+                      <li><span>Fallback policy</span><strong id="readoutFallbackPolicy">Graceful degrade</strong></li>
+                      <li><span>Density</span><strong id="readoutDensity">Comfortable</strong></li>
+                    </ul>
+                    <p class="narrative-copy settings-note">Changes apply immediately and persist across sessions via local storage.</p>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-panel" id="panel-activity" data-panel-body>
+                <div class="data-card">
+                  <div class="card-head">
+                    <div>
+                      <p class="panel-label">Operator activity</p>
+                      <strong>Session action log</strong>
+                    </div>
+                    <span class="status-pill" id="activityCountPill">0 entries</span>
+                    <button class="button button-ghost small clear-log-btn" id="clearActivityLog" type="button">Clear log</button>
+                  </div>
+                  <div class="activity-workbench">
+                    <div class="activity-lane">
+                      <div class="table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Time</th>
+                              <th>Action</th>
+                              <th>Detail</th>
+                            </tr>
+                          </thead>
+                          <tbody id="activityTableBody"></tbody>
+                        </table>
+                      </div>
+                      <p class="table-footnote">Actions persist across sessions via local storage. Use Clear log to reset.</p>
+                    </div>
+                    <div class="activity-empty" id="activityEmpty">
+                      <p class="panel-label">No activity yet</p>
+                      <strong>Interact with the workspace to populate the log.</strong>
+                      <p>Panel switches, filter changes, risk resolutions, and cross-panel jumps are recorded here.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="mission-grid" id="mission">
+          <article class="mission-copy">
+            <p class="eyebrow">Mission profile</p>
+            <h2>Built for operators who need confidence under pressure.</h2>
+            <p>
+              HydraX now has a credible product shell and a usable workspace layer:
+              landing narrative, dashboard navigation, state patterns, and structured
+              operating surfaces ready for deeper data wiring.
+            </p>
+          </article>
+
+          <article class="mission-log">
+            <div class="mission-log-header">
+              <p class="panel-label">Adaptive feed</p>
+              <strong>Recent system events</strong>
+            </div>
+            <ul id="eventFeed">
+              <li><span class="event-time">08:14</span><p>Priority shifted toward Singapore Nexus after spread tightened.</p></li>
+              <li><span class="event-time">08:11</span><p>Frankfurt Loop moved to warm standby during latency spike.</p></li>
+              <li><span class="event-time">08:06</span><p>Inventory skew threshold compressed for the Asia session open.</p></li>
+            </ul>
+          </article>
+        </section>
+      </main>
     </div>
 
-    <nav class="grid">
-      <a class="card" href="/issuer/">
-        <p class="card-eyebrow">Issuer</p>
-        <h2 class="card-title">issuer-portal</h2>
-        <p class="card-desc">Tokenized-product workbench — create, approve, transition lifecycle states.</p>
-      </a>
-      <a class="card" href="/distributor/">
-        <p class="card-eyebrow">Distributor</p>
-        <h2 class="card-title">distributor-portal</h2>
-        <p class="card-desc">Approval queue + decision UI for product launch and subscription approvals.</p>
-      </a>
-      <a class="card" href="/investor/">
-        <p class="card-eyebrow">Investor</p>
-        <h2 class="card-title">investor-portal</h2>
-        <p class="card-desc">Subscription lookup + upstream-health visibility into the platform.</p>
-      </a>
-      <a class="card" href="/ops/">
-        <p class="card-eyebrow">Ops</p>
-        <h2 class="card-title">ops-console</h2>
-        <p class="card-desc">Audit-event search; SLA + incident surface placeholders for ops teams.</p>
-      </a>
-      <a class="card" href="/admin/">
-        <p class="card-eyebrow">Admin</p>
-        <h2 class="card-title">admin</h2>
-        <p class="card-desc">Tenant + user + role + integrations management for platform administrators.</p>
-      </a>
-    </nav>
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-relevant="additions"></div>
 
-    <div class="footer">
-      Source: <a href="https://github.com/naimkatiman/hydrax-app">github.com/naimkatiman/hydrax-app</a>.
-      Each portal is a Vite + React + Redux Toolkit static bundle. Shared primitives live in
-      <code>web/packages/ui</code> + <code>web/packages/tenant-theme</code>.
-    </div>
-  </div>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
