@@ -1,0 +1,420 @@
+1
+00:00:00,530 --> 00:00:05,940
+Hey, I mean, I am going to do something ambitious for the next five minutes.
+
+2
+00:00:06,060 --> 00:00:09,800
+I will tell you what I think your adoption bottleneck on Cantonese.
+
+3
+00:00:09,960 --> 00:00:15,200
+I will propose a wedge to break it and show you the working code I will around that thesis.
+
+4
+00:00:15,600 --> 00:00:20,440
+I might be talking past you on a few things, but please, please grill me at the end.
+
+5
+00:00:20,800 --> 00:00:23,000
+I will find out tonight, then next month.
+
+6
+00:00:25,520 --> 00:00:26,140
+Here's the thing.
+
+7
+00:00:26,420 --> 00:00:28,860
+Cantonese wins the regulated multi-party tokenization.
+
+8
+00:00:28,860 --> 00:00:36,600
+Pricey by design atomic interoperability that model that fits how easy to shine actually work.
+
+9
+00:00:36,800 --> 00:00:41,100
+Hydra X wins because you are the regulated rails for Southeast Asia.
+
+10
+00:00:41,900 --> 00:00:46,430
+But the thing is also rails alone don't drive adoption.
+
+11
+00:00:46,830 --> 00:00:52,650
+The bottleneck between we have rail and issue a ship a product on them is the workflow layer above.
+
+12
+00:00:53,110 --> 00:00:57,270
+That's where you can grow fastest and that's the layer I would.
+
+13
+00:00:59,640 --> 00:01:03,520
+Three assumptions are making name up front so you can block them.
+
+14
+00:01:03,940 --> 00:01:05,840
+One institution won a tenant's surface.
+
+15
+00:01:06,020 --> 00:01:07,480
+You provide not their own boot.
+
+16
+00:01:08,040 --> 00:01:12,660
+Two, your roadmap once a white label, workflow plain, not bespoke per deal,
+
+17
+00:01:12,860 --> 00:01:15,820
+engineering three, Cantonese selective disclosure.
+
+18
+00:01:16,460 --> 00:01:19,820
+Cantonese selective disclosure is what made that plan defensible.
+
+19
+00:01:20,040 --> 00:01:24,860
+Again, a generic SaaS competitor tell me which breaks and the rest of this presentation
+
+20
+00:01:24,860 --> 00:01:26,040
+reshape your answer.
+
+21
+00:01:27,140 --> 00:01:29,500
+Instead of just pitching, I would that thing the rep.
+
+22
+00:01:31,020 --> 00:01:33,500
+Instead of just pitching, I would the thing.
+
+23
+00:01:33,680 --> 00:01:38,560
+The repo is Hydra X at app, live across three railways service right now,
+
+24
+00:01:38,940 --> 00:01:42,720
+portals, the Cantonese network, home website and the slide decks.
+
+25
+00:01:43,240 --> 00:01:49,740
+Nine bags and service seats go perform critical flow, approval audit,
+
+26
+00:01:50,560 --> 00:01:54,080
+market data, plus the Hydra X and Canton editors.
+
+27
+00:01:54,080 --> 00:01:58,500
+Three, not service for notification, integration and a BFF bet and for
+
+28
+00:01:58,500 --> 00:02:04,040
+front end. Five rolls, aware, portals, issuer, disruptor, investor, ops and admin,
+
+29
+00:02:04,280 --> 00:02:07,160
+running on bet demo mode that data.
+
+30
+00:02:08,200 --> 00:02:09,780
+So you can click around with that or bet end.
+
+31
+00:02:09,980 --> 00:02:12,960
+Of course, the time is consuming for that.
+
+32
+00:02:13,280 --> 00:02:14,420
+I just focus on demo.
+
+33
+00:02:15,000 --> 00:02:18,540
+Five demos, script modeling, the multi-party governance contract,
+
+34
+00:02:18,880 --> 00:02:22,120
+outs complete, pass key, magic link over real SMTP.
+
+35
+00:02:22,120 --> 00:02:25,720
+The developer only login removes before public exposure.
+
+36
+00:02:26,720 --> 00:02:30,240
+One workflow, end-to-end and investors are made a secretion.
+
+37
+00:02:30,520 --> 00:02:33,560
+Workflow service validated, approval service,
+
+38
+00:02:33,860 --> 00:02:36,980
+upon the care menu with an SLA timer.
+
+39
+00:02:37,300 --> 00:02:39,020
+Notification service, fan out, the approval,
+
+40
+00:02:39,400 --> 00:02:43,580
+keep, accept, demo, Hydra X, adapter, post, their issuance.
+
+41
+00:02:43,940 --> 00:02:48,080
+The Canton editor commits the damn DML script comment and
+
+42
+00:02:48,960 --> 00:02:52,360
+also in my mode is synchronized.
+
+43
+00:02:52,680 --> 00:02:56,780
+Audit locks every state change.
+
+44
+00:02:57,280 --> 00:02:59,360
+Every transition, approval, approval,
+
+45
+00:03:00,220 --> 00:03:03,880
+replayable and the Canton specific question, tokenization stands.
+
+46
+00:03:04,360 --> 00:03:07,600
+DeFi, composability and privacy, infrastructure, setup,
+
+47
+00:03:08,000 --> 00:03:08,940
+cross-domain, data sync.
+
+48
+00:03:09,180 --> 00:03:12,720
+Each get dedicated that panel and a matching portal rate model.
+
+49
+00:03:13,450 --> 00:03:15,760
+The Hydra X rail smart is a deliberately
+
+50
+00:03:16,620 --> 00:03:19,400
+things where your real API is efficient.
+
+51
+00:03:19,800 --> 00:03:21,990
+I can of course get into it.
+
+52
+00:03:22,460 --> 00:03:24,380
+It slots in behind the same interface,
+
+53
+00:03:24,520 --> 00:03:26,300
+no rewrite on the workflow stack.
+
+54
+00:03:26,540 --> 00:03:28,820
+If we want to replace it with the real API,
+
+55
+00:03:29,160 --> 00:03:30,980
+it's almost plot and play.
+
+56
+00:03:32,220 --> 00:03:33,520
+So this is the business idea.
+
+57
+00:03:34,460 --> 00:03:37,900
+Hydra position, not just as the regulated rails,
+
+58
+00:03:38,080 --> 00:03:42,260
+but also the workflow layer above them for institutional tokenization
+
+59
+00:03:42,260 --> 00:03:43,480
+in Southeast Asia.
+
+60
+00:03:44,020 --> 00:03:48,080
+What level per tenant 3 persona is your disruptive market operator?
+
+61
+00:03:48,520 --> 00:03:50,320
+First wage, short duration credit,
+
+62
+00:03:52,000 --> 00:03:53,960
+3280 day tenant institutional.
+
+63
+00:03:55,160 --> 00:03:57,140
+That's where the volume lies.
+
+64
+00:03:57,340 --> 00:03:59,000
+Regulator are friendly to the instrument
+
+65
+00:03:59,000 --> 00:04:03,160
+and the cycle is short enough to prove the platform inside one quarter.
+
+66
+00:04:04,060 --> 00:04:07,240
+Pricing, hybrid setup plus platform plus volume.
+
+67
+00:04:08,040 --> 00:04:10,680
+Set up pace for the integration world platform pace
+
+68
+00:04:10,680 --> 00:04:11,960
+for the operating interface.
+
+69
+00:04:12,180 --> 00:04:13,440
+Volume pace for the rail.
+
+70
+00:04:13,920 --> 00:04:16,820
+Why this bit letting, why this bit letting
+
+71
+00:04:16,820 --> 00:04:18,280
+institution and build their own,
+
+72
+00:04:18,620 --> 00:04:20,060
+they don't want to maintain the workflow code.
+
+73
+00:04:20,260 --> 00:04:22,020
+Regulator one, auditable surface.
+
+74
+00:04:25,880 --> 00:04:28,540
+Why this bit letting institution build their own?
+
+75
+00:04:28,840 --> 00:04:30,480
+They don't want to maintain workflow code.
+
+76
+00:04:30,720 --> 00:04:33,840
+Regulators one, one auditable surface to look at
+
+77
+00:04:33,840 --> 00:04:35,860
+and you land adoption per tenant,
+
+78
+00:04:36,240 --> 00:04:37,640
+rather than per developer.
+
+79
+00:04:38,240 --> 00:04:39,900
+The unit of growth become a desk,
+
+80
+00:04:40,120 --> 00:04:41,280
+not integration to can.
+
+81
+00:04:42,350 --> 00:04:44,650
+For open question from the PRD,
+
+82
+00:04:44,910 --> 00:04:47,130
+I would eat on my assumption decision
+
+83
+00:04:47,130 --> 00:04:48,950
+memo for the each in the repo.
+
+84
+00:04:49,470 --> 00:04:53,590
+Q1, yours, API surface, I build the mock ready for the drop.
+
+85
+00:04:54,170 --> 00:04:56,970
+Q2, first product type, short duration credit,
+
+86
+00:04:57,250 --> 00:04:59,770
+FSM, wired in the workflow service today.
+
+87
+00:05:00,250 --> 00:05:03,130
+Q3, first tenant, usually led for the fastest land.
+
+88
+00:05:03,610 --> 00:05:07,330
+Q4, pricing, hybrid setup plus platform plus volume.
+
+89
+00:05:07,670 --> 00:05:08,910
+Non-block shipping the stack.
+
+90
+00:05:10,240 --> 00:05:11,220
+Last one at least.
+
+91
+00:05:11,220 --> 00:05:13,720
+Three things I want out of this conversation.
+
+92
+00:05:14,060 --> 00:05:15,760
+One, validate or reject your wedge,
+
+93
+00:05:16,100 --> 00:05:17,780
+short duration credit, tenant led,
+
+94
+00:05:18,000 --> 00:05:19,700
+what level workflow above your left.
+
+95
+00:05:20,300 --> 00:05:24,060
+Or two, really check my question one,
+
+96
+00:05:24,200 --> 00:05:25,340
+two, question four, just now.
+
+97
+00:05:25,720 --> 00:05:27,960
+Three, tell me, where am I met of Hydra,
+
+98
+00:05:28,120 --> 00:05:31,080
+X-Ectual roadmap diverge from yours?
+
+99
+00:05:31,440 --> 00:05:33,240
+Because the gap is where I'm flying blind.
+
+100
+00:05:33,820 --> 00:05:38,060
+I don't know what I'm doing right now.
+
+101
+00:05:38,540 --> 00:05:40,420
+Of course, we limited time of recession.
+
+102
+00:05:40,420 --> 00:05:41,800
+The rest are yours.
+
+103
+00:05:42,060 --> 00:05:43,820
+Not mine, the workflow layer is moving.
+
+104
+00:05:44,120 --> 00:05:44,920
+Gryll me on that.
+
+105
+00:05:45,450 --> 00:05:46,610
+Thank you very much.
+

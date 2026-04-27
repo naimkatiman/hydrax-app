@@ -1,0 +1,105 @@
+[00:00] Hey, I mean, I am going to do something ambitious for the next five minutes.
+[00:06] I will tell you what I think your adoption bottleneck on Cantonese.
+[00:09] I will propose a wedge to break it and show you the working code I will around that thesis.
+[00:15] I might be talking past you on a few things, but please, please grill me at the end.
+[00:20] I will find out tonight, then next month.
+[00:25] Here's the thing.
+[00:26] Cantonese wins the regulated multi-party tokenization.
+[00:28] Pricey by design atomic interoperability that model that fits how easy to shine actually work.
+[00:36] Hydra X wins because you are the regulated rails for Southeast Asia.
+[00:41] But the thing is also rails alone don't drive adoption.
+[00:46] The bottleneck between we have rail and issue a ship a product on them is the workflow layer above.
+[00:53] That's where you can grow fastest and that's the layer I would.
+[00:59] Three assumptions are making name up front so you can block them.
+[01:03] One institution won a tenant's surface.
+[01:06] You provide not their own boot.
+[01:08] Two, your roadmap once a white label, workflow plain, not bespoke per deal,
+[01:12] engineering three, Cantonese selective disclosure.
+[01:16] Cantonese selective disclosure is what made that plan defensible.
+[01:20] Again, a generic SaaS competitor tell me which breaks and the rest of this presentation
+[01:24] reshape your answer.
+[01:27] Instead of just pitching, I would that thing the rep.
+[01:31] Instead of just pitching, I would the thing.
+[01:33] The repo is Hydra X at app, live across three railways service right now,
+[01:38] portals, the Cantonese network, home website and the slide decks.
+[01:43] Nine bags and service seats go perform critical flow, approval audit,
+[01:50] market data, plus the Hydra X and Canton editors.
+[01:54] Three, not service for notification, integration and a BFF bet and for
+[01:58] front end. Five rolls, aware, portals, issuer, disruptor, investor, ops and admin,
+[02:04] running on bet demo mode that data.
+[02:08] So you can click around with that or bet end.
+[02:09] Of course, the time is consuming for that.
+[02:13] I just focus on demo.
+[02:15] Five demos, script modeling, the multi-party governance contract,
+[02:18] outs complete, pass key, magic link over real SMTP.
+[02:22] The developer only login removes before public exposure.
+[02:26] One workflow, end-to-end and investors are made a secretion.
+[02:30] Workflow service validated, approval service,
+[02:33] upon the care menu with an SLA timer.
+[02:37] Notification service, fan out, the approval,
+[02:39] keep, accept, demo, Hydra X, adapter, post, their issuance.
+[02:43] The Canton editor commits the damn DML script comment and
+[02:48] also in my mode is synchronized.
+[02:52] Audit locks every state change.
+[02:57] Every transition, approval, approval,
+[03:00] replayable and the Canton specific question, tokenization stands.
+[03:04] DeFi, composability and privacy, infrastructure, setup,
+[03:08] cross-domain, data sync.
+[03:09] Each get dedicated that panel and a matching portal rate model.
+[03:13] The Hydra X rail smart is a deliberately
+[03:16] things where your real API is efficient.
+[03:19] I can of course get into it.
+[03:22] It slots in behind the same interface,
+[03:24] no rewrite on the workflow stack.
+[03:26] If we want to replace it with the real API,
+[03:29] it's almost plot and play.
+[03:32] So this is the business idea.
+[03:34] Hydra position, not just as the regulated rails,
+[03:38] but also the workflow layer above them for institutional tokenization
+[03:42] in Southeast Asia.
+[03:44] What level per tenant 3 persona is your disruptive market operator?
+[03:48] First wage, short duration credit,
+[03:52] 3280 day tenant institutional.
+[03:55] That's where the volume lies.
+[03:57] Regulator are friendly to the instrument
+[03:59] and the cycle is short enough to prove the platform inside one quarter.
+[04:04] Pricing, hybrid setup plus platform plus volume.
+[04:08] Set up pace for the integration world platform pace
+[04:10] for the operating interface.
+[04:12] Volume pace for the rail.
+[04:13] Why this bit letting, why this bit letting
+[04:16] institution and build their own,
+[04:18] they don't want to maintain the workflow code.
+[04:20] Regulator one, auditable surface.
+[04:25] Why this bit letting institution build their own?
+[04:28] They don't want to maintain workflow code.
+[04:30] Regulators one, one auditable surface to look at
+[04:33] and you land adoption per tenant,
+[04:36] rather than per developer.
+[04:38] The unit of growth become a desk,
+[04:40] not integration to can.
+[04:42] For open question from the PRD,
+[04:44] I would eat on my assumption decision
+[04:47] memo for the each in the repo.
+[04:49] Q1, yours, API surface, I build the mock ready for the drop.
+[04:54] Q2, first product type, short duration credit,
+[04:57] FSM, wired in the workflow service today.
+[05:00] Q3, first tenant, usually led for the fastest land.
+[05:03] Q4, pricing, hybrid setup plus platform plus volume.
+[05:07] Non-block shipping the stack.
+[05:10] Last one at least.
+[05:11] Three things I want out of this conversation.
+[05:14] One, validate or reject your wedge,
+[05:16] short duration credit, tenant led,
+[05:18] what level workflow above your left.
+[05:20] Or two, really check my question one,
+[05:24] two, question four, just now.
+[05:25] Three, tell me, where am I met of Hydra,
+[05:28] X-Ectual roadmap diverge from yours?
+[05:31] Because the gap is where I'm flying blind.
+[05:33] I don't know what I'm doing right now.
+[05:38] Of course, we limited time of recession.
+[05:40] The rest are yours.
+[05:42] Not mine, the workflow layer is moving.
+[05:44] Gryll me on that.
+[05:45] Thank you very much.
