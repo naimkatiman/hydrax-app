@@ -4,7 +4,7 @@
 
 Add a single teal highlight color (and image-overlay tint) to the two static surfaces the user named:
 
-1. `web/portal-deploy/styles.css` — landing page + ambient styling for the 5 sub-portal sub-trees served at `https://hydrax-portals-production.up.railway.app/`
+1. `web/portal-deploy/styles.css` — landing page + ambient styling for the 5 sub-portal sub-trees served at `https://hydraxrail.up.railway.app/`
 2. `docs/demo/canton-interview.html` — 9-slide standalone deck
 
 Keep the warm-grey core. Teal is *highlight*, not body. Use teal with low opacity for image overlays so photographs pick up a teal cast without losing legibility.

@@ -5,7 +5,7 @@
 > **Scope:** Public-facing pricing surface on the marketing site at `web/portal-deploy/`. Mockup only — no billing, no checkout, no commerce backend.
 
 - **Date:** 2026-04-26
-- **Trigger:** User asked "what about pricing dont we need to build it at least mockup" referencing https://hydrax-portals-production.up.railway.app/
+- **Trigger:** User asked "what about pricing dont we need to build it at least mockup" referencing https://hydraxrail.up.railway.app/
 - **Anchored on:** [docs/plans/2026-04-25-q7-pricing-model-options.md](2026-04-25-q7-pricing-model-options.md) — Option D (hybrid: setup + platform + metered volume) is the recommended commercial structure.
 - **Why now:** the deployed portal already has Solutions / Portals / Quickstart / Docs / Contact but no pricing section. Buyers landing on the site have no surface to read the commercial shape, even at the structure level. A mockup unblocks buyer conversations without committing dollar amounts (which still belong to HydraX commercial).
 

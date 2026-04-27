@@ -8,7 +8,7 @@
 
 ## Goal
 
-A user navigating to `https://hydrax-portals-production.up.railway.app/investor/products` sees real data fetched from a deployed BFF over HTTPS, not fixture data, with the same response shape the portals consume today. Demo mode remains an opt-in fallback for marketing demos and design reviews, not the default.
+A user navigating to `https://hydraxrail.up.railway.app/investor/products` sees real data fetched from a deployed BFF over HTTPS, not fixture data, with the same response shape the portals consume today. Demo mode remains an opt-in fallback for marketing demos and design reviews, not the default.
 
 ## Out of scope
 
@@ -62,14 +62,14 @@ BFF currently has no CORS middleware ([services/bff/src/](../../services/bff/src
 
 | Option | Description | Trade-off |
 |---|---|---|
-| **A — Strict allowlist** *(recommended)* | `Access-Control-Allow-Origin: https://hydrax-portals-production.up.railway.app` (single origin, env-driven). Methods: GET/POST/PATCH. Credentials: false (no cookies in v1 stub auth). | Smallest blast radius; aligns with PRD §13 least-privilege default. |
+| **A — Strict allowlist** *(recommended)* | `Access-Control-Allow-Origin: https://hydraxrail.up.railway.app` (single origin, env-driven). Methods: GET/POST/PATCH. Credentials: false (no cookies in v1 stub auth). | Smallest blast radius; aligns with PRD §13 least-privilege default. |
 | B — Wildcard `*` | Easy for development; never ship. | Reject. |
 
 **Default:** A. Plan adds a small CORS module to bff with `BFF_CORS_ALLOWED_ORIGIN` env var consumed at startup.
 
 ## Assumptions
 
-1. The 5 SPAs at `hydrax-portals-production.up.railway.app` keep the same routing (`/issuer/`, `/distributor/`, `/investor/`, `/ops/`, `/admin/`). BFF is reached at the new origin via `VITE_BFF_URL` — same-origin is not required.
+1. The 5 SPAs at `hydraxrail.up.railway.app` keep the same routing (`/issuer/`, `/distributor/`, `/investor/`, `/ops/`, `/admin/`). BFF is reached at the new origin via `VITE_BFF_URL` — same-origin is not required.
 2. workflow-svc Dockerfile + tests pass per `2026-04-25-backend-services-scaffold.md`. `go vet` + `go test` green per-service before deploy.
 3. workflow-svc migrations are reversible and dry-runnable on an empty fixture per [Verification Gates](../../CLAUDE.md). The 3-second `PingContext` startup probe (per CLAUDE.md "If unset, the binary still serves /healthz but logs DATABASE_URL unset") will fail-fast on a bad DSN.
 4. Demo mode stays as an opt-in. The post-BFF rebuild does NOT remove the demo flag — the [api-client](../../web/packages/api-client/src/api.ts) keeps both code paths so a `VITE_DEMO_MODE=true` rebuild can ship at any time for design reviews.
@@ -109,7 +109,7 @@ BFF currently has no CORS middleware ([services/bff/src/](../../services/bff/src
 **Files:** none (deploy-only)
 **What:**
 - `railway link --service hydrax-bff`
-- Set env: `WORKFLOW_SVC_URL=https://hydrax-workflow-svc-production.up.railway.app` + (`APPROVAL_SVC_URL`, `AUDIT_SVC_URL`, `HYDRAX_ADAPTER_URL` if Q1=C; left unset if Q1=B), plus `BFF_CORS_ALLOWED_ORIGIN=https://hydrax-portals-production.up.railway.app`, `PORT=7103`.
+- Set env: `WORKFLOW_SVC_URL=https://hydrax-workflow-svc-production.up.railway.app` + (`APPROVAL_SVC_URL`, `AUDIT_SVC_URL`, `HYDRAX_ADAPTER_URL` if Q1=C; left unset if Q1=B), plus `BFF_CORS_ALLOWED_ORIGIN=https://hydraxrail.up.railway.app`, `PORT=7103`.
 - `railway up --path-as-root . --detach` from `services/bff/`
 **Verification:** `curl https://hydrax-bff-production.up.railway.app/healthz/composite | jq` returns the `bff` envelope with each upstream's status. workflow-svc tile shows `ok`; the unconfigured upstreams show `unreachable` (expected per Q1=B); the structured composite envelope is correct.
 **Commit:** `chore(deploy): bff service env wiring`
@@ -154,7 +154,7 @@ Per [CLAUDE.md Verification Gates](../../CLAUDE.md):
 - DB: migrations dry-run on empty + seeded fixture (workflow-svc has these per `2026-04-25-backend-services-scaffold.md`).
 - Live probes:
   - `curl -sS https://hydrax-bff-production.up.railway.app/healthz/composite | jq .upstreams` lists workflow-svc.
-  - `curl -sS -H "Origin: https://hydrax-portals-production.up.railway.app" -X OPTIONS https://hydrax-bff-production.up.railway.app/v1/products` returns 204 with the matching `Access-Control-Allow-Origin`.
+  - `curl -sS -H "Origin: https://hydraxrail.up.railway.app" -X OPTIONS https://hydrax-bff-production.up.railway.app/v1/products` returns 204 with the matching `Access-Control-Allow-Origin`.
   - Browser fetch to `/v1/products` from the portals origin succeeds (no CORS console error).
 
 ## Past-mistakes to avoid

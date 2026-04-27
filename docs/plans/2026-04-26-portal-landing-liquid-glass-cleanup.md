@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:dispatching-parallel-agents (HTML, CSS, JS, imagery agents work concurrently against the DOM contract in §2). Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the wrong-product execution-trading landing at `hydrax-portals-production.up.railway.app` with a hydrax.io-aligned institutional workflow landing that gets a visitor from "what is this?" to "I am inside the right portal" in under 10 seconds, with liquid-glass surfaces.
+**Goal:** Replace the wrong-product execution-trading landing at `hydraxrail.up.railway.app` with a hydrax.io-aligned institutional workflow landing that gets a visitor from "what is this?" to "I am inside the right portal" in under 10 seconds, with liquid-glass surfaces.
 
 **Architecture:** Single static-site deploy under `web/portal-deploy/`. Three hand-edited files (`index.html`, `styles.css`, `app.js`) plus an `assets/` folder for imagery. The 5 React portals (issuer/distributor/investor/ops/admin) keep their built `dist/` output as subdirectory targets — the React apps themselves are out of scope. Rewrite is destructive, not additive: the workspace/orders/venues/risk/positions/settings/activity sections from the old prototype are deleted from the landing because (a) they describe a trading product that doesn't exist, (b) they have a separate deploy at `hydrax-prototype-production.up.railway.app`, and (c) they bury the actual portal entry CTAs.
 
@@ -724,7 +724,7 @@ EOF
 
 - [ ] **Step 5: STOP. Do NOT deploy.** Surface the diff to the user.
 
-Deploy to a public URL (`hydrax-portals-production.up.railway.app`) is a shared-systems modification — auto mode does not authorize it. Run:
+Deploy to a public URL (`hydraxrail.up.railway.app`) is a shared-systems modification — auto mode does not authorize it. Run:
 
 ```bash
 git log -1 --stat
@@ -746,12 +746,12 @@ Wait for explicit user authorization. Do not deploy on a generic "yes" or "conti
 
 Once user authorizes (either by deploying themselves or with the named phrase):
 - If user deployed themselves, ask them to confirm the deployment id + status. Curl-check the live URL.
-- If user authorized you: run `cd web/portal-deploy && railway up --detach`. Capture deployment id + status. `curl -sI https://hydrax-portals-production.up.railway.app/` must return 200. Curl-check the rendered title contains "Institutional Onboarding".
+- If user authorized you: run `cd web/portal-deploy && railway up --detach`. Capture deployment id + status. `curl -sI https://hydraxrail.up.railway.app/` must return 200. Curl-check the rendered title contains "Institutional Onboarding".
 
 Append to STATE.yaml `verification_log`:
 
 ```
-2026-04-26 — portal-landing-cleanup: node --check passes; ID audit clean; asset audit warn-only (gradient fallbacks active); wc -l index.html=N styles.css=N app.js=N; local serve smoke 200; git diff --stat confirms 3 code files + N assets + STATE.yaml; commit <sha>; deploy authorized by user; railway deployment id=<...> status=SUCCESS; live https://hydrax-portals-production.up.railway.app returns 200 with new title. Visual fit verification deferred to user (gate only proves contracts + HTTP, not layout).
+2026-04-26 — portal-landing-cleanup: node --check passes; ID audit clean; asset audit warn-only (gradient fallbacks active); wc -l index.html=N styles.css=N app.js=N; local serve smoke 200; git diff --stat confirms 3 code files + N assets + STATE.yaml; commit <sha>; deploy authorized by user; railway deployment id=<...> status=SUCCESS; live https://hydraxrail.up.railway.app returns 200 with new title. Visual fit verification deferred to user (gate only proves contracts + HTTP, not layout).
 ```
 
 ## §7 — Out of scope (write down so it doesn't creep)

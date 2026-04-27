@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Recolor the deployed Railway portal stack (landing + 5 React portals at `https://hydrax-portals-production.up.railway.app/`) onto a single neutral-grey design language, fix responsive collapse on the shared `<AppShell>`, and align typography and spacing tokens across the static landing and React portals so the tenant default looks like one product across all six surfaces.
+**Goal:** Recolor the deployed Railway portal stack (landing + 5 React portals at `https://hydraxrail.up.railway.app/`) onto a single neutral-grey design language, fix responsive collapse on the shared `<AppShell>`, and align typography and spacing tokens across the static landing and React portals so the tenant default looks like one product across all six surfaces.
 
 **Architecture:** Two parallel token systems exist today — `--hx-*` in `web/portal-deploy/styles.css` (landing only) and `--hydrax-*` from `@hydrax/tenant-theme` (5 React portals). Both currently render blue-grey base + cyan/blue accent. The slice rewrites both palettes to a neutral-grey base + warm-grey accent (no hue chroma in the base; only a single low-sat warm grey for accent surfaces), and fixes the shared shell's known responsive gaps. Per-portal route content (HomeRoute, Sidebar, TopBar) inherits via tokens; no per-app cosmetic edits.
 
@@ -398,7 +398,7 @@ Expected: build id + deploy SUCCESS. Record both in STATE.yaml `verification_log
 
 - [ ] **Step 4: Healthcheck.**
 
-Run: `curl -sI https://hydrax-portals-production.up.railway.app/ | head -1`
+Run: `curl -sI https://hydraxrail.up.railway.app/ | head -1`
 Expected: `HTTP/2 200`.
 
 - [ ] **Step 5: User visual sign-off.** Open the URL, confirm grey-core palette, click into each portal subpath. Halt for user verdict.

@@ -3,9 +3,9 @@
 **Trigger:** user asked to audit three deployed surfaces and align them, then refresh the README.
 
 **Surfaces in scope:**
-- `https://hydrax-portals-production.up.railway.app/` — 5-portal marketing landing + the SPAs themselves
-- `https://hydrax-context-production.up.railway.app/` — interview/homework cover page
-- `https://hydrax-context-production.up.railway.app/deck` — 18-slide homework deck
+- `https://hydraxrail.up.railway.app/` — 5-portal marketing landing + the SPAs themselves
+- `https://hydrax-layer.up.railway.app/` — interview/homework cover page
+- `https://hydrax-layer.up.railway.app/deck` — 18-slide homework deck
 
 ## What an interviewer crossing all three sees today
 
@@ -43,7 +43,7 @@
 - "8 services, 5 portals" → "9 services, 5 portals" (line 2443, slide-16 title)
 
 ### Phase 3 — Cross-surface linking
-- Portals landing: add a top-nav link **"Architecture"** → `https://hydrax-context-production.up.railway.app/` (places it next to Solutions/Portals/Quickstart/Pricing/Docs/Contact). Target `_blank`.
+- Portals landing: add a top-nav link **"Architecture"** → `https://hydrax-layer.up.railway.app/` (places it next to Solutions/Portals/Quickstart/Pricing/Docs/Contact). Target `_blank`.
 - Deck: add a fixed-position **"← Context"** back-link in the chrome (top-left, next to the slide counter), targeting `/`.
 
 ### Phase 4 — README refresh

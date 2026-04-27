@@ -7,7 +7,7 @@
 
 ## Problem
 
-`docs/demo/canton-interview.html` (and its deployed twin `docs/demo/site/deck.html` at `hydrax-context-production.up.railway.app`) tells the *architecture-positioning* story — Canton owns the rails, we own the layer above. Nine slides, dense, opinionated, but **not structured to answer the homework prompt's three required sections**.
+`docs/demo/canton-interview.html` (and its deployed twin `docs/demo/site/deck.html` at `hydrax-layer.up.railway.app`) tells the *architecture-positioning* story — Canton owns the rails, we own the layer above. Nine slides, dense, opinionated, but **not structured to answer the homework prompt's three required sections**.
 
 The homework asks for:
 
@@ -19,7 +19,7 @@ The current deck mixes (1) and (3) and answers (2) only via the prototype. A rev
 
 ## Goal
 
-Ship a single homework-aligned deck — `docs/demo/canton-homework-deck.html` — that reads top-to-bottom as a direct answer to the three sections, **without abandoning the architectural opinions** that make the existing deck distinct. Replace the deployed `site/deck.html` with the new deck so reviewers landing on `hydrax-context-production.up.railway.app/deck` see the homework answer.
+Ship a single homework-aligned deck — `docs/demo/canton-homework-deck.html` — that reads top-to-bottom as a direct answer to the three sections, **without abandoning the architectural opinions** that make the existing deck distinct. Replace the deployed `site/deck.html` with the new deck so reviewers landing on `hydrax-layer.up.railway.app/deck` see the homework answer.
 
 Keep `canton-interview.html` in place as the source / alternate (linked from README "Canton interview deck" section). Two artifacts, one canonical homework answer.
 

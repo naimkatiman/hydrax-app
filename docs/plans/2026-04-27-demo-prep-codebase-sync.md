@@ -19,11 +19,11 @@ User asked: "based on update codebase u need to update too." The demo script + s
 | "Subscription lifecycle and approval persistence land this week" | Both **landed** 2026-04-26 | sublifecycle FSM commit 8038f66, approvals Postgres commits 1d5a5ae/45f2e9f/e01c05b/221d5fc/230bef8, audit emission on Transition commit 98a688d |
 | "Mocked HydraX adapter" | Accurate but expanded | hydrax-adapter Rails interface now includes Subscribe + TransferCustody + Settle + NAV (commit b67cd74). canton-adapter has an in-memory ledger with parties + commands + events HTTP (commit d1e9879). 31 hydrax-adapter tests, 23 canton-adapter tests. |
 | "First product type — short-duration credit, 30 to 180 day tenor (proposed)" | Accurate but advanced | Pure-logic Q3 credit FSM landed in `services/workflow-svc/internal/credit` (commit c8a2daa) with 12 legal edges + 6 negative cases. Q7 decision memo also complete (recommends Option D hybrid). |
-| Live URLs (implicit single Railway target) | **Three** Railway services | `hydrax-portals-production.up.railway.app` (institutional landing + 5 portals), `hydrax-context-production.up.railway.app` (Canton homework cover/deck/script bundle), `hydrax-prototype-production.up.railway.app` (bare original prototype) |
+| Live URLs (implicit single Railway target) | **Three** Railway services | `hydraxrail.up.railway.app` (institutional landing + 5 portals), `hydrax-layer.up.railway.app` (Canton homework cover/deck/script bundle), `hydrax-prototype-production.up.railway.app` (bare original prototype) |
 
 ## Production regression (discovered during pre-flight)
 
-`hydrax-context-production.up.railway.app` is serving the **operator-prototype landing** at every route (`/`, `/deck`, `/script`, `/interview`) — title `HydraX | Adaptive Liquidity Command` — instead of the Canton homework cover.
+`hydrax-layer.up.railway.app` is serving the **operator-prototype landing** at every route (`/`, `/deck`, `/script`, `/interview`) — title `HydraX | Adaptive Liquidity Command` — instead of the Canton homework cover.
 
 - **Source files in `docs/demo/site/` are correct** — `index.html` title is `Canton Network — and the layer above it · Naim Katiman`, `script.html` and `deck.html` carry their right contents.
 - **The deploy is wrong**, not the source.
@@ -46,7 +46,7 @@ User asked: "based on update codebase u need to update too." The demo script + s
 - Verification: spoken-word count under 800; element refs still resolve in `index.html`.
 
 ### 4. `docs/demo/shot-list.md`
-- WILL update: preamble "Recording setup" — note that production landing is `hydrax-portals-production.up.railway.app` (use this for executive-facing demos), bare prototype lives at `hydrax-prototype-production.up.railway.app` (use only if showing the operator-console fixture data), Canton bundle at `hydrax-context-production.up.railway.app` (currently regressed — see plan doc).
+- WILL update: preamble "Recording setup" — note that production landing is `hydraxrail.up.railway.app` (use this for executive-facing demos), bare prototype lives at `hydrax-prototype-production.up.railway.app` (use only if showing the operator-console fixture data), Canton bundle at `hydrax-layer.up.railway.app` (currently regressed — see plan doc).
 - Will NOT change: shot table, element-id anchors, recording gotchas.
 - Verification: anchor refs still resolve.
 
