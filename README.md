@@ -8,7 +8,13 @@ For the load-bearing operating rules see [CLAUDE.md](CLAUDE.md). For the product
 
 ## Live preview
 
-Landing page deployed at [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — institutional-grade entry surface that routes operators into the five role-scoped portals below.
+Three deployed surfaces, each with one job. Cross-linked top-nav + footer keep them coherent for an interviewer crossing between them.
+
+| Surface | URL | What it is |
+|---|---|---|
+| Multi-portal demo | [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) | Institutional-grade marketing landing routing into five role-scoped React portals. Built in **demo mode** — synthetic fixtures (3 institutional products, audit events, approvals) ship in the bundle; mutations don't round-trip. See `docs/demo/AUDIT-2026-04-27.md` for why. |
+| Architecture write-up | [hydrax-context-production.up.railway.app](https://hydrax-context-production.up.railway.app/) | Long-form companion to the deck — Canton primer, "what I built above the rails", three deep dives, deliberate deferrals. |
+| Slide deck | [hydrax-context-production.up.railway.app/deck](https://hydrax-context-production.up.railway.app/deck) | 18-slide homework deck. Three required sections (overview / building / deep dive) + four deep-dives + cover/close. Keyboard-navigable; `← Context` link returns to the write-up. |
 
 ![HydraX landing page](docs/demo/captures/landing.png)
 
@@ -52,7 +58,7 @@ This repo holds the off-ledger half so the on-ledger half can stay small.
 ```
 hydrax-app/
   index.html, app.js, styles.css     prototype operator console (Railway-deployed)
-  services/                          9 backend services (5 Go, 4 Node/TS)
+  services/                          9 backend services (6 Go, 3 Node/TS)
     workflow-svc/                    state machines, SLA, lifecycle (Postgres)
     approval-svc/                    sign-off chains
     audit-svc/                       append-only evidence (Postgres)
@@ -159,9 +165,9 @@ All four require external action to actually unblock.
 
 Two slide decks live in this repo. Both are single-file HTML, keyboard-navigable (←/→/space/PgUp/PgDn/Home/End, mouse-wheel paging, IntersectionObserver reveal, `prefers-reduced-motion` respected). Ambient hero imagery is generated via `/nano-banana` (provenance in [docs/demo/assets/assets-meta.json](docs/demo/assets/assets-meta.json)); the previews below are full rendered slide screenshots — text, architecture diagrams, and chrome — captured headless from the live HTML via [docs/demo/captures/capture-decks.js](docs/demo/captures/capture-decks.js).
 
-### Primary — homework-aligned deck (14 slides)
+### Primary — homework-aligned deck (18 slides)
 
-[docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) — structured directly around the homework's three required sections. Deployed at [hydrax-context-production.up.railway.app/deck](https://hydrax-context-production.up.railway.app/deck). Pairs with the long-form article [docs/demo/canton-homework.md](docs/demo/canton-homework.md).
+[docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) — structured directly around the homework's three required sections plus four deep-dives. Deployed at [hydrax-context-production.up.railway.app/deck](https://hydrax-context-production.up.railway.app/deck). Pairs with the long-form article [docs/demo/canton-homework.md](docs/demo/canton-homework.md). A fixed `← Context` link in the chrome returns to the write-up.
 
 | # | Section | Title | Slide |
 |---|---|---|---|
@@ -179,6 +185,10 @@ Two slide decks live in this repo. Both are single-file HTML, keyboard-navigable
 | 11 | §3 | Daml choices as state transitions | ![slide-11](docs/demo/captures/canton-homework/slide-11.jpg) |
 | 12 | §3 | What I built above Canton | ![slide-12](docs/demo/captures/canton-homework/slide-12.jpg) |
 | 13 | Close | Trade-offs now, roadmap next | ![slide-13](docs/demo/captures/canton-homework/slide-13.jpg) |
+| 14 | Deep dive · Tokenization | Tokens are Daml templates, not new primitives | ![slide-14](docs/demo/captures/canton-homework/slide-14.jpg) |
+| 15 | Deep dive · Composability | Composability moves up the stack | ![slide-15](docs/demo/captures/canton-homework/slide-15.jpg) |
+| 16 | Deep dive · Infrastructure | 9 services, 5 portals, one Railway project | ![slide-16](docs/demo/captures/canton-homework/slide-16.jpg) |
+| 17 | Deep dive · Data sync | Ledger truth, read-model speed | ![slide-17](docs/demo/captures/canton-homework/slide-17.jpg) |
 
 ### Alternate — architecture-positioning deck (9 slides)
 

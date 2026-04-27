@@ -1,4 +1,4 @@
-/* HydraX Workflow portal landing — dark by design.
+/* HydraX Rail portal landing — dark by design.
    `prefers-color-scheme` is intentionally NOT honored; the surface is dark-only.
    `backdrop-filter` rules are paired with an `@supports` solid-bg fallback. */
 

@@ -265,6 +265,34 @@
       align-items: center;
     }
 
+    .deck-home-link {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(36, 36, 36, 0.78);
+      border: 1px solid var(--hydrax-color-border);
+      font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;
+      font-size: 13px;
+      color: var(--hydrax-color-text-strong);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+    }
+
+    .deck-home-link:hover,
+    .deck-home-link:focus-visible {
+      border-color: var(--hydrax-color-accent);
+      color: var(--hydrax-color-accent);
+      background: var(--hydrax-color-accent-soft);
+      outline: none;
+    }
+
     .slide-nav b {
       color: var(--hydrax-color-accent);
       font-weight: 600;
@@ -368,7 +396,8 @@
     }
 
     @media print {
-      .slide-nav {
+      .slide-nav,
+      .deck-home-link {
         display: none;
       }
 
@@ -388,6 +417,10 @@
 </head>
 
 <body>
+  <a class="deck-home-link" href="/" aria-label="Back to context page">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    <span>Context</span>
+  </a>
   <div class="slide-nav" aria-label="Slide navigation">
     <button type="button" data-nav="prev" aria-label="Previous slide">&larr;</button>
     Slide <b id="slide-num">1</b> <small>/ 18</small>
@@ -1040,7 +1073,7 @@
         style="position: absolute; top: 668px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent); vertical-align: middle; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Pick the row that hurts most in your domain. For regulated finance: visibility and privacy.</span>
+          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">For regulated finance: visibility and privacy are the rows that matter.</span>
         </div>
         <div
           style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
@@ -1572,7 +1605,7 @@ $ daml codegen ts &amp;&amp; daml codegen java
         style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent); vertical-align: middle; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">These are positions, not scriptures. They get re-litigated only with new evidence.</span>
+          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Open to revision when new evidence shows up.</span>
         </div>
         <div
           style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
@@ -1806,7 +1839,7 @@ template Subscription
         style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent); vertical-align: middle; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Multi-domain is a graduation, not a starting position.</span>
+          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Single-domain by default; multi-domain when a real flow forces it.</span>
         </div>
         <div
           style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
@@ -1919,7 +1952,7 @@ template Subscription
         style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent); vertical-align: middle; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Tokenization here is a workflow over rights, not a single mutable balance.</span>
+          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Tokenization here is a workflow over rights between named parties.</span>
         </div>
         <div
           style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
@@ -1963,7 +1996,7 @@ template Subscription
               style="background: rgba(36,36,36,0.78); border: 1px solid var(--hydrax-color-accent-soft); border-radius: 12px; padding: 18px 22px; flex: 1;">
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent); vertical-align: middle; flex-shrink: 0;"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
-                <span class="mono" style="font-size: 11px; color: var(--hydrax-color-accent); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;">8 backend services</span>
+                <span class="mono" style="font-size: 11px; color: var(--hydrax-color-accent); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;">9 backend services</span>
                 <span style="margin-left: auto; font-size: 11px; color: var(--hydrax-color-text-muted);">Go &middot; Node/TS</span>
               </div>
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
@@ -2039,7 +2072,7 @@ template Subscription
         style="position: absolute; top: 660px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent); vertical-align: middle; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Evidence the boundary holds, not a claim that the platform is finished.</span>
+          <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">What runs today; the platform is not finished.</span>
         </div>
         <div
           style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
@@ -2246,10 +2279,10 @@ template Subscription
     </div>
     <h1
       style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 50px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 10px 0; color: var(--hydrax-color-text-strong);">
-      Tokens are <span style="color: var(--hydrax-color-accent); font-weight: 700;">Daml templates</span>, not new primitives
+      Tokens as <span style="color: var(--hydrax-color-accent); font-weight: 700;">Daml templates</span>
     </h1>
     <p style="font-size: 17px; line-height: 1.4; color: var(--hydrax-color-text-muted); margin: 0; max-width: 1080px;">
-      The interesting design choice isn't the asset model. It's who is on the contract, what choices they can make, and what off-ledger systems own which fields.
+      The design question is who's on the contract, what choices they can make, and what off-ledger systems own which fields.
     </p>
   </div>
   <div data-object-type="graphic"
@@ -2285,8 +2318,8 @@ template Subscription
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           </div>
           <div>
-            <div style="font-size: 16px; font-weight: 700; color: var(--hydrax-color-text-strong);">v1 stance &mdash; honest deferrals</div>
-            <div style="font-size: 12px; color: var(--hydrax-color-accent);">what's intentionally not solved</div>
+            <div style="font-size: 16px; font-weight: 700; color: var(--hydrax-color-text-strong);">v1 stance &mdash; what's deferred</div>
+            <div style="font-size: 12px; color: var(--hydrax-color-accent);">scoped out, not solved yet</div>
           </div>
         </div>
         <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
@@ -2315,7 +2348,7 @@ template Subscription
     style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
     <div style="display: flex; align-items: center; gap: 8px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Composability moves up the stack: orchestration plane, not the asset itself.</span>
+      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Composability lives in the orchestration plane.</span>
     </div>
     <div
       style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
@@ -2440,7 +2473,7 @@ template Subscription
     </div>
     <h1
       style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 50px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 10px 0; color: var(--hydrax-color-text-strong);">
-      8 services, 5 portals, <span style="color: var(--hydrax-color-accent); font-weight: 700;">one Railway project</span>
+      9 services, 5 portals, <span style="color: var(--hydrax-color-accent); font-weight: 700;">one Railway project</span>
     </h1>
     <p style="font-size: 17px; line-height: 1.4; color: var(--hydrax-color-text-muted); margin: 0; max-width: 1080px;">
       Production topology is boring on purpose. Each binary is its own service, each portal is its own static site, observability is a single composite health roll-up.
@@ -2515,7 +2548,7 @@ template Subscription
     style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
     <div style="display: flex; align-items: center; gap: 8px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Boring infrastructure is the prerequisite for interesting product work.</span>
+      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Each binary, one service. Each portal, one static site. One composite health roll-up.</span>
     </div>
     <div
       style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">
@@ -2612,7 +2645,7 @@ template Subscription
     style="position: absolute; top: 670px; left: 60px; width: 1160px; height: 30px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
     <div style="display: flex; align-items: center; gap: 8px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent);"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">The ledger is the source of truth. The projection is the source of speed.</span>
+      <span style="font-size: 13px; color: var(--hydrax-color-text-muted);">Ledger holds truth; projections answer queries.</span>
     </div>
     <div
       style="font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace; font-size: 13px; color: var(--hydrax-color-text-muted);">

@@ -265,6 +265,34 @@
       align-items: center;
     }
 
+    .deck-home-link {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(36, 36, 36, 0.78);
+      border: 1px solid var(--hydrax-color-border);
+      font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', monospace;
+      font-size: 13px;
+      color: var(--hydrax-color-text-strong);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+    }
+
+    .deck-home-link:hover,
+    .deck-home-link:focus-visible {
+      border-color: var(--hydrax-color-accent);
+      color: var(--hydrax-color-accent);
+      background: var(--hydrax-color-accent-soft);
+      outline: none;
+    }
+
     .slide-nav b {
       color: var(--hydrax-color-accent);
       font-weight: 600;
@@ -368,7 +396,8 @@
     }
 
     @media print {
-      .slide-nav {
+      .slide-nav,
+      .deck-home-link {
         display: none;
       }
 
@@ -388,6 +417,10 @@
 </head>
 
 <body>
+  <a class="deck-home-link" href="/" aria-label="Back to context page">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    <span>Context</span>
+  </a>
   <div class="slide-nav" aria-label="Slide navigation">
     <button type="button" data-nav="prev" aria-label="Previous slide">&larr;</button>
     Slide <b id="slide-num">1</b> <small>/ 18</small>
@@ -1963,7 +1996,7 @@ template Subscription
               style="background: rgba(36,36,36,0.78); border: 1px solid var(--hydrax-color-accent-soft); border-radius: 12px; padding: 18px 22px; flex: 1;">
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--hydrax-color-accent); vertical-align: middle; flex-shrink: 0;"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
-                <span class="mono" style="font-size: 11px; color: var(--hydrax-color-accent); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;">8 backend services</span>
+                <span class="mono" style="font-size: 11px; color: var(--hydrax-color-accent); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;">9 backend services</span>
                 <span style="margin-left: auto; font-size: 11px; color: var(--hydrax-color-text-muted);">Go &middot; Node/TS</span>
               </div>
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
@@ -2440,7 +2473,7 @@ template Subscription
     </div>
     <h1
       style="font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif; font-size: 50px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 10px 0; color: var(--hydrax-color-text-strong);">
-      8 services, 5 portals, <span style="color: var(--hydrax-color-accent); font-weight: 700;">one Railway project</span>
+      9 services, 5 portals, <span style="color: var(--hydrax-color-accent); font-weight: 700;">one Railway project</span>
     </h1>
     <p style="font-size: 17px; line-height: 1.4; color: var(--hydrax-color-text-muted); margin: 0; max-width: 1080px;">
       Production topology is boring on purpose. Each binary is its own service, each portal is its own static site, observability is a single composite health roll-up.

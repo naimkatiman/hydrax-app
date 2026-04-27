@@ -8,7 +8,7 @@
   <meta name="description" content="Homework submission for HydraX. A written companion to the slide deck explaining how Canton works, how I would build above it, and the trade-offs that matter." />
   <meta name="author" content="Naim Katiman" />
   <meta property="og:title" content="Canton Network — and the layer above it" />
-  <meta property="og:description" content="Canton owns the rails. The interesting work is the layer above. A homework submission for HydraX." />
+  <meta property="og:description" content="Canton owns the rails. This is a take on the layer above. Homework submission for HydraX." />
   <meta property="og:type" content="article" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,7 +35,7 @@
 <header class="hero">
   <p class="hero-eyebrow">Homework / Interview Submission · April 2026</p>
   <h1>Canton Network<br />— and <span class="accent">the layer above it.</span></h1>
-  <p class="hero-lede">Canton owns the rails. The interesting work is the layer above — the workflow, identity, approval, audit, and operational fabric that turns a Daml contract into something an institution can actually run.</p>
+  <p class="hero-lede">Canton owns the rails. This is the layer above — workflow, identity, approval, audit, and integration that an institution actually operates.</p>
 
   <div class="hero-meta">
     <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Naim Katiman</span>
@@ -46,7 +46,7 @@
   <div class="hero-cta">
     <a href="/deck" class="btn btn-primary">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      View 9-Slide Deck
+      View 18-Slide Deck
     </a>
     <a href="https://hydrax-portals-production.up.railway.app/" target="_blank" rel="noopener" class="btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -60,7 +60,7 @@
 
   <div class="hero-status">
     <span class="status-pill"><span class="dot"></span>Live on Railway</span>
-    <span class="status-pill"><span class="dot"></span>5 Portals · 8 Services</span>
+    <span class="status-pill"><span class="dot"></span>5 Portals · 9 Services</span>
     <span class="status-pill amber"><span class="dot"></span>HydraX Rails · Mock-Adapter (deferred-not-resolved)</span>
   </div>
 </header>
@@ -73,7 +73,7 @@
   <div class="prose">
     <p>Canton is best understood not as a blockchain, but as a <strong>privacy-preserving synchronisation protocol for multi-party workflows in regulated markets</strong>. Public chains optimise for shared visibility and permissionless composition. Traditional permissioned DLT optimises for control but fragments interoperability. Canton sits in the gap: independent participants run their own nodes, hold only the contracts they are entitled to see, and coordinate state changes through synchronisers that order transactions <em>without seeing their contents</em>.</p>
 
-    <p>Three primitives are load-bearing. Get any of them wrong in your mental model and the rest of the architecture stops making sense.</p>
+    <p>Three primitives. The rest of the architecture follows from them.</p>
   </div>
 
   <div class="card-grid">
@@ -98,7 +98,7 @@
   </div>
 
   <div class="prose" style="margin-top: 32px;">
-    <p>The four-layer wiring (apps → participant nodes → synchronisers → ledger) is shown in <a href="/deck">slide 03 of the deck</a>. The point that earns the architecture is <strong>selective disclosure with global coordination</strong> — you get a shared truth without forcing every participant into a globally readable state.</p>
+    <p>The four-layer wiring (apps → participant nodes → synchronisers → ledger) is in <a href="/deck">slide 03</a>. The property: <strong>selective disclosure with global coordination</strong> — shared truth without globally readable state.</p>
   </div>
 
   <h3>How Canton differs</h3>
@@ -125,12 +125,12 @@
 <!-- ─── §2 Building on Canton ────────────────────────────────────────── -->
 <section class="section" id="building">
   <p class="section-eyebrow">02 · Building on Canton</p>
-  <h2>I didn't write about it. I built it.</h2>
+  <h2>What I built.</h2>
 
   <div class="prose">
-    <p>The brief's strongest signal: <em>don't write fluff about "secure APIs and best practices" — describe what you would actually build</em>. So I built it. The repo at <a href="https://github.com/naimkatiman/hydrax-app" target="_blank" rel="noopener">naimkatiman/hydrax-app</a> is the answer to "Building on Canton" expressed as code, and the <a href="https://hydrax-portals-production.up.railway.app/" target="_blank" rel="noopener">live app</a> is the proof.</p>
+    <p>The brief asked for a description of what to build, not generic platform copy. The repo at <a href="https://github.com/naimkatiman/hydrax-app" target="_blank" rel="noopener">naimkatiman/hydrax-app</a> is the implementation; the <a href="https://hydrax-portals-production.up.railway.app/" target="_blank" rel="noopener">live app</a> is the running surface.</p>
 
-    <p>The premise: institutions don't need another ledger primitive — they need the <strong>workflow, identity, approval, audit, notification, and integration layer</strong> that turns a Daml contract into something an issuer, distributor, custodian, ops team, and investor can actually operate. HydraX has the rails (tokenisation, custody, trading, regulatory licences in MY/SG); the unmet need is the operational platform above them.</p>
+    <p>The premise: institutions need the <strong>workflow, identity, approval, audit, notification, and integration layer</strong> above the ledger — what an issuer, distributor, custodian, ops team, and investor each operate. HydraX has the rails (tokenisation, custody, trading, regulatory licences in MY/SG); this is the operational platform above them.</p>
   </div>
 
   <h3>Three planes above the rails</h3>
@@ -144,25 +144,25 @@
     <div class="card">
       <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
       <p class="card-num">Plane 02 · Orchestration</p>
-      <h4>8 Backend Services</h4>
-      <p>5 Go services (workflow, approval, audit, hydrax-adapter, canton-adapter) and 3 Node services (notify, integrate, BFF). Stable ports 7001–7005 + 7101–7103, each with `/healthz` + tests + Dockerfile.</p>
+      <h4>9 Backend Services</h4>
+      <p>6 Go services (workflow, approval, audit, hydrax-adapter, canton-adapter, market-data) and 3 Node services (notify, integrate, BFF). Stable ports 7001–7006 + 7101–7103, each with `/healthz` + tests + Dockerfile.</p>
     </div>
     <div class="card">
       <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
       <p class="card-num">Plane 03 · Rails</p>
       <h4>HydraX + Canton Adapters</h4>
-      <p>The only path the browser ever takes to the ledger. Today the HydraX adapter is mocked behind a stable interface — a deliberate deferral until HydraX shares the API surface.</p>
+      <p>The only path the browser takes to the ledger. The HydraX adapter is mocked behind a stable interface until HydraX shares the API surface.</p>
     </div>
   </div>
 
-  <h3>Five practical assumptions baked into the design</h3>
+  <h3>Five assumptions in the design</h3>
   <div class="prose">
     <ol>
-      <li><strong>Single-synchroniser to start.</strong> Multi-domain Canton is real complexity for a real benefit. We don't pay it until a tenant actually needs cross-domain composition.</li>
-      <li><strong>Web2 owns identity, UI, documents, notifications, reporting.</strong> Web3 owns shared truth and controlled state transitions. The boundary is non-negotiable — see <a href="/deck">slide 04 ("Where Canton stops")</a>.</li>
+      <li><strong>Single-synchroniser to start.</strong> Multi-domain Canton is real complexity for a real benefit; deferred until a tenant needs cross-domain composition.</li>
+      <li><strong>Web2 owns identity, UI, documents, notifications, reporting.</strong> Web3 owns shared truth and controlled state transitions. See <a href="/deck">slide 04 ("Where Canton stops")</a> for the boundary.</li>
       <li><strong>Browser never touches Daml directly.</strong> All ledger I/O routes through Go adapters with audit on the way in and event-stream projections on the way out.</li>
-      <li><strong>Tenant isolation and role-based disclosure from day one</strong>, not retrofitted. The portal shells are role-aware shells, not the same SPA with feature flags.</li>
-      <li><strong>First wedge is narrow on purpose:</strong> institutional onboarding + product issuance + subscription servicing. Not secondary market, not portfolio analytics, not a generalised workflow engine.</li>
+      <li><strong>Tenant isolation and role-based disclosure from day one</strong>, not retrofitted. Each portal is its own role-scoped shell, not the same SPA with feature flags.</li>
+      <li><strong>First wedge is narrow:</strong> institutional onboarding + product issuance + subscription servicing. Not secondary market, not portfolio analytics, not a generalised workflow engine.</li>
     </ol>
   </div>
 </section>
@@ -170,33 +170,33 @@
 <!-- ─── §3 Three Deep Dives ──────────────────────────────────────────── -->
 <section class="section" id="deep-dives">
   <p class="section-eyebrow">03 · Technical Deep Dive</p>
-  <h2>Three areas I care about — sharply.</h2>
+  <h2>Three areas to dig into.</h2>
 
   <h3>A. Privacy ↔ composability trade-off</h3>
   <div class="prose">
-    <p><a href="/deck">Slide 04</a> is the core tension. Public chains get composability <em>because</em> state is globally readable; that exact property is what disqualifies them for regulated workflows. Canton's contract-level privacy means a custodian doesn't see a competing custodian's positions even on the same domain — but it also means <strong>you cannot compose blindly</strong>. Cross-contract logic requires every relevant party to be a stakeholder on every relevant contract, or it doesn't see them. That's a feature for compliance and a constraint for builders.</p>
-    <p>The implication for application design: <strong>composability moves from the ledger to the orchestration plane</strong>. The workflow service knows which parties to bring onto a contract at issuance time so the right downstream choices are even possible. Get this wrong at modelling time and no amount of UI work fixes it.</p>
+    <p><a href="/deck">Slide 04</a> is the core tension. Public chains get composability <em>because</em> state is globally readable; that property is what disqualifies them for regulated workflows. Canton's contract-level privacy means a custodian doesn't see a competing custodian's positions on the same domain — and it means <strong>you cannot compose blindly</strong>. Cross-contract logic requires every relevant party to be a stakeholder on every relevant contract. Feature for compliance, constraint for builders.</p>
+    <p>The implication: <strong>composability moves from the ledger to the orchestration plane</strong>. The workflow service has to bring the right parties onto a contract at issuance time so the downstream choices are possible. Get this wrong at modelling time and no UI work fixes it.</p>
   </div>
 
-  <h3>B. Workflow plane as a first-class system, not a wrapper</h3>
+  <h3>B. The workflow plane as its own system</h3>
   <div class="prose">
-    <p>The default mistake is treating "the app" as a thin wrapper around Daml choices. The reality is that 80% of institutional value lives in <strong>what surrounds the choice</strong>: who approved it, what evidence was attached, which SLA clock is running, what notification fired, what audit row was written.</p>
-    <p>This is why the orchestration plane has more services than the rails plane (workflow-svc, approval-svc, audit-svc, notify-svc, integration-svc, bff) and why I refused to fold them into one. Single-purpose services with their own state machines and `/healthz` endpoints make the operational story (debugging, scaling, tenant isolation) tractable. A monolith would have been faster to ship and impossible to operate at multi-tenant scale.</p>
+    <p>A common mistake is treating "the app" as a thin wrapper around Daml choices. 80% of institutional value lives in <strong>what surrounds the choice</strong>: who approved it, what evidence was attached, which SLA clock is running, what notification fired, what audit row was written.</p>
+    <p>That's why the orchestration plane has more services than the rails plane (workflow-svc, approval-svc, audit-svc, notify-svc, integration-svc, bff). Single-purpose services with their own state machines and `/healthz` endpoints keep debugging, scaling, and tenant isolation tractable. A monolith would have been faster to ship and harder to operate at multi-tenant scale.</p>
   </div>
 
   <h3>C. Smart contract lifecycle in regulated environments</h3>
   <div class="prose">
     <p>Daml upgrade paths are real, but the operational question is harder than the technical one. When entitlements change — a distributor loses a licence, a regulator's reporting party rotates — <em>what happens to in-flight contracts?</em></p>
-    <p>The honest answer: Daml gives you the upgrade primitive (interfaces, package versioning), but you still need (a) a deterministic projection of "what's in flight at cutover", (b) a migration plan per contract template, (c) a fallback for participants who haven't accepted the new package, (d) an audit trail that proves no economic state changed during the swap. We don't claim to have solved this — we've architected so the lifecycle decisions are isolated in the rails-plane adapters, where they belong.</p>
+    <p>Daml gives you the upgrade primitive (interfaces, package versioning), but you still need (a) a deterministic projection of "what's in flight at cutover", (b) a migration plan per contract template, (c) a fallback for participants who haven't accepted the new package, (d) an audit trail that proves no economic state changed during the swap. Not solved — but the lifecycle decisions are isolated in the rails-plane adapters, where they belong.</p>
   </div>
 </section>
 
 <!-- ─── §4 Deferrals ─────────────────────────────────────────────────── -->
 <section class="section" id="deferrals">
-  <p class="section-eyebrow">04 · Deliberate Deferrals</p>
-  <h2>What's not here, and why that's the answer.</h2>
+  <p class="section-eyebrow">04 · Deferrals</p>
+  <h2>What's deferred, and why.</h2>
   <div class="prose">
-    <p>An honest section. The strongest signal of engineering maturity is naming what you didn't build and why.</p>
+    <p>What's not built, and the reason for each.</p>
     <ul>
       <li><strong>Real HydraX rails integration.</strong> The adapter is mocked behind a stable interface, waiting on HydraX engagement to share the API surface. The workflow layer is not blocked by this.</li>
       <li><strong>Multi-domain Canton.</strong> Single-synchroniser default. Multi-domain when a tenant pays for the complexity.</li>
@@ -210,13 +210,13 @@
 <!-- ─── §5 Learning loop ─────────────────────────────────────────────── -->
 <section class="section" id="learning">
   <p class="section-eyebrow">05 · How I Built This Knowledge</p>
-  <h2>Approach mattered to the brief. Here was the loop.</h2>
+  <h2>How I built up the model.</h2>
   <div class="prose">
     <ol>
-      <li>Built the <strong>mental model from first principles</strong> (rails vs. layer above) before reading docs, so I had questions to <em>test</em> against the docs rather than just absorb.</li>
+      <li>Built the <strong>mental model from first principles</strong> (rails vs. layer above) before reading docs, so I had questions to test against the docs rather than absorb passively.</li>
       <li>Confirmed against Canton + Daml official documentation. Used Context7 MCP for current SDK references.</li>
       <li><strong>Mapped each Canton primitive to a real institutional workflow</strong> (subscription, approval chain, audit) before touching code.</li>
-      <li>Built the prototype to <strong>expose where the model gets uncomfortable</strong> — the deferrals above are exactly the friction points I hit.</li>
+      <li>Built the prototype to find where the model breaks — the deferrals above are the points I hit.</li>
       <li>Wrote the deck last. Drawing the system forced me to defend each box.</li>
     </ol>
   </div>
@@ -224,15 +224,15 @@
 
 <!-- ─── Appendix grid ────────────────────────────────────────────────── -->
 <section class="appendix" id="appendix">
-  <p class="section-eyebrow">Appendix · Everything else</p>
-  <h2 style="margin-top: 0;">Four ways in.</h2>
-  <p class="prose" style="margin-bottom: 0;">The cover argument lives above. Each artifact below is the long-form version of one section.</p>
+  <p class="section-eyebrow">Appendix</p>
+  <h2 style="margin-top: 0;">Artifacts.</h2>
+  <p class="prose" style="margin-bottom: 0;">Each one is the long form of a section above.</p>
 
   <div class="appendix-grid">
     <a href="/deck" class="appx-card">
       <p class="appx-num"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>Appendix A</p>
-      <h4>9-Slide Visual Deck</h4>
-      <p>Thesis, three primitives, wiring, the gap, three planes, end-to-end flow, status, trade-offs.</p>
+      <h4>18-Slide Homework Deck</h4>
+      <p>Three required sections plus four deep-dives — conceptual overview, building on Canton, technical deep dive, tokenization, composability, infra, data sync.</p>
       <span class="appx-cta">View deck →</span>
     </a>
 
@@ -253,7 +253,7 @@
     <a href="https://github.com/naimkatiman/hydrax-app" target="_blank" rel="noopener" class="appx-card">
       <p class="appx-num"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>Appendix D</p>
       <h4>Public Source Code</h4>
-      <p>8 services, 5 portals, PRD, plan docs, this site itself. The whole repo.</p>
+      <p>9 services, 5 portals, PRD, plan docs, this site itself. The whole repo.</p>
       <span class="appx-cta">View source →</span>
     </a>
   </div>
