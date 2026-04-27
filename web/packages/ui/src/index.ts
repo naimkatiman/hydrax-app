@@ -19,3 +19,4 @@ export { AuditTimeline } from "./AuditTimeline";
 export type { TimelineEvent } from "./AuditTimeline";
 export { PersonaSwitcher, DEFAULT_PERSONAS } from "./PersonaSwitcher";
 export type { Persona, PersonaId } from "./PersonaSwitcher";
+export { ComingSoonRoute } from "./ComingSoonRoute";
