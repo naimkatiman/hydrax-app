@@ -41,8 +41,8 @@ describe("loadCorsConfig", () => {
 
   it("trims surrounding whitespace from the configured origin", () => {
     expect(
-      loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: "  https://hydrax-portals-production.up.railway.app  " }),
-    ).toEqual({ allowedOrigin: "https://hydrax-portals-production.up.railway.app" });
+      loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: "  https://hydraxrail.up.railway.app  " }),
+    ).toEqual({ allowedOrigin: "https://hydraxrail.up.railway.app" });
   });
 });
 
@@ -55,9 +55,9 @@ describe("applyCorsHeaders", () => {
 
   it("sets Access-Control-Allow-Origin and Vary when CORS is enabled", () => {
     const f = fakeRes();
-    applyCorsHeaders(f.res, { allowedOrigin: "https://hydrax-portals-production.up.railway.app" });
+    applyCorsHeaders(f.res, { allowedOrigin: "https://hydraxrail.up.railway.app" });
     expect(f.headers).toEqual({
-      "Access-Control-Allow-Origin": "https://hydrax-portals-production.up.railway.app",
+      "Access-Control-Allow-Origin": "https://hydraxrail.up.railway.app",
       Vary: "Origin",
     });
   });
@@ -92,13 +92,13 @@ describe("handlePreflight", () => {
     const handled = handlePreflight(
       { method: "OPTIONS" } as http.IncomingMessage,
       f.res,
-      { allowedOrigin: "https://hydrax-portals-production.up.railway.app" },
+      { allowedOrigin: "https://hydraxrail.up.railway.app" },
     );
     expect(handled).toBe(true);
     expect(f.status).toBe(204);
     expect(f.ended).toBe(true);
     expect(f.headers).toEqual({
-      "Access-Control-Allow-Origin": "https://hydrax-portals-production.up.railway.app",
+      "Access-Control-Allow-Origin": "https://hydraxrail.up.railway.app",
       "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
       "Access-Control-Allow-Headers": "Authorization, Content-Type",
       "Access-Control-Max-Age": "600",
