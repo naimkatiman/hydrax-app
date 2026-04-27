@@ -287,22 +287,75 @@ No imagery. No decoration. Maximum confidence through restraint.
 
 ---
 
-## Phase 3 — Composite EDL (Edit Decision List)
+## Phase 3 — Composite EDL (Edit Decision List) — EXECUTED 2026-04-28
 
-For each segment, this lists: **what visual is on screen**, **how the talking head appears**, **transitions in/out**. Timestamps are anchored to the script's spoken-segment ladder; recompute against your trimmed runtime if you came in under 5:00.
+EDL re-derived against the **trimmed** transcript (`HydraX720-trimmed-transcript.txt`), not the aspirational 5:00 script ladder. Total runtime: **310.6 s = 5:10.6**. Slot durations sum exactly.
 
-| Time | Visual | Talking head | Transition |
-|---|---|---|---|
-| 00:00–00:30 | Frame 1 (title) | full-frame, centered | hard cut to next |
-| 00:30–01:00 | Frame 2 (trust boundary) | full-frame, centered | crossfade 0.3s on word "rails" |
-| 01:00–01:30 | Frame 3 (three assumptions) | bottom-right PiP at 25% width, 5% margin | each card highlights as you say "one", "two", "three" |
-| 01:30–01:55 | Frame 4a (architecture) | bottom-right PiP at 25% | hold |
-| 01:55–02:05 | Frame 4b (three URLs) | bottom-right PiP at 25% | crossfade 0.5s on word "live across three" |
-| 02:05–02:35 | Frame 4c (10s portal screen rec) | bottom-right PiP at 25% | crossfade in, hard cut out at end of clip |
-| 02:35–03:00 | Frame 4d (Canton 4-quadrant) | bottom-right PiP at 25% | each quadrant accent-bordered as you name it |
-| 03:00–04:00 | Frame 5 (wedge slide) | bottom-right PiP at 25% | hard cut on word "idea" at 03:00 |
-| 04:00–04:30 | Frame 6 (Q-grid) | bottom-right PiP at 25% | each Q-pill highlights as you mention it |
-| 04:30–05:00 | Frame 7 (close card) | full-frame, centered | hard cut at 04:30, hold to end |
+| # | Time (trimmed) | Duration | Visual | Spoken anchor (transcript line) |
+|---|---|---|---|---|
+| 1 | 00:00–00:25 | 25.0 s | frame-1 (title) | line 1 "Hey, I mean..." → line 5 "tonight then next month" |
+| 2 | 00:25–00:59 | 34.0 s | frame-2 (trust boundary) | line 6 "Here's the thing" → line 11 "the layer I built" |
+| 3 | 00:59–01:27 | 28.0 s | frame-3 (three assumptions) | line 12 "Three assumptions I'm making" → line 19 "reshape your answer" |
+| 4 | 01:27–01:35 | 8.0 s | frame-4b (three URLs banner) | line 21 "live across three railways service" → line 22 "Cantonese website and the slide decks" |
+| 5 | 01:35–02:50 | 75.0 s | frame-4a (architecture) | line 23 "Nine bags and service" → line 40 "approval, approval, replayable" |
+| 6 | 02:50–03:16 | 26.0 s | frame-4d (Canton 4-quadrant) | line 41 "Canton specific question, tokenization stands" → line 46 "no rewrite on the workflow stack" |
+| 7 | 03:16–04:28 | 72.0 s | frame-5 (wedge) | line 47 "So this is the business idea" → line 62 "not integration and decad" |
+| 8 | 04:28–04:50 | 22.0 s | frame-6 (Q-grid) | line 63 "For open question from the PRD" → line 70 "non-block shipping the stack" |
+| 9 | 04:50–05:10.6 | 20.6 s | frame-7 (close) | line 71 "These three things I want" → line 80 "grill me on that" |
+
+**4c (screen recording) is omitted from the auto-composite** — it's optional and the user records it from `hydraxrail.up.railway.app` on the editor box. To insert it, replace the `frame-4a → frame-4b → frame-4d` middle stretch with `frame-4b → frame-4a → screen-rec → frame-4d` and shift downstream timestamps.
+
+### Auto-composite produced
+
+```bash
+# Phase 3a — slideshow.mp4: 9 static slide clips chained, fade-in/out, 1920x1080, 30 fps
+~/.local/bin/ffmpeg -y -loop 1 -t 25   -i docs/demo/assets/slides/frame-1.jpg \
+                       -loop 1 -t 34   -i docs/demo/assets/slides/frame-2.jpg \
+                       -loop 1 -t 28   -i docs/demo/assets/slides/frame-3.jpg \
+                       -loop 1 -t 8    -i docs/demo/assets/slides/frame-4b.jpg \
+                       -loop 1 -t 75   -i docs/demo/assets/slides/frame-4a.jpg \
+                       -loop 1 -t 26   -i docs/demo/assets/slides/frame-4d.jpg \
+                       -loop 1 -t 72   -i docs/demo/assets/slides/frame-5.jpg \
+                       -loop 1 -t 22   -i docs/demo/assets/slides/frame-6.jpg \
+                       -loop 1 -t 20.6 -i docs/demo/assets/slides/frame-7.jpg \
+  -filter_complex "[concat each with scale=1920:1080:force_original_aspect_ratio=decrease,
+                   pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=#0b0d12,
+                   fade=t=in:st=0:d=0.5,
+                   fade=t=out:st=<dur-0.5>:d=0.5,
+                   format=yuv420p]" \
+  -c:v libx264 -crf 18 -preset fast -r 30 docs/demo/assets/slideshow.mp4
+
+# Phase 3b — composite slideshow + talking head as bottom-right PiP at 576x324 (~30% width)
+~/.local/bin/ffmpeg -y \
+  -i docs/demo/assets/slideshow.mp4 \
+  -i docs/demo/assets/HydraX720-trimmed.mp4 \
+  -filter_complex "[1:v]scale=576:324:force_original_aspect_ratio=decrease[pip];
+                   [0:v][pip]overlay=W-w-32:H-h-32:eval=init[outv]" \
+  -map "[outv]" -map "1:a" \
+  -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p -r 30 \
+  -c:a aac -b:a 192k -movflags +faststart \
+  docs/demo/assets/HydraX-pitch-final.mp4
+```
+
+### Hyperframes upgrade path (richer animation per slide)
+
+The auto-composite uses straight cuts with 0.5s fades. To get richer per-slide animation (animated typography, parallax, particle effects), feed each `docs/demo/assets/slides/frame-*.jpg` into Hyperframes with the directive below, then drop the resulting MP4s back over the slideshow track in DaVinci/CapCut:
+
+| Slide | Hyperframes animation directive |
+|---|---|
+| frame-1 (title) | Subtle 4–6 s fade-in on the heading "HydraX × Canton", then the underline rule extends left-to-right over 0.6 s, then subtitle and bottom caption fade in. Hold for the rest of the 25 s slot, no further movement. |
+| frame-2 (trust boundary) | Both boxes draw their borders left-to-right over 0.8 s. Left-box "Canton" label fades in at 1.0 s, right-box "HydraX" label fades in at 1.6 s. Arrow draws from left to right over 0.8 s starting at 2.5 s. Hold. |
+| frame-3 (3 assumptions) | Three cards fade in sequentially with 0.4 s stagger. Each card's icon then content reveals over 0.6 s. Bottom caption fades in last at 4 s. Subtle 1–2% slow zoom on the active card (could rotate which card is active over the 28 s slot, but since you don't switch beats here, hold all three equally). |
+| frame-4a (architecture) | Top row of 5 portal boxes fades in left-to-right over 1.5 s. Connection lines draw downward from portals to services over 1.0 s. Service boxes appear in two staggered groups (Go cluster, then Node cluster). Connection lines from services draw down to the data stores. Daml synchronizer box pulses 1× in warm stone at the end. Subtle 3–5% slow zoom into the canton-adapter → DAML edge. |
+| frame-4b (three URLs banner) | Globe icon spins in once over 0.8 s, URL types in monospace as if being typed (cursor effect, ~80 ms per character). Caption fades in. All three panels run simultaneously with 0.3 s stagger between them. Hold. |
+| frame-4d (Canton 4-quadrant) | Quadrants fade in clockwise starting from top-left (Q1) → top-right (Q2) → bottom-right (Q4) → bottom-left (Q3), 0.5 s stagger. Each quadrant's icon draws over 0.4 s. Bottom-right pointer caption "deep deck slides 14-17" fades in last. |
+| frame-5 (wedge) | "Short-duration credit" types in word by word over 1.5 s (or use kinetic typography flair). Subtitle fades in. Persona chips fade in with 0.3 s stagger. Pricing strip rows reveal top-to-bottom over 1.5 s. Hold. |
+| frame-6 (Q-grid) | All four cards fade in simultaneously. Each Q-tag, title, and pill reveal in sequence within each card (0.3 s stagger). Pills pulse once in their respective accent colors. Bottom caption fades in. |
+| frame-7 (close) | Flame icon fades in. Three close lines reveal sequentially with 0.6 s stagger. "Grill me." appears last with a subtle 1–2% scale-up bounce. Hold for the remaining 16 s — full impact. |
+
+For each, target ~5–7 s of animation at the start of the slot, then HOLD STATIC for the remainder. The talking-head VO is the load-bearing content; the b-roll's job is to land the visual frame and then get out of the way.
+
+### Caption pass
 
 ### Caption pass
 
