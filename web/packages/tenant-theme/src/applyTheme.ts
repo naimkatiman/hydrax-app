@@ -13,6 +13,7 @@ const TOKEN_TO_CSS_VAR: Record<keyof TenantThemeTokens, string> = {
   colorFocusRing: "--hydrax-color-focus-ring",
   colorDanger: "--hydrax-color-danger",
   colorSuccess: "--hydrax-color-success",
+  colorWarning: "--hydrax-color-warning",
 
   fontSans: "--hydrax-font-sans",
   fontMono: "--hydrax-font-mono",

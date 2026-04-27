@@ -17,6 +17,7 @@ export interface TenantThemeTokens {
   readonly colorFocusRing: string;
   readonly colorDanger: string;
   readonly colorSuccess: string;
+  readonly colorWarning: string;
 
   readonly fontSans: string;
   readonly fontMono: string;

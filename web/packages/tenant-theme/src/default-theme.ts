@@ -16,6 +16,7 @@ export const DEFAULT_TENANT_THEME: TenantTheme = {
     colorFocusRing: "hsla(30, 8%, 72%, 0.55)",
     colorDanger: "hsl(0, 72%, 58%)",
     colorSuccess: "hsl(140, 60%, 50%)",
+    colorWarning: "hsl(36, 86%, 44%)",
 
     fontSans:
       "-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif",

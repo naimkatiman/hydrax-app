@@ -30,9 +30,7 @@ function glyphForUpstream(s: UpstreamHealthStatus): StatusGlyph {
     return { icon: CheckCircle2, color: "var(--hydrax-color-success)", label: "ok" };
   }
   if (s === "unreachable") {
-    // FIXME(token): no warning/amber token in TenantThemeTokens yet.
-    // Add colorWarning to default-theme.ts + applyTheme.ts then swap.
-    return { icon: AlertCircle, color: "#d97706", label: "unreachable" };
+    return { icon: AlertCircle, color: "var(--hydrax-color-warning)", label: "unreachable" };
   }
   return { icon: XCircle, color: "var(--hydrax-color-danger)", label: "down" };
 }
@@ -42,7 +40,7 @@ function glyphForBff(s: CompositeHealthStatus): StatusGlyph {
     return { icon: CheckCircle2, color: "var(--hydrax-color-success)", label: "ok" };
   }
   if (s === "degraded") {
-    return { icon: AlertCircle, color: "#d97706", label: "degraded" };
+    return { icon: AlertCircle, color: "var(--hydrax-color-warning)", label: "degraded" };
   }
   return { icon: XCircle, color: "var(--hydrax-color-danger)", label: "down" };
 }
