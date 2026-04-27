@@ -94,8 +94,8 @@
 
 ## Live URL inventory (verified 2026-04-27)
 
-- **Institutional landing + 5 portals (production):** [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — use this for executive-facing demos.
-- **Canton homework cover + deck + script bundle:** [hydrax-context-production.up.railway.app](https://hydrax-context-production.up.railway.app/) — pairs with this script's narrative directly. Verified 2026-04-27 — `/`, `/deck`, `/script`, `/interview`, `/canton-interview` all 200 with their correct titles.
+- **Institutional landing + 5 portals (production):** [hydraxrail.up.railway.app](https://hydraxrail.up.railway.app/) — use this for executive-facing demos.
+- **Canton homework cover + deck + script bundle:** [hydrax-layer.up.railway.app](https://hydrax-layer.up.railway.app/) — pairs with this script's narrative directly. Verified 2026-04-27 — `/`, `/deck`, `/script`, `/interview`, `/canton-interview` all 200 with their correct titles.
 - **Bare original prototype:** [hydrax-prototype-production.up.railway.app](https://hydrax-prototype-production.up.railway.app/) — historical reference; `index.html` element ids in this script point at the same prototype source.
 
 ---

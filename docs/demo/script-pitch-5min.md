@@ -39,7 +39,7 @@
 
 ## Segment 4 — Proof: I Built It (01:30 → 03:00)
 
-**Visual cue:** architecture diagram (services + portals row), then a single 10-second screen-recorded clip of `hydrax-portals-production.up.railway.app` landing → portal grid
+**Visual cue:** architecture diagram (services + portals row), then a single 10-second screen-recorded clip of `hydraxrail.up.railway.app` landing → portal grid
 
 > Instead of just pitching, I built the thing. The repo is `hydrax-app`, live across three Railway services right now — portals, the Canton homework site, and the original prototype. Nine backend services — six Go for performance-critical workflow, approval, audit, market data, plus the HydraX and Canton adapters. Three Node services for notifications, integrations, and a BFF. Five role-aware portals — issuer, distributor, investor, ops, admin — running on baked demo-mode data so you can click around without a backend. Five Daml scripts modeling the multi-party governance contracts. Auth complete — passkeys, magic-link over real SMTP, the developer-only login removed before public exposure. One workflow end-to-end. An investor submits a subscription. Workflow service validates. Approval service opens the ceremony with an SLA timer. Notification service fans out. The approver clicks accept. The mocked HydraX adapter posts the issuance. The Canton adapter commits the Daml command on an in-memory synchronizer. Audit logs every state change. Every transition provable, attributable, replayable. And the Canton-specific questions — tokenization stance, DeFi composability under privacy, infrastructure setup, cross-domain data sync — each get a dedicated deck panel and a matching portal read-model. The HydraX-rails mock is a deliberate bet: when your real API surface drops, it slots in behind the same interface, no rewrite of the workflow stack.
 
@@ -76,8 +76,8 @@
 - **Timestamp ladder:** monotonic 00:00 → 00:30 → 01:00 → 01:30 → 03:00 → 04:00 → 04:30 → 05:00. Segment 4 (build proof) gets the largest 90-second slot — it's the load-bearing credibility segment.
 - **Codebase claims (verified against current repo, 2026-04-27 PM refresh):** 9 backend services (6 Go + 3 Node — `find services -maxdepth 2 -name 'cmd' -o -name 'package.json'` confirms 6 Go cmd dirs + 3 Node package.jsons), 5 React portals running on baked `VITE_DEMO_MODE=true` synthetic data (commit `1938166`), 5 Daml scripts in `services/canton-adapter/daml/hydrax-governance/daml/Test/GovernanceScript.daml` — `testHappyPath`, `testUnauthorizedApprover`, `testDoubleApproval`, `testRejectBlocksExecute`, `testInterfaceView`, auth complete through slice 2e (passkeys + magic-link over SMTP + AUTH_DEV_LOGIN removed), HydraX-rails mock covers issue/subscribe/transfer-custody/settle/NAV, Canton adapter ships in-memory Daml ledger, Q3 credit FSM wired in workflow-svc, Q7 hybrid pricing decision memo in repo, 18-slide canton-homework-deck.html (slides 0-17) covering the 4 Canton deep-dive topics referenced in Segment 4. All grounded against project CLAUDE.md "Decisions (Recent)" entries dated 2026-04-25 through 2026-04-27.
 - **Public URL claims:** "live across three Railway services" refers to all three production deployments, all verified live 2026-04-27 PM:
-  - [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — institutional landing + 5 portals + /pricing + /docs + /quickstart
-  - [hydrax-context-production.up.railway.app](https://hydrax-context-production.up.railway.app/) — Canton homework cover + /deck (18 slides) + /script (this file's mirror at `docs/demo/site/script.html`) + /interview
+  - [hydraxrail.up.railway.app](https://hydraxrail.up.railway.app/) — institutional landing + 5 portals + /pricing + /docs + /quickstart
+  - [hydrax-layer.up.railway.app](https://hydrax-layer.up.railway.app/) — Canton homework cover + /deck (18 slides) + /script (this file's mirror at `docs/demo/site/script.html`) + /interview
   - [hydrax-prototype-production.up.railway.app](https://hydrax-prototype-production.up.railway.app/) — bare original operator-console prototype, source matches `index.html`
 - **Tone audit:** confidence markers — owns the diagnosis ("what I think your adoption bottleneck is"), names verifiable build artifacts, closes with "grill me." Humility markers — "any of them could be wrong," "tell me which breaks," "I'd rather find out tonight than next month," "that gap is where I'm flying blind." Build-proof markers — every claim in Segment 4 is grep-verifiable in the repo.
 
@@ -106,7 +106,7 @@ For each segment's `Visual cue`, generate one or two frames:
 | 3 | three vertical cards, labels "assumption 1", "assumption 2", "assumption 3", each with one-line content from the segment |
 | 4a | architecture diagram — 6 Go service boxes + 3 Node service boxes in a row, 5 portal boxes above, Postgres + Mongo + Daml below |
 | 4b | three-URL banner — institutional portals, Canton homework site, prototype — each with a small status pill |
-| 4c | (insert here) 10-second screen recording of `hydrax-portals-production.up.railway.app` landing → click into one portal → click a workflow lane (cursor-magnified) |
+| 4c | (insert here) 10-second screen recording of `hydraxrail.up.railway.app` landing → click into one portal → click a workflow lane (cursor-magnified) |
 | 4d | four-quadrant Canton-deep-dive panel — Tokenization · DeFi composability under privacy · Infra & ops setup · Cross-domain data sync — synced to spoken delivery of those four bullets |
 | 5 | wedge slide — large "Short-duration credit · Tenant-led · White-label" with three persona chips |
 | 6 | 2×2 grid Q1 / Q3 / Q4 / Q7 with one-word status pills |

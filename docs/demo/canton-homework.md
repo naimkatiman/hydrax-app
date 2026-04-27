@@ -4,7 +4,7 @@
 
 > Canton owns the rails. The interesting work is the layer above.
 
-**Live:** https://hydrax-context-production.up.railway.app — single-URL presentation: cover article + 14-slide homework deck + 5-minute script + live multi-portal demo + public source.
+**Live:** https://hydrax-layer.up.railway.app — single-URL presentation: cover article + 14-slide homework deck + 5-minute script + live multi-portal demo + public source.
 
 This is a single-page index for the homework. The substantive material lives in three artifacts and a working prototype:
 

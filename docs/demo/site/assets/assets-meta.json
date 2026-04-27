@@ -2,7 +2,7 @@
   "$comment": "Provenance for generated images consumed by docs/demo/canton-interview.html. Generated via /nano-banana skill (OpenRouter, google/gemini-3.1-flash-image-preview).",
   "generated_at": "2026-04-26",
   "model": "google/gemini-3.1-flash-image-preview",
-  "palette_source": "https://hydrax-portals-production.up.railway.app/styles.css (--hx-bg #141414, --hx-bg-elevated #242424, --hx-ink #F5F5F5, --hx-accent hsl(30,8%,78%) #CDC8C2)",
+  "palette_source": "https://hydraxrail.up.railway.app/styles.css (--hx-bg #141414, --hx-bg-elevated #242424, --hx-ink #F5F5F5, --hx-accent hsl(30,8%,78%) #CDC8C2)",
   "assets": [
     {
       "file": "deck-bg.jpg",

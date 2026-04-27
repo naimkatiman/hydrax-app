@@ -9,8 +9,8 @@
 
 **Live production URLs (verified 2026-04-27):**
 
-- **Executive demos use this:** [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) — institutional landing + 5 role portals. The polished face of the product. If the audience is a stakeholder, distributor, or investor, record against this URL.
-- **Canton-narrative paired site:** [hydrax-context-production.up.railway.app](https://hydrax-context-production.up.railway.app/) — cover article + deck + script. Verified 2026-04-27 — all four routes (`/`, `/deck`, `/script`, `/interview`) serve their correct titles.
+- **Executive demos use this:** [hydraxrail.up.railway.app](https://hydraxrail.up.railway.app/) — institutional landing + 5 role portals. The polished face of the product. If the audience is a stakeholder, distributor, or investor, record against this URL.
+- **Canton-narrative paired site:** [hydrax-layer.up.railway.app](https://hydrax-layer.up.railway.app/) — cover article + deck + script. Verified 2026-04-27 — all four routes (`/`, `/deck`, `/script`, `/interview`) serve their correct titles.
 - **Bare prototype:** [hydrax-prototype-production.up.railway.app](https://hydrax-prototype-production.up.railway.app/) — historical reference; this is the URL whose source matches `../../index.html`. Use for the operator-console walkthrough segments below if you want to record against the deployed copy instead of localhost.
 
 **Recording setup:**

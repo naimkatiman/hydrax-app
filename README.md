@@ -12,9 +12,9 @@ Three deployed surfaces, each with one job. Cross-linked top-nav + footer keep t
 
 | Surface | URL | What it is |
 |---|---|---|
-| Multi-portal demo | [hydrax-portals-production.up.railway.app](https://hydrax-portals-production.up.railway.app/) | Institutional-grade marketing landing routing into five role-scoped React portals. Built in **demo mode** — synthetic fixtures (3 institutional products, audit events, approvals) ship in the bundle; mutations don't round-trip. See `docs/demo/AUDIT-2026-04-27.md` for why. |
-| Architecture write-up | [hydrax-context-production.up.railway.app](https://hydrax-context-production.up.railway.app/) | Long-form companion to the deck — Canton primer, "what I built above the rails", three deep dives, deliberate deferrals. |
-| Slide deck | [hydrax-context-production.up.railway.app/deck](https://hydrax-context-production.up.railway.app/deck) | 18-slide homework deck. Three required sections (overview / building / deep dive) + four deep-dives + cover/close. Keyboard-navigable; `← Context` link returns to the write-up. |
+| Multi-portal demo | [hydraxrail.up.railway.app](https://hydraxrail.up.railway.app/) | Institutional-grade marketing landing routing into five role-scoped React portals. Built in **demo mode** — synthetic fixtures (3 institutional products, audit events, approvals) ship in the bundle; mutations don't round-trip. See `docs/demo/AUDIT-2026-04-27.md` for why. |
+| Architecture write-up | [hydrax-layer.up.railway.app](https://hydrax-layer.up.railway.app/) | Long-form companion to the deck — Canton primer, "what I built above the rails", three deep dives, deliberate deferrals. |
+| Slide deck | [hydrax-layer.up.railway.app/deck](https://hydrax-layer.up.railway.app/deck) | 18-slide homework deck. Three required sections (overview / building / deep dive) + four deep-dives + cover/close. Keyboard-navigable; `← Context` link returns to the write-up. |
 
 ![HydraX landing page](docs/demo/captures/landing.png)
 
@@ -167,7 +167,7 @@ Two slide decks live in this repo. Both are single-file HTML, keyboard-navigable
 
 ### Primary — homework-aligned deck (18 slides)
 
-[docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) — structured directly around the homework's three required sections plus four deep-dives. Deployed at [hydrax-context-production.up.railway.app/deck](https://hydrax-context-production.up.railway.app/deck). Pairs with the long-form article [docs/demo/canton-homework.md](docs/demo/canton-homework.md). A fixed `← Context` link in the chrome returns to the write-up.
+[docs/demo/canton-homework-deck.html](docs/demo/canton-homework-deck.html) — structured directly around the homework's three required sections plus four deep-dives. Deployed at [hydrax-layer.up.railway.app/deck](https://hydrax-layer.up.railway.app/deck). Pairs with the long-form article [docs/demo/canton-homework.md](docs/demo/canton-homework.md). A fixed `← Context` link in the chrome returns to the write-up.
 
 | # | Section | Title | Slide |
 |---|---|---|---|
