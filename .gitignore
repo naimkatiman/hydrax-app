@@ -1,9 +1,24 @@
 node_modules/
 npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+
 .DS_Store
+Thumbs.db
+*.swp
+*~
+
 .env
 .env.local
 .env.*.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.iml
 
 # Go
 bin/
@@ -12,6 +27,27 @@ bin/
 
 # TypeScript / Node services
 dist/
+build/
 *.tsbuildinfo
 .vite/
+.turbo/
+.next/
 coverage/
+*.log
+
+# Source maps in deployed bundles (rebuild artifacts)
+web/portal-deploy/**/*.map
+
+# Heavy media — host externally, never in git
+# (GitHub hard-rejects single files >100 MB)
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.aac
+*.ogg
