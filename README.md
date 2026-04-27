@@ -72,7 +72,7 @@ hydrax-app/
   web/
     apps/                            5 role-scoped React portals
       issuer-portal, distributor-portal, investor-portal, ops-console, admin
-    packages/                        shared UI, tenant-theme, api-client
+    packages/                        shared UI, tenant-theme, api-client, auth-ui (passkey + magic-link session helpers)
   db/
     postgres/migrations/             schema for v1
   docs/
@@ -101,6 +101,7 @@ hydrax-app/
 | Cross-service wires | bff ↔ workflow-svc (products, subscriptions), bff ↔ audit-svc, bff ↔ approval-svc, bff ↔ market-data-svc, workflow-svc ↔ hydrax-adapter (issue) |
 | Portals | 5 with polished baselines (sidebar + topbar + stat tiles + EmptyState + hero JPEG) |
 | Postgres-backed | workflow-svc products, audit-svc events |
+| Auth substrate | Passwordless only — passkey (WebAuthn) + magic-link with real SMTP transport; `AUTH_DEV_LOGIN` removed (slices 2a–2e landed 2026-04-27) |
 | Daml spike | `hydrax-governance` package — `daml build` green, 5 Scripts green on `--ide-ledger` |
 | HydraX rails | mocked behind `MockRails` in `hydrax-adapter` per [PRD-v2 §14 Q1](docs/prd-v2.md) deferral |
 | Canton synchronizer | Daml runs on `--ide-ledger` only; real synchronizer deferred |
