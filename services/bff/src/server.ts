@@ -621,7 +621,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
       return;
     }
 
-    if (req.url === "/healthz") {
+    if (req.url === "/" || req.url === "/healthz") {
       respondJson(res, 200, { service: opts.service, status: "ok" });
       return;
     }
