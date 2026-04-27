@@ -3,7 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
-import { AppShell } from "@hydrax/ui";
+import { AppShell, ComingSoonRoute } from "@hydrax/ui";
 import { OpsSidebar, OpsBrand } from "./components/OpsSidebar";
 import { OpsTopBar } from "./components/OpsTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
@@ -28,6 +28,7 @@ function ShellContents() {
         <Route path="/" element={<HomeRoute />} />
         <Route path="/audit" element={<AuditRoute />} />
         <Route path="/health" element={<HealthRoute />} />
+        <Route path="*" element={<ComingSoonRoute />} />
       </Routes>
     </AppShell>
   );

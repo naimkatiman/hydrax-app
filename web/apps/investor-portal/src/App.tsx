@@ -3,7 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { hydraxApi } from "@hydrax/api-client";
 import { ThemeProvider, DEFAULT_TENANT_THEME } from "@hydrax/tenant-theme";
-import { AppShell } from "@hydrax/ui";
+import { AppShell, ComingSoonRoute } from "@hydrax/ui";
 import { InvestorSidebar, InvestorBrand } from "./components/InvestorSidebar";
 import { InvestorTopBar } from "./components/InvestorTopBar";
 import { HomeRoute } from "./routes/HomeRoute";
@@ -36,6 +36,7 @@ function ShellContents() {
         <Route path="/products/:id" element={<ProductDetailRoute />} />
         <Route path="/subscribe" element={<SubscribeRoute />} />
         <Route path="/subscriptions/:id" element={<SubscriptionDetailRoute />} />
+        <Route path="*" element={<ComingSoonRoute />} />
       </Routes>
     </AppShell>
   );
