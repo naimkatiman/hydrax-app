@@ -12,7 +12,7 @@ Three deployed surfaces, each with one job. Cross-linked top-nav + footer keep t
 
 | Surface | URL | What it is |
 |---|---|---|
-| Multi-portal demo | [hydraxrail.up.railway.app](https://hydraxrail.up.railway.app/) | Institutional-grade marketing landing routing into five role-scoped React portals. Built in **demo mode** — synthetic fixtures (3 institutional products, audit events, approvals) ship in the bundle; mutations don't round-trip. See `docs/demo/AUDIT-2026-04-27.md` for why. |
+| Multi-portal demo | [hydraxrail.com](https://hydraxrail.com/) | Institutional-grade marketing landing routing into five role-scoped React portals. Built in **demo mode** — synthetic fixtures (3 institutional products, audit events, approvals) ship in the bundle; mutations don't round-trip. See `docs/demo/AUDIT-2026-04-27.md` for why. Same surface remains reachable at `hydraxrail.up.railway.app` during the cutover window. |
 | Architecture write-up | [hydrax-layer.up.railway.app](https://hydrax-layer.up.railway.app/) | Long-form companion to the deck — Canton primer, "what I built above the rails", three deep dives, deliberate deferrals. |
 | Slide deck | [hydrax-layer.up.railway.app/deck](https://hydrax-layer.up.railway.app/deck) | 18-slide homework deck. Three required sections (overview / building / deep dive) + four deep-dives + cover/close. Keyboard-navigable; `← Context` link returns to the write-up. |
 

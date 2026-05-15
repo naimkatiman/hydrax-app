@@ -303,7 +303,7 @@ EDL re-derived against the **trimmed** transcript (`HydraX720-trimmed-transcript
 | 8 | 04:28–04:50 | 22.0 s | frame-6 (Q-grid) | line 63 "For open question from the PRD" → line 70 "non-block shipping the stack" |
 | 9 | 04:50–05:10.6 | 20.6 s | frame-7 (close) | line 71 "These three things I want" → line 80 "grill me on that" |
 
-**4c (screen recording) is omitted from the auto-composite** — it's optional and the user records it from `hydraxrail.up.railway.app` on the editor box. To insert it, replace the `frame-4a → frame-4b → frame-4d` middle stretch with `frame-4b → frame-4a → screen-rec → frame-4d` and shift downstream timestamps.
+**4c (screen recording) is omitted from the auto-composite** — it's optional and the user records it from `hydraxrail.com` on the editor box. To insert it, replace the `frame-4a → frame-4b → frame-4d` middle stretch with `frame-4b → frame-4a → screen-rec → frame-4d` and shift downstream timestamps.
 
 ### Auto-composite produced
 
