@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import type http from "node:http";
-import { loadCorsConfig, applyCorsHeaders, handlePreflight } from "./cors.js";
+import { loadCorsConfig, applyCorsHeaders, handlePreflight, pickAllowedOrigin } from "./cors.js";
 
 function fakeRes() {
   const headers: Record<string, string> = {};
@@ -29,33 +29,110 @@ function fakeRes() {
   };
 }
 
+function reqWithOrigin(origin?: string, method: string = "GET"): http.IncomingMessage {
+  return { method, headers: origin ? { origin } : {} } as unknown as http.IncomingMessage;
+}
+
 describe("loadCorsConfig", () => {
-  it("returns null origin when env var unset", () => {
-    expect(loadCorsConfig({})).toEqual({ allowedOrigin: null });
+  it("returns empty allowlist when env var unset", () => {
+    expect(loadCorsConfig({})).toEqual({ allowedOrigins: [] });
   });
 
-  it("returns null origin when env var is empty/whitespace", () => {
-    expect(loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: "" })).toEqual({ allowedOrigin: null });
-    expect(loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: "   " })).toEqual({ allowedOrigin: null });
+  it("returns empty allowlist when env var is empty/whitespace", () => {
+    expect(loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: "" })).toEqual({ allowedOrigins: [] });
+    expect(loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: "   " })).toEqual({ allowedOrigins: [] });
+    expect(loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: " , , " })).toEqual({ allowedOrigins: [] });
   });
 
-  it("trims surrounding whitespace from the configured origin", () => {
+  it("parses a single origin (backward compat with the original loader)", () => {
     expect(
       loadCorsConfig({ BFF_CORS_ALLOWED_ORIGIN: "  https://hydraxrail.up.railway.app  " }),
-    ).toEqual({ allowedOrigin: "https://hydraxrail.up.railway.app" });
+    ).toEqual({ allowedOrigins: ["https://hydraxrail.up.railway.app"] });
+  });
+
+  it("parses a comma-separated allowlist with whitespace trimmed per entry", () => {
+    expect(
+      loadCorsConfig({
+        BFF_CORS_ALLOWED_ORIGIN: " https://hydraxrail.com , https://hydraxrail.up.railway.app ",
+      }),
+    ).toEqual({
+      allowedOrigins: ["https://hydraxrail.com", "https://hydraxrail.up.railway.app"],
+    });
+  });
+
+  it("discards empty entries between commas", () => {
+    expect(
+      loadCorsConfig({
+        BFF_CORS_ALLOWED_ORIGIN: "https://hydraxrail.com,,https://hydraxrail.up.railway.app,",
+      }),
+    ).toEqual({
+      allowedOrigins: ["https://hydraxrail.com", "https://hydraxrail.up.railway.app"],
+    });
+  });
+});
+
+describe("pickAllowedOrigin", () => {
+  const config = {
+    allowedOrigins: ["https://hydraxrail.com", "https://hydraxrail.up.railway.app"],
+  };
+
+  it("returns null when allowlist is empty", () => {
+    expect(pickAllowedOrigin(reqWithOrigin("https://hydraxrail.com"), { allowedOrigins: [] })).toBeNull();
+  });
+
+  it("returns null when request has no Origin header", () => {
+    expect(pickAllowedOrigin(reqWithOrigin(), config)).toBeNull();
+  });
+
+  it("returns the matched origin when listed", () => {
+    expect(pickAllowedOrigin(reqWithOrigin("https://hydraxrail.com"), config)).toBe(
+      "https://hydraxrail.com",
+    );
+    expect(
+      pickAllowedOrigin(reqWithOrigin("https://hydraxrail.up.railway.app"), config),
+    ).toBe("https://hydraxrail.up.railway.app");
+  });
+
+  it("returns null for an unlisted origin", () => {
+    expect(pickAllowedOrigin(reqWithOrigin("https://attacker.example"), config)).toBeNull();
+  });
+
+  it("is case-sensitive on the origin value (spec-compliant opaque-string compare)", () => {
+    expect(pickAllowedOrigin(reqWithOrigin("https://HYDRAXRAIL.COM"), config)).toBeNull();
   });
 });
 
 describe("applyCorsHeaders", () => {
   it("is a no-op when CORS is disabled", () => {
     const f = fakeRes();
-    applyCorsHeaders(f.res, { allowedOrigin: null });
+    applyCorsHeaders(reqWithOrigin("https://hydraxrail.com"), f.res, { allowedOrigins: [] });
     expect(f.headers).toEqual({});
   });
 
-  it("sets Access-Control-Allow-Origin and Vary when CORS is enabled", () => {
+  it("is a no-op when the inbound Origin is not on the allowlist", () => {
     const f = fakeRes();
-    applyCorsHeaders(f.res, { allowedOrigin: "https://hydraxrail.up.railway.app" });
+    applyCorsHeaders(reqWithOrigin("https://attacker.example"), f.res, {
+      allowedOrigins: ["https://hydraxrail.com"],
+    });
+    expect(f.headers).toEqual({});
+  });
+
+  it("echoes only the matched origin (never wildcards) when the inbound Origin is allowed", () => {
+    const f = fakeRes();
+    applyCorsHeaders(reqWithOrigin("https://hydraxrail.com"), f.res, {
+      allowedOrigins: ["https://hydraxrail.com", "https://hydraxrail.up.railway.app"],
+    });
+    expect(f.headers).toEqual({
+      "Access-Control-Allow-Origin": "https://hydraxrail.com",
+      Vary: "Origin",
+    });
+  });
+
+  it("echoes the legacy Railway origin when the request comes from there (cutover safety)", () => {
+    const f = fakeRes();
+    applyCorsHeaders(reqWithOrigin("https://hydraxrail.up.railway.app"), f.res, {
+      allowedOrigins: ["https://hydraxrail.com", "https://hydraxrail.up.railway.app"],
+    });
     expect(f.headers).toEqual({
       "Access-Control-Allow-Origin": "https://hydraxrail.up.railway.app",
       Vary: "Origin",
@@ -67,9 +144,9 @@ describe("handlePreflight", () => {
   it("returns false and does not write when method is not OPTIONS", () => {
     const f = fakeRes();
     const handled = handlePreflight(
-      { method: "GET" } as http.IncomingMessage,
+      reqWithOrigin("https://hydraxrail.com", "GET"),
       f.res,
-      { allowedOrigin: "https://example.com" },
+      { allowedOrigins: ["https://hydraxrail.com"] },
     );
     expect(handled).toBe(false);
     expect(f.status).toBeNull();
@@ -79,26 +156,43 @@ describe("handlePreflight", () => {
   it("returns false when CORS is disabled, even on OPTIONS", () => {
     const f = fakeRes();
     const handled = handlePreflight(
-      { method: "OPTIONS" } as http.IncomingMessage,
+      reqWithOrigin("https://hydraxrail.com", "OPTIONS"),
       f.res,
-      { allowedOrigin: null },
+      { allowedOrigins: [] },
     );
     expect(handled).toBe(false);
     expect(f.status).toBeNull();
   });
 
-  it("writes 204 with full CORS preflight headers on OPTIONS when enabled", () => {
+  it("writes 204 with full preflight headers + matched origin when the origin is allowed", () => {
     const f = fakeRes();
     const handled = handlePreflight(
-      { method: "OPTIONS" } as http.IncomingMessage,
+      reqWithOrigin("https://hydraxrail.com", "OPTIONS"),
       f.res,
-      { allowedOrigin: "https://hydraxrail.up.railway.app" },
+      { allowedOrigins: ["https://hydraxrail.com", "https://hydraxrail.up.railway.app"] },
     );
     expect(handled).toBe(true);
     expect(f.status).toBe(204);
     expect(f.ended).toBe(true);
     expect(f.headers).toEqual({
-      "Access-Control-Allow-Origin": "https://hydraxrail.up.railway.app",
+      "Access-Control-Allow-Origin": "https://hydraxrail.com",
+      "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type",
+      "Access-Control-Max-Age": "600",
+      Vary: "Origin",
+    });
+  });
+
+  it("writes 204 WITHOUT Allow-Origin when the origin is foreign — browser will reject the actual request", () => {
+    const f = fakeRes();
+    const handled = handlePreflight(
+      reqWithOrigin("https://attacker.example", "OPTIONS"),
+      f.res,
+      { allowedOrigins: ["https://hydraxrail.com"] },
+    );
+    expect(handled).toBe(true);
+    expect(f.status).toBe(204);
+    expect(f.headers).toEqual({
       "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
       "Access-Control-Allow-Headers": "Authorization, Content-Type",
       "Access-Control-Max-Age": "600",

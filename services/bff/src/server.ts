@@ -50,7 +50,7 @@ export function startServer(opts: StartOptions): Promise<StartResult> {
   const corsConfig = loadCorsConfig(process.env);
 
   const server = http.createServer(async (req, res) => {
-    applyCorsHeaders(res, corsConfig);
+    applyCorsHeaders(req, res, corsConfig);
     if (handlePreflight(req, res, corsConfig)) return;
 
     // ── Auth routes (unprotected) ───────────────────────────────────────────
